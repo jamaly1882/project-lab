@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>نظام المساحة الالكتروني</title>
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
+</head>
+<body>
+
+<div class="templatemo-flex-row">
+    <!-- Sidebar -->
+    <div class="templatemo-sidebar">
+        <header class="templatemo-site-header">
+            <div class="square"></div>
+              <h1> منسق القسم </h1>
+             <p>إصدار تقرير مساحي بغرض  البناء</p>
+        </header>
+        <div class="profile-photo-container">
+            <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+            <div class="profile-photo-overlay"></div>
+        </div>
+
+        <!-- Search -->
+        <form class="templatemo-search-form" role="search">
+            <div class="input-group">
+                <button type="submit" class="fa fa-search"></button>
+                <input type="text" class="form-control" placeholder="بحث" name="srch-term" id="srch-term">
+            </div>
+        </form>
+
+        <div class="mobile-menu-icon">
+            <i class="fa fa-bars"></i>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="templatemo-left-nav">
+            <ul>
+                <li><a href="{% url 'masha:interface' %}"><i class="fa fa-home fa-fw"></i> الرئيسية</a></li>
+
+                <li>
+                    <a href="{% url 'masha:enter_data_report_masahi' %}" >
+                        <i class="fa fa-envelope"></i> طلبات جديدة
+                                            </a>
+                </li>
+
+             
+                <li>
+                    <a href="#" onclick="loadContent(event, '{% url 'masha:show_tsrah_exit_eng_by_manger' %}')">
+                        <i class="fa fa-eject fa-fw"></i> تصاريح الخروج
+                        <span class="badge badge-danger" data-counter="num_unread_3">{% if num_unread_3 > 0 %}{{ num_unread_3 }}{% endif %}</span>
+                    </a>
+                </li>
+                   <li>
+                    <a href="#" onclick="loadContent(event, '{% url 'masha:rafth_mamlah_form_by_manger' %}')">
+                        <i class="fa fa-envelope"></i> الطلبات   المرفوضة
+                        <span class="badge badge-danger" data-counter="num_unread">{% if num_unread > 0 %}{{ num_unread }}{% endif %}</span>
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="#" onclick="loadContent(event, '{% url 'masha:talb_astkmal_mamlah' %}')">
+                        <i class="fa fa-eject fa-fw"></i> طلبات   الاستكمال
+                        <span class="badge badge-danger" data-counter="num_unread_2">{% if num_unread_2 > 0 %}{{ num_unread_2 }}{% endif %}</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#" onclick="loadContent(event, '{% url 'masha:print_talbt_nah_bana' %}')">
+                        <i class="fa fa-eject fa-fw"></i> طباعة  الطلبات 
+                       </a>
+                </li>
+                  <li><a href="{% url 'masha:serch_page_talb_bana' %}"><i class="fa fa-eject fa-fw"></i> التعديل</a></li>
+                <li><a href="{% url 'masha:report_state_talbat_nah' %}"><i class="fa fa-eject fa-fw"></i> التقارير</a></li>
+
+       
+                <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i> تسجيل الخروج</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="templatemo-content col-1 light-gray-bg">
+        <div class="templatemo-top-nav-container">
+            <div class="row">
+                <nav class="templatemo-top-nav col-lg-12 col-md-12">
+                    <ul class="text-uppercase">
+                        <li><a href="#" class="active">طلبات جديدة</a></li>
+                        <li><a href="#">طلبات مرفوضة</a></li>
+                        <li><a href="#">طلبات مكتملة</a></li>
+                        <li><a href="#">طلبات قيد الاجراء</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div id="content-area">
+            <!-- سيتم تحميل المحتوى هنا -->
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'js/templatemo-script.js' %}"></script>
+
+<script>
+let currentUrl = null;
+
+// تحميل المحتوى داخل content-area
+function loadContent(event, url){
+    if(event) event.preventDefault();
+    currentUrl = url;
+    fetch(url)
+        .then(res => res.text())
+        .then(html => document.getElementById('content-area').innerHTML = html)
+        .catch(err => console.error('خطأ في تحميل المحتوى:', err));
+}
+
+// تحديث الإشعارات في الوقت الحقيقي
+function updateNotifications(){
+    fetch("{% url 'masha:interface_nah_astshr_json' %}")
+        .then(res => res.json())
+        .then(data => {
+            const counters = ['num_unread', 'num_unread_2', 'num_unread_3'];
+            counters.forEach(key => {
+                const el = document.querySelector(`.badge[data-counter="${key}"]`);
+                if(el){
+                    el.textContent = data[key];
+                    el.style.display = data[key] > 0 ? 'inline-block' : 'none';
+                }
+            });
+
+            // إعادة تحميل المحتوى الحالي تلقائيًا
+            if(currentUrl) loadContent(null, currentUrl);
+        })
+        .catch(err => console.error('خطأ في تحديث الإشعارات:', err));
+}
+
+// تحديث كل 5 ثواني
+setInterval(updateNotifications, 5000);
+document.addEventListener('DOMContentLoaded', () => updateNotifications());
+</script>
+
+</body>
+</html>

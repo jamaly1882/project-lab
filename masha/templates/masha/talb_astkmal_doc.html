@@ -1,0 +1,91 @@
+{% load static %}
+
+
+    <!-- جدول البيانات -->
+    <div class="templatemo-content-widget no-padding">
+        <div class="panel panel-default table-responsive">
+            <table class="table table-striped table-bordered templatemo-user-table">
+                <thead>
+                    <tr>
+                        <th>طباعة</th>
+                        <th>اسم الوثيقة الناقصة</th>
+                        <th>اسم الحي</th>
+                        <th>اسم المالك</th>
+                        <th>اسم مقدم الطلب</th>
+                        <th>وحدة الجوار</th>
+                        <th>القطاع</th>
+                        <th>المديرية</th>
+                        <th>نوع الطلب</th>
+                        <th>تاريخ الطلب</th>
+                        <th>رقم الطلب</th>
+                    </tr>
+                </thead>
+                <tbody id="results_body">
+                {% for i in form %}
+                    <tr>
+                        <td><a href="{% url 'masha:talb_astkmal_by_manger' i.id %}" target="_blank">طباعة</a></td>
+                        <td>{{i.name_documnt}}</td>
+                        <td>{{i.streat_name}}</td>
+                        <td>{{i.name}}</td>
+                        <td>{{i.name_wk}}</td>
+                        <td>{{i.unit.name}}</td>
+                        <td>{{i.unit.gata.name}}</td>
+                        <td>{{i.mahfth.name}}</td>
+                        <td>{{i.hidden_ansh_hdm}}</td>
+                        <td>{{i.ajaml}}</td>
+                        <td>{{i.id}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+
+<!-- البحث اللحظي AJAX -->
+<script>
+$(document).ready(function(){
+    $('#live_search').on('input', function(){
+        let query = $(this).val().trim();
+        if(query === ""){
+            $('#results_body').html('');
+            return;
+        }
+        $.ajax({
+            url: "{% url 'masha:live_search_talb_astkmal' %}",
+            data: { q: query },
+            success: function(res){
+                let tbody = '';
+                if(res.results.length > 0){
+                    res.results.forEach(function(item){
+                        tbody += `<tr>
+                            <td><a href="/talb_astkmal_by_manger/${item.id}/" target="_blank">طباعة</a></td>
+                            <td>${item.name_documnt}</td>
+                            <td>${item.streat_name}</td>
+                            <td>${item.name}</td>
+                            <td>${item.name_wk}</td>
+                            <td>${item.unit_name}</td>
+                            <td>${item.gata_name}</td>
+                            <td>${item.mahfth_name}</td>
+                            <td>${item.hidden_ansh_hdm}</td>
+                            <td>${item.ajaml}</td>
+                            <td>${item.id}</td>
+                        </tr>`;
+                    });
+                } else {
+                    tbody = "<tr><td colspan='11' style='text-align:center'>لا توجد نتائج</td></tr>";
+                }
+                $('#results_body').html(tbody);
+            },
+            error: function(err){ console.log(err); }
+        });
+    });
+});
+</script>
+
+<script src="{% static 'assets/js/popper.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/js/custom-script.js' %}"></script>
+</body>
+</html>

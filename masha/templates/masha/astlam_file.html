@@ -1,0 +1,93 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<table border="1" align="center">
+{% for i in form %}
+<tr>
+	<td colspan="3">
+
+	<font  style="font-family: Hanimation Arabic ;">رقم الطلب      {{i.id}}
+
+	 		<br>
+	 	
+	 	 <font  style="font-family: Hanimation Arabic ;">   تاريخ الطلب   {{i.ajaml}}
+	 		
+	
+	</td>
+
+	 	
+
+
+    	
+ 
+
+
+     <td colspan="3" align="right"><h1 align="center" style="font-family: Hanimation Arabic ;"> اشعار استلام طلب  </h1>
+     	<img src="/D:/مجلد جديد/erea/static/assets/image/bg-head.jpg" alt="صورة" style="width: 50%; height: auto;" />
+
+    	
+
+    	 
+    </td>
+
+        <td  colspan="3"  align="right">
+        	<font  style="font-family: Hanimation Arabic ;">الجمهورية اليمنية   </font>
+    	<br>
+    	<font  style="font-family: Hanimation Arabic ;" size="+1">وزارة النقل والاشغال العامة  </font>
+    	 <br>
+
+    	<font  style="font-family: Hanimation Arabic ;">مكتب محافظة صنعاء</font>
+
+    	
+ 
+
+</font>
+</font>
+</td>
+</font>
+</font>
+</td>
+</tr>
+	{% endfor  %}
+
+	<tr> 
+    <td  colspan="9"  style="background-color:#FFC107 ;"  align="center"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">     اشعار استلم طلب  </font>
+    </td>
+
+	</tr>
+
+	<tr  colspan="9" >
+		
+	<td colspan="2"style="background-color:#424575;"  align="center"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"> رقم الهاتف </td>
+		<td colspan="2" style="background-color:#424575;" align="center"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">صفة مقدم الطلب  </font></td>
+		
+		<td colspan="3" style="background-color:#424575;" align="center"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"> اسم صاحب الطلب  </font></td>
+<td colspan="2" style="background-color:#424575;" align="center"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">رقم الطلب  </font></td>
+	</tr>
+{% for i in form %}
+	<tr  colspan="9" >
+		<td colspan="2" align="center"><font    style="font-family: Hanimation Arabic ;">{{i.phone}}</td>
+			<td colspan="2" align="center"><font  style="font-family: Hanimation Arabic ;">{{i.saft_sahb_talab}}</td>
+			<td colspan="3" align="center">           {{i.name}}  </td>
+			<td colspan="2"  align="center"><font  style="font-family: Hanimation Arabic ;">{{i.id}}</td>
+		
+		
+	</tr>
+	{% endfor %}
+
+
+
+
+	
+
+
+</table>
+
+</body>
+</html>
+
+

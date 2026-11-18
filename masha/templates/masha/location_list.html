@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>عرض الموقع على الخريطة</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 500px;  /* ارتفاع الخريطة */
+            width: 100%;     /* عرض الخريطة */
+        }
+    </style>
+</head>
+<body>
+    <h1>الموقع على الخريطة</h1>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
+    <script>
+        // إعداد الخريطة
+        var map = L.map('map').setView([0, 0], 2); // عرض أولي للخريطة
+
+        // إضافة طبقة الخريطة
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // تحويل UTM إلى إحداثيات جغرافية
+        proj4.defs("EPSG:32639", "+proj=utm +zone=39 +datum=WGS84 +units=m +no_defs");
+
+        // الإحداثيات UTM
+        var easting = 373000;
+        var northing = 1456000;
+
+        // تحويل الإحداثيات
+        var latLng = proj4("EPSG:32639", [easting, northing]);
+
+        // إضافة العلامة إلى الخريطة
+        L.marker([latLng[1], latLng[0]]).addTo(map)
+            .bindPopup("Easting: " + easting + "<br>Northing: " + northing)
+            .openPopup();
+
+        // ضبط الخريطة على الموقع
+        map.setView([latLng[1], latLng[0]], 15);
+    </script>
+</body>
+</html>

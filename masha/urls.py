@@ -1,0 +1,217 @@
+
+from django.urls import path,include
+
+from . import views 
+app_name='masha'  
+urlpatterns = [
+path(
+    'form-shifts/<int:id>/',
+    views.show_form_shifts,
+    name='show_form_shifts'
+),
+path(
+    'form-shifts-edit/<int:id>/',
+     views.edit_form_shifts,
+    name='edit_form_shifts'
+
+
+),
+path("print_talbt_nah_bana", views.print_talbt_nah_bana, name="print_talbt_nah_bana"),
+path("print_talbt_nah", views.print_talbt_nah, name="print_talbt_nah"),
+path("reason_rafth_managmnat_generl_to_convert_maderah", views.reason_rafth_managmnat_generl_to_convert_maderah, name="reason_rafth_managmnat_generl_to_convert_maderah"),
+
+path("live_search_ajax_report_masha_to_rafth_aldarah_to_report", views.live_search_ajax_report_masha_to_rafth_aldarah_to_report, name="live_search_ajax_report_masha_to_rafth_aldarah_to_report"),
+path("show_convert_to_mashi_from_fero_nah_adrah", views.show_convert_to_mashi_from_fero_nah_adrah, name="show_convert_to_mashi_from_fero_nah_adrah"),
+
+path("live_search_ajax_report_masha_to_agree_manager_generl_mang", views.live_search_ajax_report_masha_to_agree_manager_generl_mang, name="live_search_ajax_report_masha_to_agree_manager_generl_mang"),
+path('masha/show_convert_to_mashi_from_fero', views.show_convert_to_mashi_from_fero, name='show_convert_to_mashi_from_fero'),
+path("live_search_ajax_report_masha_to_generle_adarah", views.live_search_ajax_report_masha_to_generle_adarah, name="live_search_ajax_report_masha_to_generle_adarah"),
+path("live_search_ajax_tsrah_exit_tsrah_karoj", views.live_search_ajax_tsrah_exit_tsrah_karoj, name="live_search_ajax_tsrah_exit_tsrah_karoj"),
+path("live_search_ajax_tsrah_exit_nah", views.live_search_ajax_tsrah_exit_nah, name="live_search_ajax_tsrah_exit_nah"),
+path("live_search_ajax_report_masha_print_archif", views.live_search_ajax_report_masha_print_archif, name="live_search_ajax_report_masha_print_archif"),
+path("live_search_ajax_report_masha_print", views.live_search_ajax_report_masha_print, name="live_search_ajax_report_masha_print"),
+path("live_search_talb_astkmal_bana", views.live_search_talb_astkmal_bana, name="live_search_talb_astkmal_bana"),
+path("live_search_rafth_mamlah_bana", views.live_search_rafth_mamlah_bana, name="live_search_rafth_mamlah_bana"),
+path("live_search_tsrah_bana_report", views.live_search_tsrah_bana_report, name="live_search_tsrah_bana_report"),
+path("live_search_talb_astkmal", views.live_search_talb_astkmal, name="live_search_talb_astkmal"),
+path("live_search_rafth_mamlah", views.live_search_rafth_mamlah, name="live_search_rafth_mamlah"),
+
+path("live_search_tsrah_exit", views.live_search_tsrah_exit, name="live_search_tsrah_exit"),
+path("serch_agree_tsrah_karoj", views.serch_agree_tsrah_karoj, name="serch_agree_tsrah_karoj"),
+path("live_search_ajax_report_masha", views.live_search_ajax_report_masha, name="live_search_ajax_report_masha"),
+path("serch_talbt_report_by_mnager_nah", views.serch_talbt_report_by_mnager_nah, name="serch_talbt_report_by_mnager_nah"),
+path("edit_form_shifts_nah/<int:id>/", views.edit_form_shifts_nah, name="edit_form_shifts_nah"),
+
+path("asder_astmart_location_report/<int:id>/", views.asder_astmart_location_report, name="asder_astmart_location_report"),
+path('show_tsrah_exit_eng_by_manger_by_manger', views.show_tsrah_exit_eng_by_manger_by_manger, name='show_tsrah_exit_eng_by_manger_by_manger'),
+
+path('interface_nah_astshr_json_astsherh', views.interface_nah_astshr_json_astsherh, name='interface_nah_astshr_json_astsherh'),
+
+path('talb_astkmal_mamlah_report_astsherh', views.talb_astkmal_mamlah_report_astsherh, name='talb_astkmal_mamlah_report_astsherh'),
+path('report_state_talbat_nah_json_astsherh', views.report_state_talbat_nah_json_astsherh, name='report_state_talbat_nah_json_astsherh'),
+
+path('rafth_mamlah_form_by_manger_report_astsherh', views.rafth_mamlah_form_by_manger_report_astsherh, name='rafth_mamlah_form_by_manger_report_astsherh'),
+
+path('show_tsrah_exit_eng_by_manger_report_astshrah', views.show_tsrah_exit_eng_by_manger_report_astshrah, name='show_tsrah_exit_eng_by_manger_report_astshrah'),
+path('talb_astkmal_mamlah_astsherh', views.talb_astkmal_mamlah_astsherh, name='talb_astkmal_mamlah_astsherh'),
+path('rafth_mamlah_form_by_manger_astsherh', views.rafth_mamlah_form_by_manger_astsherh, name='rafth_mamlah_form_by_manger_astsherh'),
+path('show_tsrah_exit_eng_by_manger_astsherh', views.show_tsrah_exit_eng_by_manger_astsherh, name='show_tsrah_exit_eng_by_manger_astsherh'),
+path('report_state_talbat_nah_astshr', views.report_state_talbat_nah_astshr, name='report_state_talbat_nah_astshr'),
+path('live_search_ajax_report', views.live_search_ajax_report, name='live_search_ajax_report'),
+
+path('live_search_ajax_hadod_a', views.live_search_ajax_hadod_a, name='live_search_ajax_hadod_a'),
+path('serch_data_report_mashi_to_update', views.serch_data_report_mashi_to_update, name='serch_data_report_mashi_to_update'),
+path('live_search_ajax_bana', views.live_search_ajax_bana, name='live_search_ajax_bana'),
+path("request/edit/<int:id>/", views.update_request, name="update_request"),
+
+path('search_edit_form_talb_bana/<int:id>/', views.search_edit_form_talb_bana, name='search_edit_form_talb_bana'),
+path('serch_page_talb_bana/', views.serch_page_talb_bana, name='serch_page_talb_bana'),
+path('masha/edit_form_talb/<int:id>/', views.edit_form_talb, name='edit_form_talb'),
+path('search_page_talb/', views.search_page_talb, name='search_page_talb'),
+path('live_search_ajax_table/', views.live_search_ajax_table, name='live_search_ajax_table'),
+ path('live-search/', views.live_search_ajax, name='live_search_ajax'),
+    path('search-page/', views.search_page, name='search_page'),
+    path('edit_report_ajax/<int:id>/', views.edit_report_ajax, name='edit_report_ajax'),
+
+    path('get_units_by_mderah/', views.get_units_by_mderah, name='get_units_by_mderah'),
+
+path('masha/serch_in_screen_prisdent_masah_talbt_to_data_base', views.serch_in_screen_prisdent_masah_talbt_to_data_base, name='serch_in_screen_prisdent_masah_talbt_to_data_base'),
+path('search_edit_form/<int:id>/', views.search_edit_form, name='search_edit_form'),
+path('search_edit_form_talb/<int:id>/', views.search_edit_form_talb, name='search_edit_form_talb'),
+path('edit_form/<int:id>/', views.edit_form, name='edit_form'),
+path('serch_in_screen_prisdent_masah_talbt', views.serch_in_screen_prisdent_masah_talbt, name='serch_in_screen_prisdent_masah_talbt'),
+path('show_report_nah_by_manager_rafth', views.show_report_nah_by_manager_rafth, name='show_report_nah_by_manager_rafth'),
+path('rafth_by_manager_aldarah_generl_nah', views.rafth_by_manager_aldarah_generl_nah, name='rafth_by_manager_aldarah_generl_nah'),
+path('show_report_nah_by_manager_rafth', views.show_report_nah_by_manager_rafth, name='show_report_nah_by_manager_rafth'),
+path('talb_astkmal_mamlah_report', views.talb_astkmal_mamlah_report, name='talb_astkmal_mamlah_report'),
+path('rafth_mamlah_form_by_manger_report', views.rafth_mamlah_form_by_manger_report, name='rafth_mamlah_form_by_manger_report'),
+path('masha/show_tsrah_exit_eng_by_manger_report', views.show_tsrah_exit_eng_by_manger_report, name='show_tsrah_exit_eng_by_manger_report'),
+path('masha/report_state_talbat_nah_json', views.report_state_talbat_nah_json, name='report_state_talbat_nah_json'),
+path('masha/report_state_talbat_nah', views.report_state_talbat_nah, name='report_state_talbat_nah'),
+path('masha/show_convert_to_mashi_from_fero_nah', views.show_convert_to_mashi_from_fero_nah, name='show_convert_to_mashi_from_fero_nah'),
+path("show_report_nah_by_manager", views.show_report_nah_by_manager, name="show_report_nah_by_manager"),
+path("realtime/counts/", views.get_realtime_counts, name="realtime_counts"),
+path('masha/rafth_astmarh_nah/<int:id>', views.rafth_astmarh_nah, name='rafth_astmarh_nah'),
+path('masha/talb_astkmal_by_manger/<int:id>', views.talb_astkmal_by_manger, name='talb_astkmal_by_manger'),
+path('enter_data_report_masahi_screen', views.enter_data_report_masahi_screen, name='enter_data_report_masahi_screen'),
+path('interface_nah_astshr_json', views.interface_nah_astshr_json, name='interface_nah_astshr_json'),
+path('interface_nah_astshr_json', views.interface_nah_astshr_json, name='interface_nah_astshr_json'),
+path('talb_astkmal_mamlah', views.talb_astkmal_mamlah, name='talb_astkmal_mamlah'),
+path('rafth_mamlah_form_by_manger', views.rafth_mamlah_form_by_manger, name='rafth_mamlah_form_by_manger'),
+path('interface_nah_astshr', views.interface_nah_astshr, name='interface_nah_astshr'),
+path('masha/show_astmrat_json', views.show_astmrat_json, name='show_astmrat_json'),
+path('masha/show_manager_masah_nah_json', views.show_manager_masah_nah_json, name='show_manager_masah_nah_json'),
+path('masha/tslam_astsh', views.tslam_astsh, name='tslam_astsh'),
+path('masha/convert_agin/<int:id>', views.convert_agin, name='convert_agin'),
+path('masha/convert_agin_agree/<int:id>', views.convert_agin_agree, name='convert_agin_agree'),
+path('masha/show_report_adrah/<int:id>', views.show_report_adrah, name='show_report_adrah'),
+path('masha/show_convert_to_mashi_from_fero', views.show_convert_to_mashi_from_fero, name='show_convert_to_mashi_from_fero'),
+path('masha/masahi_convert/<int:id>', views.masahi_convert, name='masahi_convert'),
+path('masha/tslam_id/<int:id>', views.tslam_id, name='tslam_id'),
+path('masha/red_bol_massage', views.red_bol_massage, name='red_bol_massage'),
+path('masha/red_bol/<int:id>', views.red_bol, name='red_bol'),
+path('masha/verify_code_insert', views.verify_code_insert, name='verify_code_insert'),
+path('masha/verify_code', views.verify_code, name='verify_code'),
+path('masha/astshr', views.astshr, name='astshr'),
+path('masha/show_tsrah_exit_eng_by_manger', views.show_tsrah_exit_eng_by_manger, name='show_tsrah_exit_eng_by_manger'),
+path('masha/location_list/<int:id>', views.location_list, name='location_list'),
+path('masha/add_location/<int:id>', views.add_location, name='add_location'),
+path('masha/show_conecctions', views.show_conecctions, name='show_conecctions'),
+path('masha/sand_connections', views.sand_connections, name='sand_connections'),
+path('masha/select_unit_masha', views.select_unit_masha, name='select_unit_masha'),
+path('masha/select_gata_erea_mderah_masha', views.select_gata_erea_mderah_masha, name='select_gata_erea_mderah_masha'),
+path('masha/select_erea_mderah_masha', views.select_erea_mderah_masha, name='select_erea_mderah_masha'),
+path('masha/interface', views.interface, name='interface'),
+
+path('masha/map_project/<int:id>', views.map_project, name='map_project'),
+path('masha/add_locatios_shift_to_report_masah/<int:id>', views.add_locatios_shift_to_report_masah, name='add_locatios_shift_to_report_masah'),
+path('', views.interface, name='interface'),
+path('masha/show_center', views.show_center, name='show_center'),
+path('masha/map', views.map, name='map'),
+path('masha/map_add_data_base', views.map_add_data_base, name='map_add_data_base'),
+path('masha/add_abade_report_masahi/<int:id>', views.add_abade_report_masahi, name='add_abade_report_masahi'),
+    path('seol/', views.manage_seol, name='manage_seol'),
+    path('kah/', views.manage_kah, name='manage_kah'),
+path('masha/tslam', views.tslam, name='tslam'),
+   path('type-maps/ajax/', views.type_map_ajax, name='type_map_ajax'),
+     path('type_map_list_create', views.type_map_list_create, name='type_map_list_create'),
+    path('manage_eng/', views.manage_eng, name='manage_eng'),
+     path('print_report/', views.print_report, name='print_report'),
+   
+path('masha/add_form_new_talb', views.add_form_new_talb, name='add_form_new_talb'),
+path('masha/screen_enter_number_mahther_and_number_strate_and_unit', views.screen_enter_number_mahther_and_number_strate_and_unit, name='screen_enter_number_mahther_and_number_strate_and_unit'),
+  path('blocks/', views.manage_blocks, name='manage_blocks'),
+  path('manage_typ/', views.manage_typ, name='manage_typ'),
+path('manage_talb_astshr/', views.manage_talb_astshr, name='manage_talb_astshr'),
+
+     path('naturals/', views.manage_naturals, name='manage_naturals'),
+path('masha/agree_report_masahi_by_manager_mangmant_adarah/<int:id>', views.agree_report_masahi_by_manager_mangmant_adarah, name='agree_report_masahi_by_manager_mangmant_adarah'),
+path('masha/show_erea_masha/<int:id>', views.show_erea_masha, name='show_erea_masha'),
+path('masha/show_gata_masha/<int:id>', views.show_gata_masha, name='show_gata_masha'),
+path('masha/show_unit_masha/<int:id>', views.show_unit_masha, name='show_unit_masha'),
+path('masha/show_strate_masha_mahter/<int:id>', views.show_strate_masha_mahter, name='show_strate_masha_mahter'),
+path('masha/show_strate_masha_hadod_information/<int:id>', views.show_strate_masha_hadod_information, name='show_strate_masha_hadod_information'),
+path('masha/add_tlab_tslime_line_organzatio_add_strate_and_unit_to_data_base', views.add_tlab_tslime_line_organzatio_add_strate_and_unit_to_data_base, name='add_tlab_tslime_line_organzatio_add_strate_and_unit_to_data_base'),
+path('masha/add_tlab_tslime_line_organzatio_add_db_strate', views.add_tlab_tslime_line_organzatio_add_db_strate, name='add_tlab_tslime_line_organzatio_add_db_strate'),
+path('masha/add_tlab_tslime_line_organzatio_add_db', views.add_tlab_tslime_line_organzatio_add_db, name='add_tlab_tslime_line_organzatio_add_db'),
+path('masha/screen_interface_line_tslime_nah', views.screen_interface_line_tslime_nah, name='screen_interface_line_tslime_nah'),
+path('masha/screen_paesdint_masah', views.screen_paesdint_masah, name='screen_paesdint_masah'),
+path('masha/screen_adrat_ver', views.screen_adrat_ver, name='screen_adrat_ver'),
+path('masha/werd_sader_manager', views.werd_sader_manager, name='werd_sader_manager'),
+path('masha/show_managment_nah', views.show_managment_nah, name='show_managment_nah'),
+path('masha/show_managmant_masah', views.show_managmant_masah, name='show_managmant_masah'),
+path('masha/rafth_agree_report_masahi_by_manager_mangmant_report_masahi_by_manager_mangmant/<int:id>', views.rafth_agree_report_masahi_by_manager_mangmant_report_masahi_by_manager_mangmant, name='rafth_agree_report_masahi_by_manager_mangmant_report_masahi_by_manager_mangmant'),
+
+path('show_astmrat/', views.show_astmrat, name='show_astmrat'),
+
+path('masha/agree_report_masahi_by_manager_mangmant/<int:id>', views.agree_report_masahi_by_manager_mangmant, name='agree_report_masahi_by_manager_mangmant'),
+path('masha/show_report_masah_by_eng_data/<int:id>', views.show_report_masah_by_eng_data, name='show_report_masah_by_eng_data'),
+path('masha/show_manager_masah_nah', views.show_manager_masah_nah, name='show_manager_masah_nah'),
+path('masha/agree_rafth_report_masah_nah_tamp', views.agree_rafth_report_masah_nah_tamp, name='agree_rafth_report_masah_nah_tamp'),
+path('masha/add_abade_report_masahi/<int:id>', views.add_abade_report_masahi, name='add_abade_report_masahi'),
+path('masha/astkmal_report_masah_nah/<int:id>', views.astkmal_report_masah_nah, name='astkmal_report_masah_nah'),
+path('masha/asder_astmart_location/<int:id>', views.asder_astmart_location, name='asder_astmart_location'),
+path('masha/show_tlabt_nah_rakis', views.show_tlabt_nah_rakis, name='show_tlabt_nah_rakis'),
+path('masha/screen_show_report', views.screen_show_report, name='screen_show_report'),
+path('masha/add_unit_nah_eng_masha/', views.add_unit_nah_eng_masha, name='add_unit_nah_eng_masha'),
+path('masha/show_astmrah/<int:id>', views.show_astmrah, name='show_astmrah'),
+path('masha/add_motan_service_jamhore_to_fane/<int:id>', views.add_motan_service_jamhore_to_fane, name='add_motan_service_jamhore_to_fane'),
+path('masha/agree_tsrah_xx', views.agree_tsrah_xx, name='agree_tsrah_xx'),
+
+path('masha/enter_data_report_masahi', views.enter_data_report_masahi, name='enter_data_report_masahi'),
+path('masha/asder_nah_report_masah', views.asder_nah_report_masah, name='asder_nah_report_masah'),
+path('masha/form_add_masah', views.form_add_masah, name='form_add_masah'),
+path('masha/form_add_masah_nah', views.form_add_masah_nah, name='form_add_masah_nah'),
+
+path('masha/insert_to_image_talb', views.insert_to_image_talb, name='insert_to_image_talb'),
+path('masha/talb_add_to_base_trhle', views.talb_add_to_base_trhle, name='talb_add_to_base_trhle'),
+path('masha/asder_report_masah_db_nah_project', views.asder_report_masah_db_nah_project, name='asder_report_masah_db_nah_project'),
+path('masha/outpu_report_masah_nah_to_moatn/<int:id>', views.outpu_report_masah_nah_to_moatn, name='outpu_report_masah_nah_to_moatn'),
+path('masha/enter_face_enter_nah', views.enter_face_enter_nah, name='enter_face_enter_nah'),
+    path('mahfth/', views.mahfth_list, name='mahfth_list'),
+    path('mahfth/create/', views.mahfth_create, name='mahfth_create'),
+    path('mahfth/delete/', views.mahfth_delete, name='mahfth_delete'),
+     path('erea/', views.erea_list, name='erea_list'),
+    path('erea/create/', views.erea_create, name='erea_create'),
+    path('erea/delete/', views.erea_delete, name='erea_delete'),
+
+path('index/', views.index, name='index'),
+      path('gata/', views.gata_list, name='gata_list'),
+    path('gata/create/', views.gata_create, name='gata_create'),
+    path('gata/delete/', views.gata_delete, name='gata_delete'),
+       path('eng/', views.eng_list, name='eng_list'),
+    path('eng/create/', views.eng_create, name='eng_create'),
+    path('eng/delete/', views.eng_delete, name='eng_delete'),
+
+       path('unit/', views.unit_list, name='unit_list'),
+    path('unit/create/', views.unit_create, name='unit_create'),
+    path('unit/delete/', views.unit_delete, name='unit_delete'),
+
+
+
+
+
+
+
+]
+

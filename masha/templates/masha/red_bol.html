@@ -1,0 +1,257 @@
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="zxx">
+   <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+      <link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
+      <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+      <link rel="stylesheet" href="{% static 'assets/bootstarp/bootstrap.min.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/super-classes.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+      <link rel="stylesheet" href="{% static 'assets/css/mobile.css' %}">
+          <title>نظام المساحة الالكتروني</title>
+   </head>
+   <body>
+      <!---header-and-banner-section-->
+      <div class="header-and-banner-con w-100">
+         <div class="header-and-banner-inner-con overlay-content">
+            <header>
+               <!--navbar-start-->
+               <div class="container">
+                  <div class="header-con">
+                     <nav class="navbar navbar-expand-lg navbar-light p-0">
+                        <a class="navbar-brand p-0" href="index.html">
+                        
+                        </a>
+                        <button class="navbar-toggler p-0 collapsed" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                        <span class="navbar-toggler-icon"></span>
+                        <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+                           
+                      
+                           <ul class="navbar-nav">
+                             
+                              <li class="nav-item">
+                                 <a class="nav-link text-white p-0" href="about.html">معلومات</a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link text-white p-0" href="services.html"> الخدمات  </a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link text-white p-0" href="pricing.html"> Pricing</a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link text-white p-0" href="team.html">الفريق</a>
+                              </li>
+                               <li class="nav-item active">
+                                 <a class="nav-link text-white p-0" href="{% url 'masha:agree_tsrah_xx' %}">الرئيسية<span class="sr-only">(current)</span></a>
+                              </li>
+                           </ul>
+                         
+                        </div>
+                     </nav>
+                  </div>
+               </div>
+             </header>
+           </div>
+         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+         <br>
+         <br>
+         <div align="right">
+
+
+         
+<form  enctype="multipart/form-data" id="add_unit">
+   {% csrf_token %}
+
+
+ 
+   <label style="display:none;">رقم الطلب</label>
+
+   <input type="hidden" name="number" id="number" value="{{f.id}}" class="form-control">
+
+   
+      <label >الرد</label>
+  
+   <input type="text" name="name" value=""  id="red_mas" class="form-control" dir="rtl">
+<label >اسم الحي  </label>
+     <input type="text"  class="form-control"  name="streat_name" id="streat_name" value="{{f.streat_name}}"  dir="rtl" 
+
+
+
+           onkeypress="return runScript_15(event)"  readonly>
+  
+   
+</table>
+
+         <input type="hidden" id="hid_type_alrth" name="hidden_type_alrth" style="display:none;">
+        <input type="hidden" id="hid_gata" name=
+        "hidden_unit" style="display:none;">
+
+
+      
+
+         
+            
+              
+ <input type="checkbox"   name="exit" style="width:20px;height:20px;" value="منجزة"    id="exit_a"  />
+ <font size="+2"> الموافقة</font>
+<br>
+
+ <input type="checkbox"   style="display:none;" name="rafth_maml" style="width:20px;height:20px;" value="مرفوضة"  id="rafth_maml_a" />
+     
+       <font size="+2"  style="display:none;" > مرفوضة</font>
+        <br> 
+        <div id="show_rafth"  style="display:none;">
+  <label>سبب  الرفض</label>
+        <input type="text" name="rasone_rafth_maml" id="rasone_rafth_maml" class="form-control">
+                  
+    </div>
+  
+
+ <input type="checkbox"  style="display:none;"   name="talb_astkml" style="width:20px;height:20px;" value="استكمال"     id="talb_astkml_a"  />
+         <font size="+2"  style="display:none;" > طلب استكمال</font>
+<br>
+           <input type="submit" name="" value="اضافة"   class="btn btn-primary" style="height:70px;width:100px">
+       </form>
+       </div>
+
+ 
+
+               <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+      
+ <script type="text/javascript">      
+var $j = jQuery.noConflict();
+ $j(document).ready(function() {
+   
+$('#add_unit').submit(function(e) {
+        e.preventDefault();
+         var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+         var exit_a=  $('#exit_a').is(':checked')
+        
+          
+           var red_mas=  $('#red_mas').val()
+              var number=  $('#number').val()
+     
+        if (red_mas==""){
+$('#red_mas').css('border-color','red');
+         alert("اكتب   الرد")
+       }
+         
+      else if(exit_a=="" ){
+        alert("يجب عليك ان تعمل اشارة صح على احد الخيارات")
+
+       }
+
+       
+
+else{
+         
+
+      
+var  form_data = new FormData();
+form_data.append("exit", "منجزة" );
+
+
+form_data.append('red_mas', document.querySelector('#red_mas').value);
+form_data.append('number', document.querySelector('#number').value);
+
+var xhr = new XMLHttpRequest();
+xhr.open('POST', '/masha/red_bol_massage');
+xhr.onload = function() {
+    window.location.href="{%  url 'masha:show_conecctions' %}"
+};
+xhr.send(form_data); 
+}
+});
+});
+
+
+
+
+        </script>
+
+         <script type="text/javascript">
+
+
+var rafth_maml_a=document.querySelector('#rafth_maml_a')
+
+
+   
+
+rafth_maml_a.addEventListener('change',function(){
+     document.getElementById("show_rafth").style.display="block";
+      document.getElementById("tt").style.display="none";
+      });
+
+
+var  talb_astkml_a=document.querySelector('#talb_astkml_a')
+
+
+   
+
+talb_astkml_a.addEventListener('change',function(){
+     document.getElementById("show_rafth").style.display="none";
+      document.getElementById("tt").style.display="none";
+      });
+
+
+
+
+   
+
+
+
+   
+
+  </script>
+
+  <script src="{% static 'assets/js/wow.js' %}"></script>
+      <script>
+         new WOW().init();
+      </script>
+      <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+      <script src="{% static 'assets/js/popper.min.js' %}"> </script>
+      <script src="{% static 'assets/js/bootstrap.min.js' %}"> </script>
+      <script src="{% static 'assets/js/custom-script.js' %}"> </script>
+   </body>
+</html>

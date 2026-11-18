@@ -1,0 +1,571 @@
+{% extends  'my_job/primry.html' %}
+
+{% load static %}
+{% load bootstrap4 %}
+{% block content %}
+
+
+
+  <form method="post" action="{% url 'masha:add_abade_report_masahi' form_a.id %}" 
+  id="atajhat" class="form-control"   enctype="multipart/form-data">
+    {% csrf_token %}
+<ul class="nav nav-tabs" id="myTab" role="tablist"  style="float:right">
+     <li class="nav-item" role="presentation">
+    <a class="nav-link" id="mrfg-tab" data-toggle="tab" href="#mrfg"  role="tab" aria-controls="mrfg" aria-selected="false">المرفقات</a>
+ <li class="nav-item" role="presentation">
+    <a class="nav-link" id="grb-tab" data-toggle="tab" href="#grb"  role="tab" aria-controls="grb" aria-selected="false">غرب</a>
+  </li>
+    <li class="nav-item" role="presentation">
+    <a class="nav-link" id="shrg-tab" data-toggle="tab"  href="#shrg"  role="tab"
+     aria-controls="shrg" aria-selected="false">شرق</a>
+  </li>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link" id="jnob-tab" data-toggle="tab"  href="#jnob" role="tab"
+     aria-controls="jnob" aria-selected="false">جنوب</a>
+  </li>
+  
+   <li class="nav-item" role="presentation">
+    <a class="nav-link active" id="shml-tab" data-toggle="tab"  href="#shml"  role="tab" aria-controls="shml" aria-selected="true">شمال</a>
+  </li>
+</ul>
+<br>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="shml" role="tabpanel" aria-labelledby="shml-tab">
+ 
+<br>
+   
+
+
+      
+   
+    <input type="checkbox"  value="شمال"  name="chk"  id="shm"  style="width:20px;height:20px;"> شمال  
+    <br>
+ <label id="shml_1" >البعد حسب الاسقاط   </label>
+    <input type="text" id="shml_2" value=""  dir="rtl" class="form-control" name="val" 
+ />
+
+   
+    <label id="shml_3" >الوصف</label>
+     <select id="shart_shm" class="form-control"  dir="rtl" > 
+       <option ></option> 
+       <option  value="شارع">شارع</option>
+        <option  value="جار">جار</option>
+        <option  value="حجز خدمي">حجز خدمي</option>
+               <option  value="م+جار">م+جار</option>
+       </select>
+    <input type="hidden" value=""   style="display: none;" class="form-control" name="shml_11" id="shml_11"
+    onkeypress="return runScript_b_2(event)" />
+    <input type="hidden" name="" id="width_streat_shift" value="{{form_a.type_ashtrat_ver.width_street}}">
+
+
+   
+               <label id="lab_d" style="display: none;">عرض الشارع</label>
+        <input type="text"  class="form-control" dir="rtl"  name="w_1" value="" 
+        id="lab_dd" style="display: none;">
+      
+          <label   id="lab_ddd" style="display: none;"> نوع الشارع</label>
+          <select  dir="rtl"  onchange="fun_str_2(this.value)" class="form-control"  style="display: none;" id="lab_dddd">
+        
+      
+
+                    <option value="" ></option>
+                   <option value="ترابي" >ترابي </option>
+                   <option value="اسفلتي"   >اسفلتي</option>
+       
+     
+     </select> 
+          
+          
+
+             <label   id="lab_ddddd"  style="display: none;"> رقم الشارع</label>
+          <input   dir="rtl" style="display: none;" type="text" name="w_3" value="" class="form-control"  
+          id="lab_dddddd"   style="display: none;"  >
+    
+    
+ </div>
+  <div class="tab-pane fade show" id="jnob" role="tabpanel" aria-labelledby="jnob-tab">
+<br>
+
+       <input type="checkbox"  value="جنوب"  name="chk" id="jan"  style="width:20px;height:20px;"> جنوب 
+       <br>
+  
+   <label id="jan_1" >البعد حسب الاسقاط      </label>
+    <input type="text" value=""  dir="rtl" class="form-control" name="val_1" id="jan_2"
+    onkeypress="return runScript_b_2(event)" />
+   
+   <label id="jan_3" >الوصف</label>
+          <select id="shart_shm_jn"   dir="rtl"class="form-control"  > 
+       <option ></option> 
+       <option  value="شارع">شارع</option>
+        <option  value="جار">جار</option>
+         <option  value="حجز خدمي">حجز خدمي</option>
+                <option  value="م+جار">م+جار</option>
+       </select>
+    <input type="hidden" value=""   style="display: none;" class="form-control" name="shml_22" id="shml_22"
+    onkeypress="return runScript_b_2(event)" />
+          <label id="lab_j" style="display: none;">عرض الشارع</label>
+        <input type="text"  class="form-control"  dir="rtl" name="w_4" value="" 
+        id="lab_jj" style="display: none;">
+      
+        
+          <label   id="lab_jjj" style="display: none;"> نوع الشارع</label>
+          <select   onchange="fun_str_2(this.value)"  dir="rtl" class="form-control"  style="display: none;" id="lab_jjjj">
+      
+
+                    <option value="" ></option>
+                   <option value="ترابي" >ترابي </option>
+                   <option value="اسفلتي"   >اسفلتي</option>
+       
+     
+     </select> 
+          
+          
+             <label   id="lab_jjjjj"  style="display: none;"> رقم الشارع</label>
+          <input  dir="rtl"  style="display: none;" type="text" name="w_6" value="" class="form-control"  
+          id="lab_jjjjjj"   style="display: none;"  >
+   </div>
+  <div class="tab-pane fade show " id="shrg" role="tabpanel" aria-labelledby="shrg-tab">
+ 
+<br>
+
+     <input type="checkbox"  value="شرق"  name="chk" id="shar"  style="width:20px;height:20px;"> شرق
+     <br>
+     <label  id="shar_1">البعد حسب الاسقاط   </label>
+    <input type="text"  dir="rtl" value=""  class="form-control"  name="val_2"
+    id="shar_2"
+    onkeypress="return runScript_b_2(event)" />
+
+     <label id="shar_3">الوصف</label>
+         <select id="shart_shm_sh" class="form-control"  dir="rtl"> 
+       <option ></option> 
+       <option  value="شارع">شارع</option>
+        <option  value="جار">جار</option>
+         <option  value="حجز خدمي">حجز خدمي</option>
+         <option  value="م+جار">م+جار</option>
+       </select>
+    <input type="hidden" value=""   style="display: none;" class="form-control" name="shml_33" id="shml_33"
+    onkeypress="return runScript_b_2(event)" />
+  
+        <label id="lab_s" style="display: none;">عرض الشارع</label>
+        <input type="text"  class="form-control"  dir="rtl" name="w_7" value="" 
+        id="lab_ss" style="display: none;">
+      
+        
+          <label   id="lab_sss" style="display: none;"> نوع الشارع</label>
+          <select   onchange="fun_str_2(this.value)" dir="rtl" class="form-control"  style="display: none;" id="lab_ssss">
+      
+
+              
+                    <option value="" ></option>
+                   <option value="ترابي" >ترابي </option>
+                   <option value="اسفلتي"   >اسفلتي</option>
+       
+     
+     </select> 
+          
+          
+
+             <label   id="lab_sssss"  style="display: none;"> رقم الشارع</label>
+          <input   style="display: none;" type="text" dir="rtl" name="w_9" value="" class="form-control"  
+          id="lab_ssssss"   style="display: none;"  >
+      </div>
+  <div class="tab-pane fade show " id="grb" role="tabpanel" aria-labelledby="grb-tab">
+ 
+<br>
+       <input type="checkbox"  value="غرب"  name="chk" id="gr"  style="width:20px;height:20px;"> غـرب
+       <br>
+ <label  id="gr_1">الابعاد حسب الطبيعة</label>
+    <input  type="text" value=""   class="form-control" name="val_3"  dir="rtl"
+     id="gr_2"
+    onkeypress="return runScript_b_2(event)" />
+   
+      <label  id="gr_3">الوصف</label>
+          <select id="shart_shm_g" class="form-control"  dir="rtl" > 
+       <option ></option> 
+       <option  value="شارع">شارع</option>
+        <option  value="جار">جار</option>
+         <option  value="حجز خدمي">حجز خدمي</option>
+               <option  value="م+جار">م+جار</option>
+       </select>
+             <label id="lab_g" style="display: none;" >عرض الشارع</label>
+        <input type="text"  class="form-control"  dir="rtl" name="w_10" value="" 
+        id="lab_gg" style="display: none;">
+      
+        
+          <label   id="lab_ggg" style="display: none;"> نوع الشارع</label>
+          <select   onchange="fun_str_2(this.value)"  dir="rtl" class="form-control"  style="display: none;" id="lab_gggg">
+      
+
+            
+                    <option value="" ></option>
+                   <option value="ترابي" >ترابي </option>
+                   <option value="اسفلتي"   >اسفلتي</option>
+       
+     
+     </select> 
+          
+          
+
+             <label   id="lab_ggggg"  style="display: none;"> رقم الشارع</label>
+          <input  dir="rtl"   style="display: none;" type="text" name="w_12" value="" class="form-control"  
+          id="lab_gggggg"   style="display: none;"  >
+    <input type="hidden" value=""   style="display: none;" class="form-control" name="shml_44" id="shml_44"
+    onkeypress="return runScript_b_2(event)" />
+     <input type="hidden" name="" id="face_streat_shift" value="{{form_a.type_ashtrat_ver.interface_tol}}">
+        
+<input type="hidden" id="id_w_2" name="w_2">
+ <input type="hidden" id="id_w_5" name="w_5">
+ <input type="hidden" id="id_w_8" name="w_8">  
+ <input type="hidden" id="id_w_11" name="w_11">  
+</div>
+<div class="tab-pane fade show " id="mrfg" role="tabpanel" aria-labelledby="mrfg-tab">
+    <br>
+            <input type="hidden" id="xx_nah" value="{{form_a.type_ashtrat_ver.erea_arth}}">    
+    <br>
+
+ <br>
+ <label id="lab_sakn">نوع المنشاة</label>
+             <select  id="typ_sakn" dir="rtl" class="form-control">
+                      <option selected disabled>اختيار </option>
+                      {% for i in xx  %}
+              <option value="{{i.name}}">{{i.name}}</option>
+
+           {% endfor %}
+                 </select>
+                 <br>
+                     <label>مساحة  الارض حسب الاسقاط</label>
+ <input  id="e_11" type="text" name="erea_asqt"dir="rtl" class="form-control">
+ <br>
+  <label>راي  المهندس</label>
+ <input type="text" name="opnine_eng"dir="rtl" class="form-control" id="opin_en">
+
+ <label>اضافة نسخة من الكروكي</label>
+ <input type="file" name="mahther_line"dir="rtl" value="اضافة صورة استمارة المعاينة" class="form-control">
+ <label>اضافة صورة معاينة  الموقع</label>
+ <input type="file" name="location"dir="rtl" value="اضافة صورة استمارة المعاينة" class="form-control">
+        <input type="hidden" id="hid_type_sakn" name="hidden_type_form_sakn"style="display:none;">
+
+  <input type="checkbox"  value="منجزة"  name="tr_masah"   
+  id="trhl_masah_report"style="width:20px;height:20px;"dir="rtl"> 
+  الترحيل الى رئيس قسم تراخيص البناء للموافقة
+    <br>
+        <input type="submit"  value="اضافة"  class="btn btn-primary" name="Submit">
+    </div>
+</div>
+  <br>
+    <br>
+<div id="customPageStepBtns">        
+  <a class="btn btn-primary btnNext"  ><font size="+2">السابق   </font></a>
+      
+   
+   <a type="button" class="btn btn-primary btnPrev"><font size="+2">التالي </a>
+                   
+ </div>        
+
+
+  </form>
+
+ 
+ <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script type="text/javascript">
+ $('#customPageStepBtns').on('click', '.btnNext', function(e) {
+  e.stopPropagation();
+  $('.nav-tabs li > .active').parent('li').next('li').find('a').trigger('click');
+ 
+});
+$('#customPageStepBtns').on('click', '.btnPrev', function(e) {
+  e.stopPropagation();
+  $('.nav-tabs  li > .active').parent('li').prev('li').find('a').trigger('click')
+
+
+
+});
+</script>
+
+
+  
+
+
+     
+<script type="text/javascript">
+typ_sakn.addEventListener('change',function(){
+xx=typ_sakn.value;
+
+document.getElementById('hid_type_sakn').value=xx
+
+
+});
+    var e=document.querySelector('#e_11')
+e.addEventListener('change',function(){
+xx=e.value;
+
+yy=document.getElementById("xx_nah").value;
+if(xx<=yy){
+    alert("مساحة الارض  اقل من  المساحة المطلوبة ");
+  
+
+}
+});
+
+var  trhl_masah_report=document.querySelector('#trhl_masah_report')
+trhl_masah_report.addEventListener('click',function(){
+
+
+  x=0;
+  y=0;
+  z=0;
+ 
+
+   x=document.getElementById("lab_dd").value;
+    y=document.getElementById("lab_jj").value;
+    z=document.getElementById("lab_ss").value;
+  
+     with_db=document.getElementById("width_streat_shift").value;
+     if(x>y  && x>z){
+        if(with_db>0){
+            if (x<with_db){
+                 alert("عرض الشارع اقل من  المطلوب"+with_db)
+                   document.getElementById("lab_dd").focus();
+
+            }
+        }
+
+
+     }
+      else if(y>x  && y>z){
+        if(with_db>0){
+            if (y<with_db){
+                 alert("عرض الشارع اقل من  المطلوب"+with_db)
+                   document.getElementById("lab_jj").focus();
+
+            }
+        }
+
+
+     }
+ else if(z>x  && z>y){
+        if(with_db>0){
+            if (z<with_db){
+                 alert("عرض الشارع اقل من  المطلوب"+with_db)
+                   document.getElementById("lab_ss").focus();
+
+            }
+        }
+
+
+     }
+ 
+
+
+  
+ 
+});
+var  gr_2=document.querySelector('#gr_2')
+gr_2.addEventListener('change',function(){
+
+
+  x=0;
+  y=0;
+  z=0;
+  m=0;
+
+ 
+
+   x=document.getElementById("shml_2").value;
+    y=document.getElementById("jan_2").value;
+    z=document.getElementById("shar_2").value;
+    m=document.getElementById("gr_2").value;
+  
+     with_db=document.getElementById("face_streat_shift").value;
+ 
+
+     if(x>y  &&  x>z && x>m){
+     if (with_db>0){
+        if(x<with_db){
+
+           alert("طول الوجه  اقل من"+with_db)
+          document.getElementById("shml_2").focus();
+
+
+          }
+
+
+        }
+    }
+     else if(y>x &&  y>z && y>m){
+        if (y<with_db){
+        if (with_db>0){
+
+          
+           alert("طول الوجه  اقل من"+with_db)
+          document.getElementById("jan_2").focus();
+
+
+          }
+
+
+        }
+    }
+       else if(z>x  &&  z>y && z>m){
+        if (with_db>0){
+        if (z<with_db){
+
+           alert("طول الوجه  اقل من"+with_db)
+          document.getElementById("shar_2").focus();
+
+
+          }
+      }
+      else if(m>x  &&  m>y && m>z){
+        if (with_db>0){
+        if (m<with_db){
+
+          alert("طول الوجه  اقل من"+with_db)
+          document.getElementById("gr_2").focus();
+
+
+          }
+
+
+
+
+
+        }   
+
+
+
+}
+
+        }    
+ 
+});
+
+var  lab_dddd=document.querySelector('#lab_dddd')
+lab_dddd.addEventListener('change',function(){
+x=lab_dddd.value;
+document.getElementById("id_w_2").value=x;
+});
+var  lab_jjjj=document.querySelector('#lab_jjjj')
+lab_jjjj.addEventListener('change',function(){
+x=lab_jjjj.value;
+document.getElementById("id_w_5").value=x;
+});
+var  lab_ssss=document.querySelector('#lab_ssss')
+lab_ssss.addEventListener('change',function(){
+x=lab_ssss.value;
+document.getElementById("id_w_8").value=x;
+});
+
+var  lab_gggg=document.querySelector('#lab_gggg')
+lab_gggg.addEventListener('change',function(){
+x=lab_gggg.value;
+document.getElementById("id_w_11").value=x;
+});
+
+
+
+
+
+
+
+
+
+ 
+ var dd=document.querySelector
+ ('#shart_shm')
+dd.addEventListener('change',function(){
+  xx=dd.value;
+   document.getElementById("shml_11").value=xx;
+if(xx=="شارع"){
+   document.getElementById("lab_d").style.display='block';
+          document.getElementById("lab_dd").style.display='block';
+               document.getElementById("lab_ddd").style.display='block';
+                document.getElementById("lab_dddd").style.display='block';
+                 document.getElementById("lab_ddddd").style.display='block';
+                  document.getElementById("lab_dddddd").style.display='block';
+        
+   
+}
+});
+ var shart_shm =document.querySelector('#shart_shm_jn')
+shart_shm.addEventListener('change',function(){
+  xx=shart_shm.value;
+   document.getElementById("shml_22").value=xx;
+if(xx=="شارع"){
+  
+         
+                   document.getElementById("lab_j").style.display='block';
+          document.getElementById("lab_jj").style.display='block';
+               document.getElementById("lab_jjj").style.display='block';
+                document.getElementById("lab_jjjj").style.display='block';
+                 document.getElementById("lab_jjjjj").style.display='block';
+                  document.getElementById("lab_jjjjjj").style.display='block';
+}
+});
+ var shart_shm_sh =document.querySelector('#shart_shm_sh')
+shart_shm_sh.addEventListener('change',function(){
+  xx=shart_shm_sh.value;
+   document.getElementById("shml_33").value=xx;
+if(xx=="شارع"){
+  document.getElementById("lab_s").style.display='block';
+          document.getElementById("lab_ss").style.display='block';
+               document.getElementById("lab_sss").style.display='block';
+                document.getElementById("lab_ssss").style.display='block';
+                 document.getElementById("lab_sssss").style.display='block';
+                  document.getElementById("lab_ssssss").style.display='block';
+  
+}
+});
+ var shart_shm_g=document.querySelector('#shart_shm_g')
+shart_shm_g.addEventListener('change',function(){
+  xx=shart_shm_g.value;
+   document.getElementById("shml_44").value=xx;
+if(xx=="شارع"){
+ 
+   document.getElementById("lab_g").style.display='block';
+          document.getElementById("lab_gg").style.display='block';
+               document.getElementById("lab_ggg").style.display='block';
+                document.getElementById("lab_gggg").style.display='block';
+                 document.getElementById("lab_ggggg").style.display='block';
+                  document.getElementById("lab_gggggg").style.display='block';
+    
+}
+});
+
+
+
+
+var jan=document.querySelector('#jan')
+jan.addEventListener('click',function(){
+aa=jan.value;
+
+
+
+ });
+var shar=document.querySelector('#shar')
+shar.addEventListener('click',function(){
+aa=shar.value;
+
+
+
+
+
+
+ });
+var gr=document.querySelector('#gr')
+gr.addEventListener('click',function(){
+aa=gr.value;
+
+
+
+ });
+
+
+
+</script>
+<script type="text/javascript">
+
+
+</script>
+
+{% endblock %}

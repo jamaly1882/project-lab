@@ -1,0 +1,242 @@
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>عنوان الصفحة</title>
+<style>
+   
+
+  body {
+            direction: lft;
+
+
+            font-family:
+                'NotoKufiArabic',
+                Arial,
+                sans-serif;
+
+            font-size: 12px;
+
+            padding: 20px;
+        }
+
+ @page {
+            size: A4;
+            margin: 0;
+        }
+
+
+.header_report {
+    padding-top: 40px;
+    padding-right: 40px;
+    padding-left: 40px;
+    text-align: center;
+    background: #fff;
+    color: black;
+    font-size: 24px;
+    font-weight: bold;
+    border-top: 4px solid #000;
+    border-bottom: 3px solid #000;
+    width: 99%;
+    border-radius: 10px;
+}
+
+#report_left, #company__name_en, #name_en_branch, #address_en, #phone_en {
+    text-align: right;
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(26, 54, 126, 0.125);
+    border-rad
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: right;
+}
+
+th {
+    background-color: #eee;
+    font-weight: bold;
+}
+.logo {
+    display: block;
+    width: 100px;
+    height: 60px;
+    object-fit: contain;
+    margin: 0 auto;
+}
+</style>
+</head>
+<body>
+<table border="1"  align="center">
+
+
+<tr>
+	
+
+	 	 <td  colspan="1" align="center">
+
+	 		<font  style="font-family: Hanimation Arabic ;" size="+1">رقم  الطلب: {{form.id}} </font>
+
+	 		<br>
+	 	
+	 <font  style="font-family: Hanimation Arabic ;" size="+1">التاريخ: {{form.ajaml}} </font>
+	 		
+	
+	</td>
+
+
+    	
+ 
+
+
+    <td colspan="3" align="right"><h1 align="center" style="font-family: Hanimation Arabic ;">    <img
+        src="{{ image_base64 }}"
+        alt="شعار"
+        class="logo"
+    >
+  <td  colspan="3"  align="right">
+        	<font  style="font-family: Hanimation Arabic ;" size="+1">الجمهورية اليمنية   </font>
+    	<br>
+    	<font  style="font-family: Hanimation Arabic ;" size="+1">وزارة النقل والاشغال العامة  </font>
+    	 <br>
+
+	<font  style="font-family: Hanimation Arabic ;" size="+1"> مكتب محافظة  صنعاء</font>
+
+    	<br>
+
+    	
+	<font  style="font-family: Hanimation Arabic ;" size="+1">مكتب   {{form.mahfth.name}}</font>
+
+</font>
+</td>
+	</tr>
+
+<tr>
+  <td  colspan="6"   style="background-color:#424575; text-align:left; padding-left:230px;" >
+
+	<font   style="font-family: Hanimation Arabic ;" size="+2" color="#FFFFFF">  تكليف  خروج   </font> 
+	</td>
+	</tr>
+<tr>
+  <td  colspan="6"   align="right"><font   style="font-family: Hanimation Arabic ;" size="+1">
+
+	يكلف    الاخوة المهندسين  التالية اسمائهم  للنزول الميداني  والرفع المساحي  لأرضية المواطن     {{form.name}}
+	</td>
+	</tr>
+	<tr>
+		
+	
+		
+			
+		<td colspan="1" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">
+		</font></td>
+	<td colspan="1"style="background-color:#424575;"   align="right"><font   style="font-family: Hanimation Arabic ;" color="#FFFFFF" >صفتة</td>
+
+		  <td colspan="3"  align="right"><font    style="font-family: Hanimation Arabic ;">{{form.eng_nazol}}</td>
+		<td colspan="1" style="background-color:#424575;"   align="right"><font   style="font-family: Hanimation Arabic ;" color="#FFFFFF" >المهندس   </td>
+	</tr>
+	
+	<td colspan="1" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">
+		</font></td>
+	<td colspan="1"style="background-color:#424575;"   align="right"><font   style="font-family: Hanimation Arabic ;" color="#FFFFFF" >صفتة</td>
+
+		  <td colspan="3"  align="right"><font  ></td>
+		<td colspan="1" style="background-color:#424575;"   align="right"><font   style="font-family: Hanimation Arabic ;" color="#FFFFFF" >المهندس   </td>
+	</tr>
+	
+
+	<tr> 
+    <td  colspan="6"   style="background-color:#424575;"   align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;" color="#FFFFFF" >بيانات طالب التقرير</font></td>
+
+	</tr>
+			<tr>
+		
+				<td colspan="1"   align="right"><font   style="font-family: Hanimation Arabic ;">{{form.mahfth.name}}</td>
+				<td colspan="1"  style="background-color:#424575;"   align="right"><font    style="font-family: Hanimation Arabic ;" color="#FFFFFF" >المديرية</td>
+	
+			<td colspan="1"  align="right"><font   style="font-family: Hanimation Arabic ;">{{form.phone}}</td>
+				<td colspan="1"  style="background-color:#424575;"   align="right"><font  style="font-family: Hanimation Arabic ;" color="#FFFFFF" >رقم الهاتف</td>
+		  	<td colspan="1"  align="right"><font    style="font-family: Hanimation Arabic ;">{{form.name}}</td>
+			<td colspan="1" style="background-color:#424575;"  align="right"><font    style="font-family: Hanimation Arabic ;" color="#FFFFFF" >اسم طالب التقرير</td>
+	</tr>
+	<tr>
+		
+		
+				<td colspan="1"  align="right"><font   style="font-family: Hanimation Arabic ;">{{form.unit.name}} </font></td>
+			<td colspan="1"  style="background-color:#424575;"   align="right"><font    style="font-family: Hanimation Arabic ;" color="#FFFFFF" > رقم وحدة الجوار</td>
+				<td colspan="1"  align="right"><font   style="font-family: Hanimation Arabic ;">{{form.unit.gata.name}}</td>
+			<td colspan="1" style="background-color:#424575;"   align="right"><font  style="font-family: Hanimation Arabic ;" color="#FFFFFF" > القطاع </td>
+
+		 	<td colspan="1"  align="right"><font   style="font-family: Hanimation Arabic ;">
+		 {{form.streat_name}}</td>
+			<td colspan="1"  style="background-color:#424575;"  align="right"><font    style="font-family: Hanimation Arabic ;" color="#FFFFFF" >الحي</td>
+		
+
+	</tr>
+
+	<tr>
+		
+		
+				<td colspan="1"  align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"></td>
+				<td colspan="1"  style="background-color:#424575;"  align="right"><font   style="font-family: Hanimation Arabic ;" color="#FFFFFF" >ساعه العودة</td>
+				<td colspan="1"  align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"></td>
+			<td colspan="1" style="background-color:#424575;"  align="right"><font   style="font-family: Hanimation Arabic ;" color="#FFFFFF" > ساعه الخروج</td>
+
+		 	<td colspan="1"  align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"></td>
+			<td colspan="1" style="background-color:#424575;"   align="right"><font   style="font-family: Hanimation Arabic ;" color="#FFFFFF" >نوع المهمة</td>
+		
+
+	</tr>
+	
+	
+   <tr>
+		<td colspan="6"  align="right"><font  style="font-family: Hanimation Arabic ;">
+		   .تنوية - على المهندسين  تسليم التقرير  الى الموظف المختص  في صباح اليوم التالي  ونحملكم مسؤولية التأخير
+	</td>
+	</tr>
+         
+	 	              
+
+		<tr align="center"   colspan="6">
+		
+			
+	
+		<td colspan="3"   align="right"><font  style="font-family: Hanimation Arabic ;">رئيس قسم المساحة </font></td>
+
+		
+	</tr>
+
+
+	<tr>
+
+		<td colspan="3" align="right"><font size="+1">/م</font></td>
+
+		
+		
+		
+	</tr>
+
+	
+	
+
+
+</table>
+
+</body>
+</font>
+</html>

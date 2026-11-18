@@ -1,0 +1,66 @@
+{% extends  'masha/primry.html' %}
+
+
+{% load static %}
+{% load bootstrap4 %}
+{% block content %}
+
+<table border="3" align="center" style="width: 70%;">
+
+
+
+
+  <tr>
+            <td   rowspan="2" align="right" style="background-color:#424575;"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">البروز المسموح بة  </font></td>
+        <td   rowspan="2" align="right" style="background-color:#424575;"><font  color="#FFFFFF" style="font-family: Hanimation Arabic ;">الارتداد المسموح بة  </font></td>
+        <td  colspan="3" align="center"style="background-color:#424575;"><font  color="#FFFFFF" style="font-family: Hanimation Arabic ;">بيانات الشارع  </font></td>
+
+      <td   rowspan="2" align="center"  style="background-color:#424575;"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">الابعاد حسب الطبيعة  </font></td>
+    <td  rowspan="2"style="background-color:#424575;"align="center"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">الابعاد حسب الوثيقة </td>
+
+      <td   rowspan="2" style="background-color:#424575;"align="center"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">حدود الارض</td>
+    <td  rowspan="2"style="background-color:#424575;" align="center"><font  color="#FFFFFF" style="font-family: Hanimation Arabic ;"> الاتجاهات</td>
+  </tr>
+<tr>
+    <td   colspan="1" align="center" style="background-color:#424575;" ><font  color="#FFFFFF" style="font-family: Hanimation Arabic ;">رقم الشارع</td>
+        <td  colspan="1" align="center" style="background-color:#424575;"><font  color="#FFFFFF" style="font-family: Hanimation Arabic ;">نوع الشارع</td>
+      <td  colspan="1"  align="center" style="background-color:#424575;"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">عرض الشارع</td>
+
+</tr>
+
+{% for i in yy %}
+
+
+<tr>
+<td colspan="1"  align="center"> </td>     
+  <td colspan="1"  align="center"> </td>
+            <td colspan="1"  align="center"><font size="+1"  style="font-family: Hanimation Arabic ;"> {{i.number_strate}}</td>
+
+      <td  colspan="1" align="center"><font size="+1"   style="font-family: Hanimation Arabic ;">{{i.type_street}}</td>
+      <td colspan="1"  align="center"><font size="+1"   style="font-family: Hanimation Arabic ;">{{i.width_street}}</td>
+      <td  colspan="1" align="center"  ><font size="+1"   style="font-family: Hanimation Arabic ;">{{i.quantity}}</td>
+    <td colspan="1"  align="center"> </td>
+
+      <td  colspan="1"   align="center"><font size="+1"   style="font-family: Hanimation Arabic ;">{{i.shar_atjah}}
+</td>
+    <td colspan="1" align="center" style="background-color:#424575;"><font size="+1"   style="font-family: Hanimation Arabic ;">{{i.sh}}</td>
+
+</tr>
+
+
+{% endfor  %}
+
+
+
+
+</table>
+
+
+
+
+
+
+
+
+  
+{% endblock %}

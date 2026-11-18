@@ -1,0 +1,235 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نظام المساحة الإلكتروني</title>
+
+  <!-- CSS -->
+  <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
+  <link href="{% static 'css/sweetalert2.min.css' %}" rel="stylesheet">
+
+  <!-- jQuery -->
+  <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+  <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+<style>
+  /* تعريف خط Noto Kufi Arabic */
+  @font-face {
+    font-family: 'Noto Kufi Arabic';
+    src: url("{% static 'fonts/NotoKufiArabic-Regular.ttf' %}") format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Noto Kufi Arabic';
+    src: url("{% static 'fonts/NotoKufiArabic-Bold.ttf' %}") format('truetype');
+    font-weight: bold;
+    font-style: normal;
+  }
+
+  /* تطبيق الخط على جميع الصفحة */
+  body, input, select, textarea, button, table {
+    font-family: 'Noto Kufi Arabic', sans-serif;
+    font-size: 18px; /* حجم الخط العام */
+    direction: rtl;
+    text-align: right;
+    background: #f5f6fa;
+  }
+
+  h1 { font-size: 36px; }
+  h2 { font-size: 28px; font-weight: bold; margin-bottom: 30px; text-align: center; }
+  h3 { font-size: 24px; }
+
+  /* أزرار */
+  .templatemo-blue-button {
+    font-size: 16px;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .templatemo-blue-button:hover {
+    background:#2c80c9;
+  }
+
+  /* الجداول */
+  .table td, .table th {
+    font-size: 16px;
+    text-align: right;
+  }
+
+  /* الفورم */
+  .form-control {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  /* تنظيم الصفحة */
+  .templatemo-flex-row {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  .templatemo-sidebar {
+    order: 1;
+    right: 0;
+    left: auto;
+  }
+  .templatemo-content {
+    order: 2;
+    width: 100%;
+    padding: 40px;
+  }
+</style>
+
+</head>
+
+<body>
+  <div class="templatemo-flex-row">
+    <!-- القائمة الجانبية -->
+    <div class="templatemo-sidebar">
+      <header class="templatemo-site-header">
+        <div class="square"></div>
+        <h1>مدير النظام</h1>
+      </header>
+
+      <div class="profile-photo-container">
+        <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+        <div class="profile-photo-overlay"></div>
+      </div>
+
+      <form class="templatemo-search-form" role="search">
+        <div class="input-group">
+          <button type="submit" class="fa fa-search"></button>
+          <input type="text" class="form-control" placeholder="بحث" name="srch-term" id="srch-term">
+        </div>
+      </form>
+
+      <div class="mobile-menu-icon"><i class="fa fa-bars"></i></div>
+
+      <nav class="templatemo-left-nav">
+        <ul>
+          <li><a href="{% url 'masha:index' %}" class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+          <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="container">
+      <div class="templatemo-content-widget white-bg p-3 mb-4">
+        <h2>إدارة المديريات</h2>
+
+        <form id="mahfth_form" method="post">{% csrf_token %}
+          <input type="hidden" id="mahfth_id" name="id">
+          <div class="form-group mb-3">
+            <label>اسم المديرية</label>
+            {{ form.name }}
+          </div>
+          <button type="submit" class="templatemo-blue-button">💾 حفظ</button>
+          <button type="button" id="cancel_edit" class="templatemo-blue-button" style="background:#7f8c8d;display:none;">❌ إلغاء</button>
+        </form>
+
+        <table class="table table-bordered table-striped mt-4" id="mahfth_table">
+          <thead>
+            <tr><th>#</th><th>الاسم</th><th>الإجراءات</th></tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr data-id="{{ item.id }}">
+              <td>{{ forloop.counter }}</td>
+              <td class="name_cell">{{ item.name }}</td>
+              <td>
+                <button class="templatemo-blue-button edit_btn">✏️ تعديل</button>
+                <button class="templatemo-blue-button delete_btn" style="background:#e74c3c;">🗑 حذف</button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-muted">لا توجد محافظات بعد</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+$(function(){
+
+  function refreshTable(){
+    $.get(window.location.href, function(res){
+      let newRows = $(res).find('#mahfth_table tbody').html();
+      $('#mahfth_table tbody').html(newRows);
+    });
+  }
+
+  // إضافة أو تعديل
+  $('#mahfth_form').submit(function(e){
+    e.preventDefault();
+    $.ajax({
+      url: '{% url "masha:mahfth_create" %}',
+      type: 'POST',
+      data: new FormData(this),
+      processData: false,
+      contentType: false,
+      success: function(res){
+        if(res.success){
+          Swal.fire({icon:'success', title:'تم الحفظ ✅', timer:1500, showConfirmButton:false});
+          $('#mahfth_form')[0].reset();
+          $('#mahfth_id').val('');
+          $('#cancel_edit').hide();
+          refreshTable();
+        } else {
+          Swal.fire('خطأ', 'تحقق من صحة البيانات', 'error');
+        }
+      },
+      error: function(){
+        Swal.fire('❌', 'حدث خطأ أثناء الاتصال بالسيرفر', 'error');
+      }
+    });
+  });
+
+  // تعديل صف
+  $(document).on('click', '.edit_btn', function(){
+    let row = $(this).closest('tr');
+    $('#mahfth_id').val(row.data('id'));
+    $('input[name="name"]').val(row.find('.name_cell').text());
+    $('#cancel_edit').show();
+  });
+
+  // إلغاء التعديل
+  $('#cancel_edit').click(function(){
+    $('#mahfth_form')[0].reset();
+    $('#mahfth_id').val('');
+    $(this).hide();
+  });
+
+  // حذف صف
+  $(document).on('click', '.delete_btn', function(){
+    let id = $(this).closest('tr').data('id');
+    Swal.fire({
+      icon:'warning', title:'هل أنت متأكد؟', showCancelButton:true,
+      confirmButtonText:'نعم، احذف', cancelButtonText:'إلغاء'
+    }).then(result=>{
+      if(result.isConfirmed){
+        $.post('{% url "masha:mahfth_delete" %}', {
+          'id': id,
+          'csrfmiddlewaretoken': '{{ csrf_token }}'
+        }, function(res){
+          if(res.success){
+            Swal.fire({icon:'success', title:'تم الحذف 🗑', timer:1000, showConfirmButton:false});
+            refreshTable();
+          } else {
+            Swal.fire('خطأ', 'تعذر الحذف', 'error');
+          }
+        });
+      }
+    });
+  });
+
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+{% extends  'masha/primry.html'  %}
+
+
+{% load static %}
+{% load bootstrap4 %}
+
+ 
+ 
+
+{% block content %}
+   <a href="{% url 'masha:agree_tsrah_xx' %}" class="btn btn-outline-primary">
+  <font size="+1.5"            style="font-family:Noto Kufi Arabic Medium;">
+رجوع
+</font>
+</a>       
+
+<form  enctype="multipart/form-data"  method="post" action="{% url 'masha:map' %}">
+   {% csrf_token %}
+
+   <label style="display:none;">رقم الطلب</label>
+
+   <input type="hidden" name="number" id="number" value="{{f.id}}" class="form-control">
+
+   
+      <label style="display:none;">اسم  طالب الرخصة</label>
+  
+   <input type="hidden" name="name" value="{{f.name}} "  class="form-control">
+<label >اسم الحي  </label>
+     <input type="text"  class="form-control"  name="streat_name" id="streat_name" value="{{f.streat_name}}"  dir="rtl" 
+
+
+
+           onkeypress="return runScript_15(event)" >
+  
+   
+</table>
+
+         <input type="hidden" id="hid_type_alrth" name="hidden_type_alrth" style="display:none;">
+        <input type="hidden" id="hid_gata" name=
+        "hidden_unit" style="display:none;">
+
+
+        
+       
+
+         
+            
+              
+ <input type="checkbox"   name="exit" style="width:20px;height:20px;" value="منجزة"    id="exit_a"  />
+ <font size="+2"> الموافقة</font>
+<br>
+
+ <input type="checkbox"   name="rafth_maml" style="width:20px;height:20px;" value="مرفوضة"  id="rafth_maml_a" />
+     
+       <font size="+2"> مرفوضة</font>
+        <br> 
+        <div id="show_rafth"  style="display:none;">
+  <label>سبب  الرفض</label>
+        <input type="text" name="rasone_rafth_maml" id="rasone_rafth_maml" class="form-control">
+                  
+    </div>
+  
+
+ <input type="checkbox"   name="talb_astkml" style="width:20px;height:20px;" value="استكمال"     id="talb_astkml_a"  />
+         <font size="+2"> طلب استكمال</font>
+<br>
+ <label >النقطة  الاولى</label>
+
+   <input type="text" name="point_1" id="point_1" value="" class="form-control">
+    <label >النقطة  الثانية</label>
+
+   <input type="text"  name="point_2"  class="form-control" id="point_2">
+
+    <label >الاسم</label>
+
+   <input type="text"  name="name"  class="form-control" >
+           <input type="submit" name="" value="اضافة"   class="btn btn-primary" style="height:70px;width:100px">
+       </form>
+               <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <script type="text/javascript">      
+
+
+
+
+
+        </script>
+
+         <script type="text/javascript">
+
+
+var rafth_maml_a=document.querySelector('#rafth_maml_a')
+
+
+   
+
+rafth_maml_a.addEventListener('change',function(){
+     document.getElementById("show_rafth").style.display="block";
+      document.getElementById("tt").style.display="none";
+      });
+
+
+var  talb_astkml_a=document.querySelector('#talb_astkml_a')
+
+
+   
+
+talb_astkml_a.addEventListener('change',function(){
+     document.getElementById("show_rafth").style.display="none";
+      document.getElementById("tt").style.display="none";
+      });
+
+
+
+
+   
+
+
+
+   
+
+  </script>
+
+         {% endblock  %}

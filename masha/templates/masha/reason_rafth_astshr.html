@@ -1,0 +1,85 @@
+{% load static %}
+
+<div class="container">
+
+    <div class="templatemo-content-widget no-padding">
+        <div class="panel panel-default table-responsive">
+            <table class="table table-striped table-bordered templatemo-user-table">
+                <thead>
+                    <tr align="right">
+                        <th>استمارة رفض</th>
+                        <th>اسم الحي</th>
+                        <th>اسم المالك</th>
+                        <th>اسم مقدم الطلب</th>
+                        <th>سبب  الرفض</th>
+                       
+                        <th>المديرية</th>
+                        <th>نوع الطلب</th>
+                        <th>تاريخ الطلب</th>
+                        <th>رقم الطلب</th>
+                    </tr>
+                </thead>
+                <tbody id="results_body">
+                {% for i in form %}
+                    <tr>
+                        <td><a href="{% url 'masha:rafth_astmarh_nah' i.id %}" target="_blank" class="btn outline-success">اصدار</a></td>
+                        <td>{{i.streat_name}}</td>
+                        <td>{{i.name}}</td>
+                        <td>{{i.name_wk}}</td>
+                        <td>{{i.rasone_rafth_maml}}</td>
+                      
+                        <td>{{i.mahfth.name}}</td>
+                        <td>{{i.hidden_ansh_hdm}}</td>
+                        <td>{{i.ajaml}}</td>
+                        <td>{{i.id}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+<script>
+$(document).ready(function(){
+    $('#live_search').on('input', function(){
+        let query = $(this).val().trim();
+        if(query === ""){
+            $('#results_body').html('');
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'masha:live_search_rafth_mamlah' %}",
+            data: { q: query },
+            success: function(res){
+                let tbody = '';
+                if(res.results.length > 0){
+                    res.results.forEach(function(item){
+                        tbody += `<tr>
+                            <td><a href="/rafth_astmarh_nah/${item.id}/" target="_blank" class="btn outline-success">اصدار</a></td>
+                            <td>${item.streat_name}</td>
+                            <td>${item.name}</td>
+                            <td>${item.name_wk}</td>
+                            <td>${item.rasone_rafth_maml}</td>
+                        
+                            <td>${item.mahfth_name}</td>
+                            <td>${item.hidden_ansh_hdm}</td>
+                            <td>${item.ajaml}</td>
+                            <td>${item.id}</td>
+                        </tr>`;
+                    });
+                } else {
+                    tbody = "<tr><td colspan='10' style='text-align:center'>لا توجد نتائج</td></tr>";
+                }
+                $('#results_body').html(tbody);
+            },
+            error: function(err){ console.log(err); }
+        });
+    });
+});
+</script>
+
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+</body>
+</html>

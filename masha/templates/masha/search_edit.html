@@ -1,0 +1,1645 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>نظام المساحة الالكتروني</title>
+
+    <meta
+        name="description"
+        content=""
+    >
+
+    <meta
+        name="author"
+        content="نظام المساحة الالكتروني"
+    >
+
+
+    <!-- =========================================================
+         المكتبات المحلية
+         ========================================================= -->
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="{% static 'css/font-awesome.min.css' %}"
+    >
+
+    <!-- Bootstrap -->
+    <link
+        rel="stylesheet"
+        href="{% static 'css/bootstrap.min.css' %}"
+    >
+
+    <!-- SweetAlert2 -->
+    <link
+        rel="stylesheet"
+        href="{% static 'css/sweetalert2.min.css' %}"
+    >
+
+    <!-- TemplateMo -->
+    <link
+        rel="stylesheet"
+        href="{% static 'css/templatemo-style.css' %}"
+    >
+
+
+    <!-- =========================================================
+         CSS خاص بالصفحة
+         ========================================================= -->
+
+    <style>
+
+        /* =====================================================
+           الحقول غير الصحيحة
+           ===================================================== */
+
+        .input-error {
+            border: 2px solid red !important;
+            animation: shake 0.2s linear 2;
+        }
+
+
+        @keyframes shake {
+
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-3px);
+            }
+
+            50% {
+                transform: translateX(3px);
+            }
+
+            75% {
+                transform: translateX(-3px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+
+        }
+
+
+        /* =====================================================
+           checkbox غير الصحيح
+           ===================================================== */
+
+        .checkbox-error + label {
+            color: red !important;
+            font-weight: bold;
+        }
+
+
+        /* =====================================================
+           Checkbox مخصص
+           ===================================================== */
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+
+        input[type="checkbox"] + label span {
+
+            display: inline-block;
+
+            width: 20px;
+
+            height: 20px;
+
+            border: 2px solid #777;
+
+            border-radius: 3px;
+
+            margin-left: 8px;
+
+            position: relative;
+
+            vertical-align: middle;
+
+            cursor: pointer;
+
+            background: #fff;
+
+        }
+
+
+        input[type="checkbox"]:checked + label span::after {
+
+            content: "✓";
+
+            position: absolute;
+
+            left: 2px;
+
+            top: -5px;
+
+            font-size: 18px;
+
+            color: green;
+
+            font-weight: bold;
+
+        }
+
+
+        /* =====================================================
+           عناوين الأقسام
+           ===================================================== */
+
+        .section-title {
+
+            color: #1565c0;
+
+            font-weight: bold;
+
+            margin-top: 20px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        /* =====================================================
+           الفورم
+           ===================================================== */
+
+        #edit_form {
+
+            background: #ffffff;
+
+            padding: 25px;
+
+            border-radius: 5px;
+
+            margin-top: 25px;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        /* =====================================================
+           مسافة بين عناصر الفورم
+           ===================================================== */
+
+        #edit_form .form-control {
+
+            margin-bottom: 8px;
+
+        }
+
+
+        /* =====================================================
+           زر الحفظ
+           ===================================================== */
+
+        .save-btn {
+
+            min-width: 180px;
+
+            font-weight: bold;
+
+        }
+
+
+        /* =====================================================
+           رابط الملفات الحالية
+           ===================================================== */
+
+        .current-file {
+
+            display: inline-block;
+
+            margin-top: 8px;
+
+            color: #1565c0;
+
+            font-weight: bold;
+
+        }
+
+
+        /* =====================================================
+           حقول الإحداثيات
+           ===================================================== */
+
+        .coordinate-fields {
+
+            transition: all 0.2s ease;
+
+        }
+
+    </style>
+
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     الهيكل الرئيسي
+     ========================================================= -->
+
+<div class="templatemo-flex-row">
+
+
+    <!-- =====================================================
+         القائمة الجانبية
+         ===================================================== -->
+
+    <div class="templatemo-sidebar">
+
+
+        <header class="templatemo-site-header">
+
+            <div class="square"></div>
+
+            <h1>
+                مهندس المساحة
+            </h1>
+
+        </header>
+
+
+        <!-- صورة النظام -->
+
+        <div class="profile-photo-container">
+
+            <img
+                src="{% static 'assets/image/bg-head-03.jpg' %}"
+                alt="صورة النظام"
+                class="img-responsive"
+            >
+
+            <div class="profile-photo-overlay"></div>
+
+        </div>
+
+
+        <!-- زر قائمة الهاتف -->
+
+        <div class="mobile-menu-icon">
+
+            <i class="fa fa-bars"></i>
+
+        </div>
+
+
+        <!-- القائمة -->
+
+        <nav class="templatemo-left-nav">
+
+            <ul>
+
+
+                <li>
+
+                    <a
+                        href="{% url 'masha:search_page' %}"
+                        class="active"
+                    >
+
+                        <i class="fa fa-home fa-fw"></i>
+
+                        الرئيسية
+
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a href="#">
+
+                        <i class="fa fa-bar-chart fa-fw"></i>
+
+                        الطلبات
+
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a href="#">
+
+                        <i class="fa fa-database fa-fw"></i>
+
+                        التقارير
+
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a
+                        href="{% url 'accounts:user_logout' %}"
+                    >
+
+                        <i class="fa fa-eject fa-fw"></i>
+
+                        تسجيل الخروج
+
+                    </a>
+
+                </li>
+
+
+            </ul>
+
+        </nav>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         المحتوى الرئيسي
+         ===================================================== -->
+
+    <div class="templatemo-content col-1 light-gray-bg">
+
+
+        <!-- =================================================
+             الشريط العلوي
+             ================================================= -->
+
+        <div class="templatemo-top-nav-container">
+
+            <div class="row">
+
+                <nav class="templatemo-top-nav col-lg-12 col-md-12">
+
+                    <ul class="text-uppercase">
+
+
+                        <li>
+
+                            <a
+                                href="{% url 'masha:search_page' %}"
+                                class="active"
+                            >
+
+                                <i class="fa fa-home fa-fw"></i>
+
+                                الرئيسية
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a href="#">
+
+                                بيانات الطلب
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a href="#">
+
+                                تعديل الطلب
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a href="#">
+
+                                استعراض الطلب
+
+                            </a>
+
+                        </li>
+
+
+                    </ul>
+
+                </nav>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             فورم تعديل التقرير
+             ================================================= -->
+
+        <form
+            id="edit_form"
+            enctype="multipart/form-data"
+            dir="rtl"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- =================================================
+                 بيانات الإسقاط
+                 ================================================= -->
+
+            <h5 class="section-title">
+                بيانات الإسقاط
+            </h5>
+
+
+            <div class="row">
+
+
+                <!-- مساحة الأرض -->
+
+                <div class="col-md-6">
+
+                    <label>
+                        مساحة الأرض حسب الإسقاط:
+                    </label>
+
+                    <input
+                        type="text"
+                        name="erea_asqt"
+                        class="form-control"
+                        value="{{ form_a.erea_asqt }}"
+                    >
+
+                </div>
+
+
+                <!-- نظام الإسقاط -->
+
+                <div class="col-md-6">
+
+                    <label>
+                        نظام الإسقاط المستخدم:
+                    </label>
+
+                    <select
+                        name="location_arth"
+                        id="location_arth"
+                        class="form-control"
+                    >
+
+                        <option
+                            value=""
+                            disabled
+                            {% if not form_a.location_arth %}
+                                selected
+                            {% endif %}
+                        >
+                            اختيار
+                        </option>
+
+
+                        {% for i in xx %}
+
+                            <option
+                                value="{{ i.name }}"
+                                {% if form_a.location_arth == i.name %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ i.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- إحداثيات الشمال -->
+
+                <div
+                    class="col-md-4 coordinate-fields"
+                    id="coord-fields"
+                    style="
+                        display:
+                        {% if form_a.location_arth == 'احدثيات' %}
+                            block
+                        {% else %}
+                            none
+                        {% endif %};
+                    "
+                >
+
+                    <label id="location_shml_lable">
+                        إحداثيات الشمال:
+                    </label>
+
+                    <input
+                        type="text"
+                        name="point_1"
+                        id="point_1"
+                        class="form-control"
+                        value="{{ form_a.point_1 }}"
+                    >
+
+                </div>
+
+
+                <!-- إحداثيات الشرق -->
+
+                <div
+                    class="col-md-4 coordinate-fields"
+                    id="coord-fields-2"
+                    style="
+                        display:
+                        {% if form_a.location_arth == 'احدثيات' %}
+                            block
+                        {% else %}
+                            none
+                        {% endif %};
+                    "
+                >
+
+                    <label id="location_shml_lable_2">
+                        إحداثيات الشرق:
+                    </label>
+
+                    <input
+                        type="text"
+                        name="point_2"
+                        id="point_2"
+                        class="form-control"
+                        value="{{ form_a.point_2 }}"
+                    >
+
+                </div>
+
+
+                <!-- الاسم -->
+
+                <div class="col-md-12">
+
+                    <label>
+                        الاسم:
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        value="{{ form_a.name }}"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <hr>
+
+
+            <!-- =================================================
+                 بيانات البلوك
+                 ================================================= -->
+
+            <h5 class="section-title">
+                بيانات البلوك
+            </h5>
+
+
+            <div class="row">
+
+
+                <!-- نوع البلوك -->
+
+                <div class="col-md-3">
+
+                    <label>
+                        نوع البلوك:
+                    </label>
+
+                    <select
+                        name="type_block"
+                        class="form-control"
+                        id="type_block"
+                    >
+
+                        {% for i in block %}
+
+                            <option
+                                value="{{ i.id }}"
+                                {% if form_a.type_block.id == i.id %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ i.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- طبيعة موقع الأرض -->
+
+                <div class="col-md-3">
+
+                    <label>
+                        طبيعة موقع الأرض:
+                    </label>
+
+                    <select
+                        name="type_natural"
+                        class="form-control"
+                        id="type_natural"
+                    >
+
+                        {% for i in natural %}
+
+                            <option
+                                value="{{ i.id }}"
+                                {% if form_a.type_natural.id == i.id %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ i.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- الموقع من مجرى السيول -->
+
+                <div class="col-md-3">
+
+                    <label>
+                        الموقع من مجرى السيول:
+                    </label>
+
+                    <select
+                        name="type_seol"
+                        class="form-control"
+                        id="type_seol"
+                    >
+
+                        {% for i in seo %}
+
+                            <option
+                                value="{{ i.name }}"
+                                {% if form_a.type_seol.name == i.name %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ i.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- الموقع من أبراج الكهرباء -->
+
+                <div class="col-md-3">
+
+                    <label>
+                        الموقع من ابراج الكهرباء:
+                    </label>
+
+                    <select
+                        name="type_kah"
+                        class="form-control"
+                        id="type_kah"
+                    >
+
+                        {% for i in kah %}
+
+                            <option
+                                value="{{ i.name }}"
+                                {% if form_a.type_kah.name == i.name %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ i.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+            <hr>
+
+
+            <!-- =================================================
+                 بيانات الموقع
+                 ================================================= -->
+
+            <h5 class="section-title">
+                بيانات الموقع
+            </h5>
+
+
+            <div class="row">
+
+
+                <!-- منسوب الشارع -->
+
+                <div class="col-md-4">
+
+                    <label>
+                        منسوب الشارع:
+                    </label>
+
+                    <input
+                        type="text"
+                        name="mnsobe"
+                        class="form-control"
+                        value="{{ form_a.report_masahi.mnsobe }}"
+                    >
+
+                </div>
+
+
+                <!-- وحدة الجوار -->
+
+                <div class="col-md-4">
+
+                    <label>
+                        وحدة الجوار:
+                    </label>
+
+                    <select
+                        name="unit"
+                        id="unit"
+                        class="form-control"
+                    >
+
+                        <option
+                            value=""
+                            disabled
+                            selected
+                        >
+                            اختيار
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- المديرية -->
+
+                <div class="col-md-4">
+
+                    <label>
+                        المديرية:
+                    </label>
+
+                    <select
+                        name="mderah"
+                        id="mderah"
+                        class="form-control"
+                    >
+
+                        {% for m in mderah %}
+
+                            <option
+                                value="{{ m.id }}"
+                                {% if form_a.mahfth.id == m.id %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ m.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+            <hr>
+
+
+            <!-- =================================================
+                 بيانات المرفقات
+                 ================================================= -->
+
+            <h5 class="section-title">
+                بيانات المرفقات
+            </h5>
+
+
+            <div class="row">
+
+
+                <!-- صورة الكروكي -->
+
+                <div class="col-md-6">
+
+                    <label>
+                        صورة الكروكي:
+                    </label>
+
+                    <input
+                        type="file"
+                        name="location_a"
+                        class="form-control"
+                    >
+
+
+                    {% if form_a.location_a %}
+
+                        <a
+                            href="{{ form_a.location_a.url }}"
+                            target="_blank"
+                            class="current-file"
+                        >
+
+                            عرض الملف الحالي
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- صورة معاينة الموقع -->
+
+                <div class="col-md-6">
+
+                    <label>
+                        صورة معاينة الموقع:
+                    </label>
+
+                    <input
+                        type="file"
+                        name="mahther_line"
+                        class="form-control"
+                    >
+
+
+                    {% if form_a.mahther_line %}
+
+                        <a
+                            href="{{ form_a.mahther_line.url }}"
+                            target="_blank"
+                            class="current-file"
+                        >
+
+                            عرض الملف الحالي
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- رأي المهندس -->
+
+                <div class="col-md-12">
+
+                    <label>
+                        رأي المهندس:
+                    </label>
+
+                    <input
+                        type="text"
+                        name="opnin_eng"
+                        class="form-control"
+                        value="{{ form_a.report_masahi.opnine_eng }}"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 الترحيل
+                 ================================================= -->
+
+            <div class="form-check mt-3">
+
+                <input
+                    type="checkbox"
+                    name="tr_masah"
+                    value="منجزة"
+                    id="tr_masah"
+                    class="form-check-input"
+                    {% if form_a.tr_masah %}
+                        checked
+                    {% endif %}
+                >
+
+                <label
+                    for="tr_masah"
+                    class="form-check-label"
+                >
+
+                    <span></span>
+
+                    الترحيل إلى رئيس قسم المساحة
+
+                </label>
+
+            </div>
+
+
+            <!-- =================================================
+                 زر الحفظ
+                 ================================================= -->
+
+            <div class="text-center mt-4">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary save-btn"
+                >
+
+                    💾 حفظ التعديلات
+
+                </button>
+
+            </div>
+
+
+            <!-- =================================================
+                 الحقول المخفية
+                 ================================================= -->
+
+            <input
+                type="hidden"
+                id="hid_mah"
+                name="hid_mah"
+            >
+
+
+            <input
+                type="hidden"
+                name="hid_gata"
+                id="hid_gata"
+            >
+
+
+            <input
+                type="hidden"
+                name="hid_block"
+                id="hid_block"
+            >
+
+
+            <input
+                type="hidden"
+                name="hid_seol"
+                id="hid_seol"
+            >
+
+
+            <input
+                type="hidden"
+                name="hid_kah"
+                id="hid_kah"
+            >
+
+
+            <input
+                type="hidden"
+                name="hid_nat"
+                id="hid_nat"
+            >
+
+
+            <input
+                type="hidden"
+                id="hid_erea_arth"
+                name="hid_erea_arth"
+            >
+
+
+            <input
+                type="hidden"
+                id="hid_map_location"
+                name="hid_map_location"
+            >
+
+
+            <input
+                type="hidden"
+                name="form_id"
+                value="{{ form_a.id }}"
+            >
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     المكتبات JavaScript المحلية
+     ========================================================= -->
+
+<!-- jQuery -->
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+
+<!-- Bootstrap -->
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+<!-- SweetAlert2 -->
+<script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+
+
+<!-- =========================================================
+     JavaScript الخاص بالصفحة
+     ========================================================= -->
+
+<script>
+
+$(document).ready(function () {
+
+
+    /* =========================================================
+       CSRF
+       ========================================================= */
+
+    const csrftoken =
+        $('[name=csrfmiddlewaretoken]').val();
+
+
+    /* =========================================================
+       تحميل الوحدات حسب المديرية
+       ========================================================= */
+
+    function loadUnits(
+        mderah_id,
+        selected_unit_id = null
+    ) {
+
+        if (!mderah_id) {
+
+            $('#unit').html(
+                '<option disabled selected>اختيار</option>'
+            );
+
+            return;
+        }
+
+
+        $.ajax({
+
+            url:
+                '{% url "masha:get_units_by_mderah" %}',
+
+            type: 'POST',
+
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+
+            data: {
+                'mderah_id': mderah_id
+            },
+
+
+            success: function (data) {
+
+                $('#unit').empty();
+
+
+                $('#unit').append(
+                    '<option value="" disabled>اختيار</option>'
+                );
+
+
+                if (
+                    data &&
+                    Array.isArray(data.units)
+                ) {
+
+                    data.units.forEach(
+                        function (u) {
+
+                            const selected =
+                                String(u.id) ===
+                                String(selected_unit_id)
+                                    ? 'selected'
+                                    : '';
+
+                            $('#unit').append(
+
+                                `<option
+                                    value="${u.id}"
+                                    ${selected}
+                                >
+                                    ${u.name}
+                                </option>`
+
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                /*
+                 * إذا لم توجد وحدة محددة
+                 * نجعل اختيار هو الافتراضي.
+                 */
+
+                if (!selected_unit_id) {
+
+                    $('#unit option:first')
+                        .prop('selected', true);
+
+                }
+
+            },
+
+
+            error: function (xhr) {
+
+                console.error(
+                    "خطأ في جلب الوحدات:",
+                    xhr.responseText
+                );
+
+            }
+
+        });
+
+    }
+
+
+    /* =========================================================
+       المديرية
+       ========================================================= */
+
+    $('#mderah').on(
+        'change',
+        function () {
+
+            const selectedOption =
+                $(this).val();
+
+
+            $('#hid_mah').val(
+                selectedOption || ''
+            );
+
+
+            loadUnits(
+                selectedOption,
+                null
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       تحميل المديرية والوحدة عند فتح الصفحة
+       ========================================================= */
+
+    const initial_mderah =
+        $('#mderah').val();
+
+
+    const initial_unit =
+        "{{ form_a.unit.id|default:'' }}";
+
+
+    if (initial_mderah) {
+
+        $('#hid_mah').val(
+            initial_mderah
+        );
+
+
+        loadUnits(
+            initial_mderah,
+            initial_unit
+        );
+
+    }
+
+
+    /* =========================================================
+       إظهار وإخفاء حقول الإحداثيات
+       ========================================================= */
+
+    function updateCoordinateFields() {
+
+        const value =
+            $('#location_arth').val();
+
+
+        if (value === 'احدثيات') {
+
+            $('#coord-fields').show();
+
+            $('#coord-fields-2').show();
+
+        } else {
+
+            $('#coord-fields').hide();
+
+            $('#coord-fields-2').hide();
+
+        }
+
+
+        /*
+         * حفظ نظام الإسقاط
+         */
+
+        $('#hid_map_location').val(
+            value || ''
+        );
+
+    }
+
+
+    /* =========================================================
+       عند تغيير نظام الإسقاط
+       ========================================================= */
+
+    $('#location_arth').on(
+        'change',
+        function () {
+
+            updateCoordinateFields();
+
+        }
+    );
+
+
+    /* =========================================================
+       تنفيذ الحالة عند فتح الصفحة
+       ========================================================= */
+
+    updateCoordinateFields();
+
+
+    /* =========================================================
+       وحدة الجوار
+       ========================================================= */
+
+    $('#unit').on(
+        'change',
+        function () {
+
+            const selectedOption =
+                $(this).val();
+
+
+            $('#hid_gata').val(
+                selectedOption || ''
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       نوع البلوك
+       ========================================================= */
+
+    $('#type_block').on(
+        'change',
+        function () {
+
+            $('#hid_block').val(
+                $(this).val() || ''
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       مجرى السيول
+       ========================================================= */
+
+    $('#type_seol').on(
+        'change',
+        function () {
+
+            $('#hid_seol').val(
+                $(this).val() || ''
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       أبراج الكهرباء
+       ========================================================= */
+
+    $('#type_kah').on(
+        'change',
+        function () {
+
+            $('#hid_kah').val(
+                $(this).val() || ''
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       طبيعة الموقع
+       ========================================================= */
+
+    $('#type_natural').on(
+        'change',
+        function () {
+
+            $('#hid_nat').val(
+                $(this).val() || ''
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       وضع القيم الحالية في الحقول المخفية عند فتح الصفحة
+       ========================================================= */
+
+    $('#hid_gata').val(
+        $('#unit').val() || ''
+    );
+
+
+    $('#hid_block').val(
+        $('#type_block').val() || ''
+    );
+
+
+    $('#hid_seol').val(
+        $('#type_seol').val() || ''
+    );
+
+
+    $('#hid_kah').val(
+        $('#type_kah').val() || ''
+    );
+
+
+    $('#hid_nat').val(
+        $('#type_natural').val() || ''
+    );
+
+
+    $('#hid_erea_arth').val(
+        $('input[name="erea_asqt"]').val() || ''
+    );
+
+
+    $('#hid_map_location').val(
+        $('#location_arth').val() || ''
+    );
+
+
+    /* =========================================================
+       حفظ الفورم عبر AJAX
+       ========================================================= */
+
+    $('#edit_form').on(
+        'submit',
+        function (e) {
+
+            e.preventDefault();
+
+
+            /*
+             * تحديث الحقول المخفية قبل الإرسال
+             */
+
+            $('#hid_mah').val(
+                $('#mderah').val() || ''
+            );
+
+
+            $('#hid_gata').val(
+                $('#unit').val() || ''
+            );
+
+
+            $('#hid_block').val(
+                $('#type_block').val() || ''
+            );
+
+
+            $('#hid_seol').val(
+                $('#type_seol').val() || ''
+            );
+
+
+            $('#hid_kah').val(
+                $('#type_kah').val() || ''
+            );
+
+
+            $('#hid_nat').val(
+                $('#type_natural').val() || ''
+            );
+
+
+            $('#hid_erea_arth').val(
+                $('input[name="erea_asqt"]').val() || ''
+            );
+
+
+            $('#hid_map_location').val(
+                $('#location_arth').val() || ''
+            );
+
+
+            /*
+             * FormData مهم لأنه يسمح بإرسال الصور
+             */
+
+            const formData =
+                new FormData(this);
+
+
+            $.ajax({
+
+                url:
+                    '{% url "masha:edit_report_ajax" form_a.id %}',
+
+                type: 'POST',
+
+                data: formData,
+
+                processData: false,
+
+                contentType: false,
+
+
+                /* =============================================
+                   نجاح الحفظ
+                   ============================================= */
+
+                success: function (res) {
+
+                    Swal.fire({
+
+                        icon: 'success',
+
+                        title: 'تم الحفظ',
+
+                        text:
+                            'تم تعديل التقرير بنجاح',
+
+                        confirmButtonText:
+                            'موافق'
+
+                    }).then(function () {
+
+                        /*
+                         * إعادة تحميل الصفحة بعد الحفظ
+                         */
+
+                        window.location.reload();
+
+                    });
+
+                },
+
+
+                /* =============================================
+                   خطأ أثناء الحفظ
+                   ============================================= */
+
+                error: function (xhr) {
+
+                    console.error(
+                        'خطأ أثناء حفظ التقرير:',
+                        xhr.responseText
+                    );
+
+
+                    Swal.fire({
+
+                        icon: 'error',
+
+                        title: 'خطأ',
+
+                        text:
+                            'حدث خطأ أثناء الحفظ',
+
+                        confirmButtonText:
+                            'موافق'
+
+                    });
+
+                }
+
+            });
+
+        }
+    );
+
+
+    /* =========================================================
+       منع الرجوع إلى الصفحة السابقة
+       ========================================================= */
+
+    history.pushState(
+        null,
+        document.title,
+        location.href
+    );
+
+
+    window.addEventListener(
+        'popstate',
+        function () {
+
+            history.pushState(
+                null,
+                document.title,
+                location.href
+            );
+
+        }
+    );
+
+
+});
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,818 @@
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>نظام المساحة الالكتروني- Preferences</title>
+    <meta name="description" content="">
+    <meta name="author" content="templatemo">
+    <!-- 
+    Visual Admin Template
+    http://www.templatemo.com/preview/templatemo_455_visual_admin
+    -->
+
+<link rel="stylesheet" href="{% static 'css/sweetalert2.min.css' %}">
+ <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+
+   
+
+
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<style type="text/css">
+  
+input[type="checkbox"] {
+    display: none; /* إخفاء الـ checkbox الفعلي */
+}
+
+input[type="checkbox"] + label span {
+    display: inline-block;
+    width: 20px; /* عرض الـ span */
+    height: 20px; /* ارتفاع الـ span */
+    border: 2px solid #ccc; /* حدود الـ span */
+    border-radius: 3px; /* زوايا مستديرة */
+    cursor: pointer; /* تغيير المؤشر إلى اليد عند التحويم */
+    position: relative; /* ضروري لوضع علامة "صح" */
+    text-align: center; /* محاذاة النص في المنتصف */
+}
+
+/* إظهار علامة "صح" عند التحديد */
+input[type="checkbox"]:checked + label span::after {
+    content: '✔'; /* علامة الصح */
+    position: absolute;
+    left: 0; /* موضع علامة الصح - مركزها */
+    top: -2px; /* موضع علامة الصح - ضبطة عمودية */
+    color: green; /* لون علامة الصح */
+    font-size: 18px; /* حجم علامة الصح */
+    line-height: 20px; /* محاذاة العلامة عموديًا */
+}
+</style>
+
+  </head>
+  <body>
+    
+    <!-- right column -->
+    <div class="templatemo-flex-row">
+      <div class="templatemo-sidebar">
+        <header class="templatemo-site-header">
+          <div class="square"></div>           <h1>نافذة رئيس القسم</h1> 
+        </header>
+        <div class="profile-photo-container">
+  <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+          <div class="profile-photo-overlay"></div>
+        </div>
+        <!-- Search box -->
+
+        <div class="mobile-menu-icon">
+            <i class="fa fa-bars"></i>
+          </div>
+        <nav class="templatemo-left-nav">
+          <ul>
+                <li><a href="{% url 'masha:show_manager_masah_nah' %}" class="active"><i class="fa fa-bar-chart fa-fw"></i>الرئيسية </a></li>
+            <li><a href="#" class="toggle"><i class="fa fa-bar-chart fa-fw"></i>الطلبات </a>
+            
+            </li>
+       
+             <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج </a></li>
+          </ul>
+        </nav>
+      </div>
+    
+      <!-- Main content -->
+      <div class="templatemo-content col-1 light-gray-bg">
+        <div class="templatemo-top-nav-container">
+          <div class="row">
+            <nav class="templatemo-top-nav col-lg-12 col-md-12">
+              <ul class="text-uppercase">
+            
+            
+              <li><a href="{% url 'masha:show_manager_masah_nah' %}" class="active">الرئيسية </a></li>
+                   
+              </ul>
+            </nav>
+          </div>
+        </div>
+      
+
+  <div align="right">
+            <form id="slam_no_b"  dir="rtl" >
+
+ {% csrf_token %}
+         
+       <div class="templatemo-content-container">
+          <div class="templatemo-content-widget white-bg">
+            <h2 class="margin-bottom-10"> مهامــي </h2>
+            <label >االتوجيـة : الموافقة اوعدم الموافقة على اصدار التقرير المساحي </label>  &nbsp;    &nbsp;  &nbsp;   &nbsp; &nbsp;    &nbsp;    &nbsp;    &nbsp; 
+            <label >أرسلت من : مهندس قسم المساحة </label> &nbsp; &nbsp;    &nbsp;    &nbsp;  &nbsp;  &nbsp;    &nbsp;    &nbsp;    &nbsp;    &nbsp;  
+                 <label >تاريخ الإرسال : {{f.id}}  </label> 
+              <br>
+  <br>
+           <div class="row form-group">
+                <div class="col-lg-12 form-group">                   
+       <input type="hidden" value="{{mas.id}}" 
+        id="number">
+
+               
+                    <div class="margin-right-15 templatemo-inline-block">
+                      <input type="radio" name="exit" id="c4" value="منجزة"  >
+                      <label for="c4" class="font-weight-400"><span></span>موافق</label>
+                    </div>
+                         <div class="margin-right-15 templatemo-inline-block">
+                      <input type="radio" name="exit" id="c3"  value="رفض"  >
+                      <label for="c3" class="font-weight-400"><span></span>غير  موافق</label>
+                    </div>
+                        <div class="margin-right-15 templatemo-inline-block">
+                      <input type="radio" name="exit" id="c2"  value="الادارة"  >
+                      <label for="c2" class="font-weight-400"><span></span>الترحيل الى الادارة </label>
+                    </div>
+                </div>
+
+              </div>
+<div id="slam_rafth"   style="display:none;" dir="rtl">  
+
+
+  <input type="hidden" value="{{mas.id}}" name="hala" id="hala">
+    <input type="hidden" value="{{mas.form_id}}" name="hala" id="hala_f">
+        <label   id="no_salm_2" dir="rtl"> </label>
+     <label   id="no_salm_4"   > اختار السبب<span style="color: red; font-size: 1.5em;">*</span> </label>
+
+ <select  id="nn_salm_nah" class="form-control" dir="rtl">
+          <option selected disabled>اختيار </option>
+        {% for i in resone %}
+      
+        <option value ="{{i.id}}">{{i.name}}</option>
+     
+        {% endfor %}
+
+    </select>
+         <label   id="no_salm_20"   style="display: none;" > اذكر سبب عدم الموافقة <span style="color: red; font-size: 1.5em;">*</span> </label>
+           <input type="text"   dir="rtl"  id="no_salm_5"  class="form-control" name="resone_refth"  style="display:none;">
+           <input type="hidden"   dir="rtl"  id="resone_report_stop"  class="form-control"  >
+           <br>
+         
+      
+        </div>
+     
+
+   
+
+
+
+	
+<input type="hidden" value=" {{mas.form.id}}"  id="form_id">
+<div class="form-group text-left">
+                <button type="submit" class="templatemo-blue-button">موافق</button>
+               
+              </div>       
+             
+	
+</form>
+ 
+</div>
+</div>
+ <div class="templatemo-content-container">
+ 	  <div class="templatemo-flex-row flex-content-row">
+            <div class="col-1">              
+              <div class="panel panel-default margin-10">
+                <div class="panel-heading"><h2>  بيانات مقدم الطلب</h2></div>
+            </div>
+
+  
+          <div class="templatemo-content-widget white-bg">
+  <div class="alert alert-info" role="alert" dir="rtl" align="right" style="color: black;">
+                    البيانات التالية توضح البيانات التي تم ادخالها من قبل منسق خدمة العملاء
+                  </div>
+                   <div class="row form-group">
+   
+
+  <div class="col-lg-4 col-md-4 form-group" dir="rtl"> 
+             <label>نوع الطلب : </label>
+      
+
+        <input type="text" dir="rtl"  class="form-control" value="{{mas.form.hidden_ansh_hdm}}" readonly  name="card_id" value=""  id="card_id"  
+        onkeypress="return runScript_3(event)">
+      </div>
+      <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >تاريخ  الطلب</label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.ajaml}}"  readonly dir="rtl" >
+    
+
+ 
+ </label>
+
+          
+  </div>
+      
+             <div class="col-lg-4 col-md-4 form-group" dir="rtl"> 
+
+            
+      
+        
+        <label id="name_rash" for="inputLastName">رقم الطلب:</label>
+   
+         <input type="text"   name="name"  value="{{mas.form.id}}" readonly id="name_aml"  class="form-control"onkeypress="return runScript_4(event)" dir="rtl"> 
+ </div>
+</div>
+<div class="row form-group">
+  <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >رقم الهاتف</label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.phone}}"  dir="rtl"  readonly>
+    
+
+ 
+
+
+          
+  </div>
+    <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  > اسم صاحب الطلب  </label>
+
+     <input type="text"  class="form-control"  name="streat_name" id="eng_safh"  readonly value="{{mas.form.name_wk}}"  dir="rtl" >
+    
+
+ 
+</div>
+   <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+          <label for="inputLastName">رقم  التقرير </label>
+    
+        <input type="text"  name="phone"  dir="rtl" value="{{mas.id}}" id="phone" value  class="form-control"
+        onkeypress="return runScript_5(event)" readonly>
+    </div>
+
+
+</div>
+    <div class="row form-group">
+  <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >رقم الهاتف</label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.phone}}" readonly dir="rtl" >
+    
+
+ 
+ </label>
+
+
+          
+  </div>
+   <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >رقم الهوية</label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.card_id}}"  readonly dir="rtl" >
+    
+
+ 
+ </label>
+
+          
+  </div>
+
+ <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  > اسم المالك </label>
+
+     <input type="text"  class="form-control"  name="streat_name" id="eng_safh" value="{{mas.form.name}} " readonly dir="rtl" >
+    
+
+ 
+</div>
+</div> 
+<div class="row form-group">
+  <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >مساحة  البصيرة </label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.erea_baser}}" dir="rtl"  readonly>
+    
+
+ 
+ </label>
+
+          
+  </div>
+   <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >رقم وثيقة الملكية</label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.document_number}}"  dir="rtl"  readonly>
+    
+
+ 
+ </label>
+
+          
+  </div>
+
+ <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >نوع وثيقة الملكية </label>
+
+     <input type="text"  class="form-control"  name="streat_name" id="eng_safh" value="{{mas.form.typ.name}}   "  readonly dir="rtl" >
+    
+
+ 
+</div>
+</div>
+<div class="row form-group">
+  <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >اسم الحي </label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value=" {{mas.form.streat_name}}"  dir="rtl"  readonly>
+    
+
+ 
+ </label>
+
+          
+  </div>
+   <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >رقم وحدة الجوار</label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.unit.name}}"  dir="rtl"  readonly >
+    
+
+ 
+ </label>
+
+          
+  </div>
+
+ <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >المديرية</label>
+
+     <input type="text"  class="form-control"  name="streat_name" id="eng_safh" value="{{mas.form.mahfth.name}}   " readonly  dir="rtl" >
+    
+
+ 
+</div>
+</div>
+    <div class="row form-group">
+
+   
+   <div class="col-lg-12 col-md-12 form-group" dir="rtl">   
+ <label for="inputStatus"  >نوع البلوك</label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.type_block.name}}"  dir="rtl"  readonly >
+    
+
+  <input type="hidden" id="text36"   name="text_36" onkeypress="return runScript_14(event)"
+class="form-control">
+ 
+ </label>
+
+          
+  </div>
+
+
+    
+</div> 
+    <div class="row form-group">
+  <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >موقع الارض من مجاري السيول </label>
+
+     <input type="text"  class="form-control"  name="streat_name" id="eng_safh" value="{{mas.form.type_seol.name}}   " readonly  dir="rtl" >
+    
+
+ 
+</div>
+ <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >طبيعة الارض </label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.type_natural.name}}"  dir="rtl"  readonly >
+    
+
+ 
+ </label>
+
+          
+  </div>
+ <div class="col-lg-4 col-md-4 form-group" dir="rtl">   
+ <label for="inputStatus"  >موقع الارض من  ابراج خطوط الضغط العالي </label>
+
+     <input type="text"  class="form-control"  name="streat_name" id="eng_safh" value="{{mas.form.type_kah.name}}   " readonly  dir="rtl" >
+    
+
+ 
+</div>
+ 
+</div>
+ <div class="row form-group">
+  
+ <div class="col-lg-6 col-md-6 form-group" dir="rtl">   
+ <label for="inputStatus"  > مقدر  البروز المسموح بة</label>
+
+     <input type="text"  class="form-control"  name="eer" id="see" value="{{mas.form.broze}} "  dir="rtl"  readonly >
+    
+
+ 
+ </label>
+
+          
+  </div>
+ <div class="col-lg-6 col-md-6 form-group" dir="rtl">   
+ <label for="inputStatus"  >الكثافة حسب عرض الشارع</label>
+
+     <input type="text"  class="form-control"  name="streat_name" id="eng_safh" value=" {{mas.form.width_street_big}}  " readonly  dir="rtl" >
+    
+
+ 
+</div>
+ 
+</div>
+</div>
+  <div class="templatemo-flex-row flex-content-row">
+            <div class="col-1">              
+              <div class="panel panel-default margin-10">
+                <div class="panel-heading"><h2>  بيانات  اسقاط الارض</h2></div>
+             
+                  <div class="templatemo-content-container">
+
+  <div class="alert alert-info" role="alert" dir="rtl" align="right" style="color: black;">
+                    البيانات التالية توضح بيانات الارض التي تم ادخالها من قبل مهندس قسم المساحة
+                  </div>
+          <div class="templatemo-content-widget no-padding">
+            <div class="panel panel-default table-responsive">
+              <div align="right">
+              <table class="table table-striped table-bordered templatemo-user-table" width="100%">
+                <thead>
+                
+              <tr align="right">
+   
+ 
+
+                <td align="center"  colspan="9"><a href="" class="white-text templatemo-sort-by">الحدود والاطوال والمساحة وفق الاتي  </a>
+                </td>
+</tr>
+<tr>
+  <td   rowspan="2" ><a href="" class="white-text templatemo-sort-by">  </a></td>
+      
+ <td   rowspan="2" ><a href="" class="white-text templatemo-sort-by"> </a></td>
+		    <td  colspan="3"  align="center"> <a href="" class="white-text templatemo-sort-by">بيانات الشارع  </a></td>
+
+		<td  rowspan="2" > <a href="" class="white-text templatemo-sort-by">الابعاد حسب الوثيقة  </a></td>
+
+		 <td  rowspan="2" > <a href="" class="white-text templatemo-sort-by">حدود الارض    </a></td>
+		 <td  rowspan="2" > <a href="" class="white-text templatemo-sort-by"> الاتجاهات    </a></td>
+	</tr>
+<tr>
+		<td   colspan="1"> <a href="" class="white-text templatemo-sort-by">رقم الشارع   </a></td>
+				<td   colspan="1"> <a href="" class="white-text templatemo-sort-by"> نوع الشارع   </a></td>
+			<td   colspan="1" ><a href="" class="white-text templatemo-sort-by">عرض الشارع  </a></td>
+		</tr>
+	</thead>
+{% for i in f %}
+
+
+<tr>
+<td colspan="1"  align="center"> </td>     
+	<td colspan="1"  align="center"> </td>
+            <td colspan="1"  align="center">{{i.number_strate}}</td>
+
+			<td  colspan="1" align="center">{{i.type_street}}</td>
+			<td  colspan="1" align="center">
+        {% if i.width_street is not None %}
+            {{ i.width_street }}
+        {% endif %}
+  
+</td>
+			<td  colspan="1" align="center"  >{{i.quantity}}</td>
+		
+
+		  <td  colspan="1"   align="center">{{i.shar_atjah}}
+</td>
+		<td colspan="1" align="center" >{{i.sh}}</td>
+
+</tr>
+{% endfor %}
+
+<tr>
+	
+
+			<td dir="rtl" colspan="6"> {{mas.form.erea_asqt}}
+	</td>
+	 
+			   <td align="right"  colspan="3">
+مساحة الارض حسب الاسقاط  </a>
+	</td>
+
+	</tr>
+
+
+	<tr>
+		
+			<td dir="rtl" colspan="6"> {{mas.opnine_eng}}
+	</td>
+	
+			<td align="right"  colspan="3">
+راي المهندس   </a>
+	</td>
+
+
+	</tr>
+</thead>
+</table>
+
+</div>
+       </div>
+                </div>                
+              </div>
+            </div> 
+      <div class="templatemo-flex-row flex-content-row">
+            <div class="col-md-6">              
+              <div class="panel panel-default">
+                <div class="panel-heading"><h2>   المرفقات   : عرض المخطط العام   </h2></div>
+               {% if mas.location %}
+           
+           
+               <img class="thumbnail" src="{{mas.location.url}}" style="width:100%;">
+           {% endif %} 
+       </div>
+                </div>                
+              
+
+         
+
+            <div class="col-md-6">              
+              <div class="panel panel-default">
+       <div class="panel-heading"><h2>  المرفقات    : عرض صورة  معانية الموقع </h2></div>
+
+ {% if mas.mahther_line %}
+           
+           
+              
+          <img class="thumbnail" src="{{mas.mahther_line.url}}" dir="rtl"  style="width:100%;">
+          {% endif %} 
+
+                
+                </div>                
+             </div>  
+             
+      
+          
+
+</div>
+
+
+  
+
+
+    <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+
+
+<script>
+
+  var $j = jQuery.noConflict();
+ $j(document).ready(function() {
+
+           
+              var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+$('#slam_no_b').submit(function(e) {
+        e.preventDefault();
+         var today = new Date();
+      
+
+// تحويل التاريخ إلى سلسلة نصية باستخدام الصيغة المحددة.
+var date_string = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+// تعيين القيمة المستخدمة إلى حقل النص المحدد.
+$('#text36').val(date_string);
+
+       
+         var c3=$('#c3').is(':checked')
+         var c4=$('#c4').is(':checked')
+          var c2=$('#c2').is(':checked')
+          var number=  $('#number').val()
+          var resone_report_stop= $('#resone_report_stop').val()
+          var form_id=$('#form_id').val()
+            var rafth_adarah_generl=  $('#rafth_adarah_generl').is(':checked')
+          var hala=  $('#hala').val();
+  
+          var hala_f=$('#hala_f').val();
+           var no_salm_5=$('#no_salm_5').val();
+         if(c3==""  && c4=="" && c2=="" ){
+
+         
+                      Swal.fire({
+        icon: 'error',
+        title: 'خطأ',
+        text:'يجب عليك عمل اشارة صح على زر',
+        confirmButtonText: 'حسناً'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // إعادة تركيز على حقل الإدخال
+            $('#no_salm_5').focus();
+        }
+    });
+
+         }
+         else if (c3!=""  && resone_report_stop==""){
+                     Swal.fire({
+        icon: 'error',
+        title: 'خطأ',
+        text:'اختار سبب الرفض',
+        confirmButtonText: 'حسناً'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // إعادة تركيز على حقل الإدخال
+            $('#nn_salm_nah').focus();
+        }
+    });
+      $('#nn_salm_nah').css('border-color','red');
+          return; // يمنع أي كود إضافي من التنفيذ
+}
+     
+
+
+       else if (c3!=""  &&resone_report_stop !="1" && !/^[ء-ي\s]+$/.test(no_salm_5)){
+                     Swal.fire({
+        icon: 'error',
+        title: 'خطأ',
+        text:'اكتب سبب الرفض على التقرير نص وليس رمز',
+        confirmButtonText: 'حسناً'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // إعادة تركيز على حقل الإدخال
+            $('#no_salm_5').focus();
+        }
+    });
+
+$('#nn_salm_nah').css('border-color','');
+  $('#no_salm_5').css('border-color','red');
+     return; // يمنع أي كود إضافي من التنفيذ
+}
+     
+
+
+       		
+
+           
+
+else{
+         
+
+      
+var  form_data = new FormData();
+
+
+
+// تحويل قيمة المعامل إلى سلسلة نصية
+
+
+// إضافة القيمة "منجزة" وقيمة المعامل إلى FormData
+
+    var radio_names = ['exit']; // أسماء radio buttons
+    var form_data = new FormData();
+    form_data.append('csrfmiddlewaretoken', '{{ csrf_token }}'); 
+
+    for (var i = 0; i < radio_names.length; i++) {
+        var radio_name = radio_names[i];
+        var radios = document.querySelectorAll('input[name="' + radio_name + '"]'); // الحصول على جميع radio buttons بنفس الاسم
+        
+        for (var j = 0; j < radios.length; j++) {
+            var radio = radios[j];
+            if (radio.checked) {
+                form_data.append(radio_name, radio.value); // إضافة القيمة المحددة إلى form_data
+                break; // الخروج من الحلقة بعد العثور على radio button المحدد
+            }
+        }
+    }
+
+ 
+form_data.append('form_id', document.querySelector('#form_id').value);
+form_data.append('text36', document.querySelector('#text36').value);
+form_data.append('no_salm_5', document.querySelector('#no_salm_5').value);
+form_data.append('resone_report_stop', document.querySelector('#resone_report_stop').value);
+
+var xhr = new XMLHttpRequest();
+xhr.open('POST', '/masha/agree_report_masahi_by_manager_mangmant/' + number);
+
+xhr.onload = function() {
+Swal.fire({
+    icon: 'success',
+    title: 'نجاح',
+    text: 'تمت الموافقة على التقرير بنجاح!',
+    confirmButtonText: 'حسناً',
+    timer: 20000, // الوقت بالمللي ثانية (10000 = 10 ثواني)
+    timerProgressBar: true,
+    showCloseButton: true,
+}).then((result) => {
+    if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+        // إعادة تعيين قيمة الحقل
+       
+        
+        // توجيه المستخدم إلى الصفحة الجديدة
+         window.location.href="{% url 'masha:show_manager_masah_nah' %}"
+      
+    }
+});
+
+   
+};
+xhr.send(form_data); 
+}
+});
+
+
+// تحويل قيمة المعامل إلى سلسلة نصية
+
+
+
+});
+ 
+</script>
+<script type="text/javascript">
+document.querySelectorAll('input[name="exit"]').forEach((elem) => {
+        elem.addEventListener("change", function(event) {
+            // إخفاء جميع الحقول
+            document.getElementById("slam_rafth").style.display = "none";
+            document.getElementById("slam_no").style.display = "none";
+
+            // إظهار الحقل المناسب بناءً على الزر المحدد
+            if (event.target.value === "منجزة") {
+                document.getElementById("slam_no").style.display = "block"; // إظهار حقل اسم المهندس
+            } else if (event.target.value === "رفض") {
+                document.getElementById("slam_rafth").style.display = "block"; // إظهار حقل سبب الرفض
+            }
+             
+            // يمكنك إضافة المزيد من الشروط إذا كان لديك أزرار أخرى
+        });
+    });
+</script>
+
+<script type="text/javascript">
+	var  slame=document.querySelector('#c3')
+slame.addEventListener('change',function(){
+n=slame.value;
+
+
+
+    document.getElementById("slam_no").style.display="block";
+   
+    document.getElementById("slam_rafth").style.display="none";
+
+
+
+});
+var  nn_salm_nah=document.querySelector('#nn_salm_nah')
+nn_salm_nah.addEventListener('change',function(){
+n=nn_salm_nah.value;
+
+  document.getElementById("resone_report_stop").value=n;
+  if (n==1){
+
+
+    document.getElementById("no_salm_5").style.display="none";
+    document.getElementById("no_salm_20").style.display="none";
+    
+   
+}
+else{
+      document.getElementById("no_salm_5").style.display="block";
+       document.getElementById("no_salm_20").style.display="block";
+}
+
+
+});
+	var  slame=document.querySelector('#c3')
+slame.addEventListener('change',function(){
+
+
+
+
+    document.getElementById("slam_rafth").style.display="block";
+   
+    document.getElementById("slam_no").style.display="none";
+
+
+
+});
+
+</script>
+
+
+  
+    <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/revo-custom.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/wow-custom.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/count.js' %}"></script>
+   <script type="text/javascript" src="{% static 'js/jquery-1.11.2.min.js' %}"></script>        <!-- jQuery -->
+    <script type="text/javascript" src="{% static 'js/bootstrap-filestyle.min.js' %}"></script>  <!-- http://markusslima.github.io/bootstrap-filestyle/ -->
+    <script type="text/javascript" src="{% static 'js/templatemo-script.js' %}"></script>     
+</body>
+
+</html>
+ 
+ 
+
+
+

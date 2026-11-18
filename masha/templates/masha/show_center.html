@@ -1,0 +1,47 @@
+
+{% extends  'masha/primry.html' %}
+
+
+{% load static %}
+{% load bootstrap4 %}
+{% block content %}
+
+ <a href="{% url 'masha:screen_interface_line_tslime_nah' %}" class="btn btn-outline-primary">
+  <font size="+1.5"            style="font-family:Noto Kufi Arabic Medium;">
+رجوع
+</font>
+</a> 
+
+<table border="3" align="center" style="width: 70%;">
+
+<tr  >
+	<td  style="background-color:#424575;"  align="center"><font size="+2"    color="#FFFFFF"  style="font-family:Noto Kufi Arabic Light;"
+  > اسما المديريات</td>
+</tr>
+{% for  i in mahf %}
+<tr>
+
+
+
+		
+			
+		
+				<td><a class="form-control btn btn-outline-primary" href="{% url  'masha:show_erea_masha' i.id %}" style="text-align:right; ">{{i.name}}</a></td>
+				
+				
+			
+	
+
+
+
+
+</tr>
+
+  {% endfor %}
+
+</table>
+  {% endblock %}
+  
+  
+
+  

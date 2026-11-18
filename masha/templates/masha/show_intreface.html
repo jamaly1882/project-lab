@@ -1,0 +1,75 @@
+  {% extends  'masha/primry.html' %}
+
+{% load static %}
+
+{% block content %}
+    
+
+
+
+     
+<br>
+<br>
+<font size="+4.5"            style="font-family:Noto Kufi Arabic Medium;" color="#424575" >  نظام المساحة الألكتروني   </font>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="row">
+  <div class="col-lg-4">
+   <a class="form-control btn btn-outline-primary"  
+    href="{% url 'masha:screen_adrat_ver' %}" style="height:100px;"><br><font             style="font-family:Noto Kufi Arabic Medium;"  size="+1.5">ادارة المساحة</font>
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-map" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.402.49l-5 1a.502.502 0 0 1-.196 0L5.5 15.01l-4.902.98A.5.5 0 0 1 0 15.5v-14a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0L10.5.99l4.902-.98a.5.5 0 0 1 .415.103zM10 1.91l-4-.8v12.98l4 .8V1.91zm1 12.98 4-.8V1.11l-4 .8v12.98zm-6-.8V1.11l-4 .8v12.98l4-.8z"/>
+</a>
+</div>
+<div class="col-lg-4">
+   <a class="form-control btn btn-outline-primary"   
+ href="{% url 'masha:screen_paesdint_masah' %}"  style="height:100px;"><br><font            style="font-family:Noto Kufi Arabic Medium;"  size="+1.5">قسم المساحة</font>
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-map" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M15.817.113A.5.5 0 0 1 16 .5v14a.5.5 0 0 1-.402.49l-5 1a.502.502 0 0 1-.196 0L5.5 15.01l-4.902.98A.5.5 0 0 1 0 15.5v-14a.5.5 0 0 1 .402-.49l5-1a.5.5 0 0 1 .196 0L10.5.99l4.902-.98a.5.5 0 0 1 .415.103zM10 1.91l-4-.8v12.98l4 .8V1.91zm1 12.98 4-.8V1.11l-4 .8v12.98zm-6-.8V1.11l-4 .8v12.98l4-.8z"/>
+</a>
+</div>
+<div class="col-lg-4" >
+   <a class="form-control btn btn-outline-primary"   
+    href="{% url 'masha:enter_face_enter_nah' %}" style="height:100px;"><br><font          style="font-family:Noto Kufi Arabic Medium;" size="+1.5">اصدارتقرير مساحي  </font>
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-fill-add" viewBox="0 0 16 16">
+  <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+  <path d="M2 13c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Z"/>
+</svg>
+</a>
+</div>
+
+
+</div>
+<br>
+
+        <div align="right"    style="background-color:#424575 ;" ><font size="+5.5"  
+      style="font-family:Noto Kufi Arabic Light;">  
+  <br></font>
+
+</div>
+{% endblock %}

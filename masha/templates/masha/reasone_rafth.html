@@ -1,0 +1,145 @@
+{% load static %}
+
+
+
+        <div class="templatemo-content-container">
+          <div class="templatemo-content-widget no-padding">
+            <div class="panel panel-default table-responsive">
+              <div align="right">
+              <table class="table table-striped table-bordered templatemo-user-table">
+                <thead>
+                
+              <tr align="right">
+
+      
+               <td align="right"><a href="" class="white-text templatemo-sort-by">طباعة  </a></td>
+       <td align="right"><a href="" class="white-text templatemo-sort-by">سبب  الرفض     </a></td>
+  
+    
+       
+        
+        <td align="right"><a href="" class="white-text templatemo-sort-by">اسم الحي   </a></td>
+
+
+  
+
+         
+      <td align="right"><a href="" class="white-text templatemo-sort-by">اسم المالك    </a></td>
+
+              <td align="right"><a href="" class="white-text templatemo-sort-by">اسم مقدم الطلب    </a></td>
+              <td align="right"><a href="" class="white-text templatemo-sort-by"> وحده الجوار  </a></td>
+                      <td align="right"><a href="" class="white-text templatemo-sort-by"> القطاع   </a></td>
+         <td align="right"><a href="" class="white-text templatemo-sort-by">المديرية  </a></td>
+   <td align="right"><a href="" class="white-text templatemo-sort-by">نوع الطلب    </a></td>
+         <td align="right"><a href="" class="white-text templatemo-sort-by">
+تاريخ الطلب  </a></td>
+
+      
+    <td align="right"><a href="" class="white-text templatemo-sort-by"> رقم   الطلب   </a></td>
+    
+
+
+
+      
+      
+      
+      
+      
+</tr>
+</thead>
+   
+      
+
+     {% for  i in form %}
+    
+ 
+
+  <tr>
+
+
+ 
+ <td align="right">
+    <a href="{% url 'masha:rafth_astmarh_nah' i.id %}" target="_blank">
+        طباعة
+    </a>
+</td>
+
+       
+
+                      
+  </td>
+  <td  align="right"><font >{{i.rasone_rafth_maml}}</font>
+                    
+       
+
+                      
+  </td>
+ 
+
+
+         
+
+
+   
+  <td  align="right"><font >{{i.streat_name}}</font>
+                    
+       
+
+                      
+  </td>
+
+
+         
+
+
+  
+
+  
+  
+  <td  align="right"><font >{{i.name}}</font>
+
+  </td>
+
+  <td  align="right"><font >{{i.name_wk}}</font>
+                    
+</td>
+
+
+  <td  align="right"><font >{{i.unit.name}} </font></td>
+  <td  align="right"><font >{{i.unit.gata.name}}</font>
+  </td>  
+  <td  align="right"><font >{{i.mahfth.name}}</font>
+  </td>
+  <td  align="right"><font >{{i.hidden_ansh_hdm}}</font>
+                    
+</td>   
+
+   <td  align="right"><font >{{i.ajaml}} </font></td>
+
+  
+  
+   <td  align="right"><font >{{i.id}}</font> </td>  
+  </tr>
+  
+
+   {% endfor %}
+
+   
+  </form>
+   </table>
+ </form>
+</div>
+</tr>
+</table>
+
+
+      <script src="{% static 'assets/js/wow.js' %}"></script>
+      <script>
+         new WOW().init();
+      </script>
+      <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+      <script src="{% static 'assets/js/popper.min.js' %}"> </script>
+      <script src="{% static 'assets/js/bootstrap.min.js' %}"> </script>
+      <script src="{% static 'assets/js/custom-script.js' %}"> </script>
+   </body>
+</html>

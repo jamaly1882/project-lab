@@ -1,0 +1,395 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نظام المساحة الالكتروني</title>
+  <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/templatemo-style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sweetalert2.min.css' %}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+  
+</head>
+<body>
+
+<div class="templatemo-flex-row">
+
+  <!-- Sidebar -->
+  <div class="templatemo-sidebar">
+    <header class="templatemo-site-header">
+      <div class="square"></div>
+      <h1>نافذة منسق القسم</h1>
+    </header>
+    <div class="profile-photo-container">
+      <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+      <div class="profile-photo-overlay"></div>
+    </div>
+    <div class="mobile-menu-icon"><i class="fa fa-bars"></i></div>
+    <nav class="templatemo-left-nav">
+      <ul>   
+
+        <li><a href="{% url 'masha:screen_adrat_ver' %}"   class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+        <li><a href="#" class="toggle"><i class="fa fa-bar-chart fa-fw"></i>الطلبات</a></li>
+       <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج </a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main content -->
+  <div class="templatemo-content col-1 light-gray-bg">
+    <div class="templatemo-top-nav-container">
+      <div class="row">
+        <nav class="templatemo-top-nav col-lg-12 col-md-12">
+          <ul class="text-uppercase">
+            <li><a href="#" class="active">الرئيسية</a></li>
+            <li><a href="">بيانات الطلب</a></li>
+            <li><a href="">تعديل الطلب</a></li>
+            <li><a href="">استعراض الطلب</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+  <!-- Main content -->
+  <div class="templatemo-content col-12 col-lg-10" dir="rtl">
+
+   <div class="templatemo-content-widget white-bg p-3 mb-4" >
+      <h2 class="text-center mb-4">إدخال بيانات المحضر</h2>
+
+      <form method="post" id="mahther_lin" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- بيانات المهندسين -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-primary text-white"><b>بيانات المهندسين</b></div>
+          <div class="card-body">
+            <div class="row g-4">
+       <div class="col-md-4">
+                <label class="form-label">اسم المهندس المستلم</label>
+                <input type="text" name="eng_tsl" id="eng_ther" class="form-control"dir="rtl">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">اسم المهندس الثاني</label>
+                <input type="text" name="eng_tow" id="eng_second" class="form-control" dir="rtl">
+              </div>
+              
+                     <div class="col-md-4">
+                <label class="form-label">اسم المهندس الأول</label>
+                <input type="text" name="eng_frist" id="eng_first" class="form-control" dir="rtl">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- بيانات الموقع -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-primary text-white"><b>بيانات الموقع</b></div>
+          <div class="card-body">
+            <input type="hidden" name="number_str" value="{{st}}">
+
+            <div class="row g-4" >
+                  <div class="col-md-4" style="display: none;">
+                <label class="form-label">القطاع</label>
+                <select id="gata" class="form-control">
+                  <option selected disabled>اختيار</option>
+                </select>
+              </div>
+              <div class="col-md-4" style="display: none;">
+                <label class="form-label">المنطقة</label>
+                <select id="erea" class="form-control">
+                  <option selected disabled>اختيار</option>
+                </select>
+              </div>
+
+          
+
+
+              <div class="col-md-6">
+                <label class="form-label">وحدة الجوار</label>
+                <select id="unit" class="form-control">
+                  <option selected disabled>اختيار</option>
+                </select>
+              </div>
+<div class="col-md-6">
+                <label class="form-label">المديرية</label>
+                <select id="mderah" class="form-control">
+                  <option selected disabled>اختيار</option>
+                  {% for i in mah %}
+                    <option value="{{i.id}}">{{i.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+          
+            </div>
+                <div class="col-md-8">
+                <label class="form-label">وصف المكان / الحي - الشارع</label>
+                <input type="text" id="streat_name" name="streat_name" class="form-control" dir="rtl">
+              </div>
+          </div>
+        </div>
+
+        <!-- بيانات المرفقات -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-primary text-white"><b>بيانات المرفقات</b></div>
+          <div class="card-body">
+            <input type="hidden" id="hid_gata">
+            <input type="hidden" id="hid_mah">
+            <input type="hidden" id="hid_er">
+            <input type="hidden" id="hid_g">
+            <input type="hidden" id="hid_typ_strrt" name="hidden_type_strate">
+
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label">صورة المحضر</label>
+                <input type="file" id="img_mahther" name="img_mahther" class="form-control" dir="rtl">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- زر الإرسال -->
+        <div class="text-center">
+          <button type="submit" class="btn btn-success btn-lg px-5">إضافة</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+</body>
+</html>
+
+
+  <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+
+
+<script>
+
+var $j = jQuery.noConflict();
+$j(document).ready(function() {
+
+  var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  $('#mahther_lin').submit(function(e) {
+    e.preventDefault();
+
+    // قراءة القيم
+    var eng_first = $('#eng_first').val().trim();
+    var eng_second = $('#eng_second').val().trim();
+    var eng_ther = $('#eng_ther').val().trim();
+    var hid_mah = $('#hid_mah').val();
+    var hid_er = $('#hid_er').val();
+    var img_mahther = $('#img_mahther')[0];
+    const file_img_mahther = img_mahther.files[0];
+    var hid_g = $('#hid_g').val();
+    var streat_name = $('#streat_name').val().trim();
+    var hid_gata = $('#hid_gata').val();
+
+    // دالة التنبيه
+    function msg(type, text) {
+      Swal.fire({
+        icon: type,
+        title: 'تنبيه',
+        text: text,
+        confirmButtonText: 'موافق'
+      });
+    }
+
+    // دالة تصفير الحدود
+    function resetBorders() {
+      $('#eng_first, #eng_second, #eng_ther, #mderah, #erea, #gata, #unit, #streat_name, #img_mahther')
+        .css('border-color', '');
+    }
+
+    resetBorders();
+
+    // دالة فحص نص عربي
+    function isArabic(text) {
+      return /^[ء-ي\s]+$/.test(text);
+    }
+
+    // ✅ التحقق من كل الحقول
+    if (eng_first === "") {
+      $('#eng_first').css('border-color', 'red');
+      msg('warning', 'يرجى إدخال اسم المهندس الأول');
+      return false;
+    }
+    if (!isArabic(eng_first)) {
+      $('#eng_first').css('border-color', 'red');
+      msg('warning', 'اسم المهندس الأول يجب أن يكون نصًا عربيًا فقط');
+      return false;
+    }
+
+    if (eng_second === "") {
+      $('#eng_second').css('border-color', 'red');
+      msg('warning', 'يرجى إدخال اسم المهندس الثاني');
+      return false;
+    }
+    if (!isArabic(eng_second)) {
+      $('#eng_second').css('border-color', 'red');
+      msg('warning', 'اسم المهندس الثاني يجب أن يكون نصًا عربيًا فقط');
+      return false;
+    }
+
+    if (eng_ther === "") {
+      $('#eng_ther').css('border-color', 'red');
+      msg('warning', 'يرجى إدخال اسم المهندس المستلم');
+      return false;
+    }
+    if (!isArabic(eng_ther)) {
+      $('#eng_ther').css('border-color', 'red');
+      msg('warning', 'اسم المهندس المستلم يجب أن يكون نصًا عربيًا فقط');
+      return false;
+    }
+
+    if (hid_mah === "") {
+      $('#mderah').css('border-color', 'red');
+      msg('warning', 'يرجى تحديد المديرية');
+      return false;
+    }
+
+
+    if (hid_gata === "") {
+      $('#unit').css('border-color', 'red');
+      msg('warning', 'يرجى إدخال وحدة الجوار');
+      return false;
+    }
+
+    if (streat_name === "") {
+      $('#streat_name').css('border-color', 'red');
+      msg('warning', 'يرجى إدخال اسم الحي');
+      return false;
+    }
+    if (!isArabic(streat_name)) {
+      $('#streat_name').css('border-color', 'red');
+      msg('warning', 'اسم الحي يجب أن يكون نصًا عربيًا فقط');
+      return false;
+    }
+
+    if (!file_img_mahther) {
+      $('#img_mahther').css('border-color', 'red');
+      msg('warning', 'يرجى رفع صورة المحضر');
+      return false;
+    }
+
+    // ✅ إذا وصلنا هنا، فكل شيء صحيح
+    msg('success', 'تم التحقق من البيانات بنجاح!');
+
+    // إرسال البيانات عبر AJAX
+    var form_data = new FormData();
+    form_data.append('csrfmiddlewaretoken', csrftoken);
+    form_data.append('eng_first', eng_first);
+    form_data.append('eng_second', eng_second);
+    form_data.append('eng_ther', eng_ther);
+    form_data.append('hid_mah', hid_mah);
+    form_data.append('hid_er', hid_er);
+    form_data.append('hid_g', hid_g);
+    form_data.append('hid_gata', hid_gata);
+    form_data.append('streat_name', streat_name);
+    form_data.append('img_mahther', file_img_mahther);
+
+    $.ajax({
+      url: '/masha/add_tlab_tslime_line_organzatio_add_strate_and_unit_to_data_base',
+      type: 'POST',
+      data: form_data,
+      processData: false,
+      contentType: false,
+      success: function(response) {
+        Swal.fire({
+          icon: 'success',
+          title: 'تم الحفظ بنجاح',
+          showConfirmButton: false,
+          timer: 2000
+        });
+        setTimeout(function() {
+          window.location.href = "{% url 'masha:add_tlab_tslime_line_organzatio_add_db' %}";
+        }, 2000);
+      },
+      error: function() {
+        msg('error', 'حدث خطأ أثناء حفظ البيانات!');
+      }
+    });
+
+  });
+
+
+
+   
+      $('#mderah').change(function() {
+    var selectedOption = $(this).val();
+ $('#hid_mah').val(selectedOption);   
+    var url = '/masha/select_erea_mderah_masha';
+    fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrftoken},
+        body: JSON.stringify({'selected_option': selectedOption})
+    })
+    .then(response => response.json())
+    .then((data) => {
+        const myObject = JSON.parse(data);
+
+        $('#unit').empty();
+        $('#unit').append('<option selected disabled>اختيار</option>');
+
+        myObject.forEach(item => {
+          console.log(item.fields) 
+            $('#unit').append('<option value="' + item.pk + '">' + item.fields.name + '</option>');
+        });
+    });
+
+  });
+
+ $('#unit').change(function() {
+    var selectedOption = $(this).val();
+   $('#hid_gata').val(selectedOption);
+});
+
+});
+
+</script>
+
+</script>
+<script type="text/javascript">
+ 
+
+ $('#customPageStepBtns').on('click', '.btnNext', function(e) {
+  e.stopPropagation();
+  $('.nav-tabs li > .active').parent('li').next('li').find('a').trigger('click');
+ 
+});
+$('#customPageStepBtns').on('click', '.btnPrev', function(e) {
+  e.stopPropagation();
+  $('.nav-tabs  li > .active').parent('li').prev('li').find('a').trigger('click')
+
+
+
+});
+</script>
+
+
+
+
+
+
+<script type="text/javascript">var sal=document.querySelector('#mh_a')
+
+
+
+   </script>
+ <script src="{% static 'assets/js/wow.js' %}"></script>
+      <script>
+         new WOW().init();
+      </script>
+      <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+      <script src="{% static 'assets/js/popper.min.js' %}"> </script>
+      <script src="{% static 'assets/js/bootstrap.min.js' %}"> </script>
+      <script src="{% static 'assets/js/custom-script.js' %}"> </script>
+   </body>
+</html>
+ 
+  

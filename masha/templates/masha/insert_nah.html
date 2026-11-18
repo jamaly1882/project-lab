@@ -1,0 +1,51 @@
+{% extends 'masha/primry.html' %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block content %}
+<form id="form_a" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label style="display: none;" id="img_rakis_one_lab">رقم قيد الطلب</label>
+    <input type="hidden" name="number" id="number_a" value="{{talb.id}}">
+    <br>
+    <label id="img_rakis_one_lab">اضافة صورة الطلب</label>
+    <br>
+    <input type="file" class="form-control" id="img_rakis_one_id" name="talbt" dir="rtl">
+    <br>
+    <input type="submit" value="اضافة الطلب" class="btn btn-primary">
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    var $j = jQuery.noConflict();
+    $j(document).ready(function() {
+        $('#form_a').submit(function(e) {
+            e.preventDefault();
+            var img_rakis_one_id = $('#img_rakis_one_id')[0];
+            const file_img_rakis_one_id = img_rakis_one_id.files[0];
+
+            if (!file_img_rakis_one_id) {
+                alert("يرجى ادخال صورة الطلب");
+                $('#img_rakis_one_id').css('border-color', 'red');
+            } else {
+                var form_data = new FormData();
+                form_data.append('number', document.querySelector('#number_a').value);
+                form_data.append('talbt', document.querySelector('#img_rakis_one_id').files[0]);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/masha/talb_add_to_base_trhle');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        alert("تم إضافة الطلب بنجاح");
+                        
+                        window.location.href = "{% url 'masha:add_form_new_talb' %}";
+                    } else {
+                        alert("حدث خطأ أثناء إضافة الطلب. حاول مرة أخرى.");
+                    }
+                };
+                xhr.send(form_data);
+            }
+        });
+    });
+</script>
+{% endblock %}

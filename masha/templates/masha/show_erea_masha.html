@@ -1,0 +1,32 @@
+{% extends  'masha/primry.html' %}
+
+
+{% load static %}
+{% load bootstrap4 %}
+{% block content %}
+ <a href="{% url 'masha:screen_interface_line_tslime_nah'%}" class="btn btn-outline-primary">
+  <font size="+1.5"            style="font-family:Noto Kufi Arabic Medium;">
+رجوع
+</font>
+</a> 
+
+<table border="3" align="center" style="width: 70%;">
+
+<tr >
+	<td align="center" style="background-color:#424575;"><font size="+2"    color="#FFFFFF"  style="font-family:Noto Kufi Arabic Light;"
+  >اسما القطاعات </td>
+</tr>
+{% for  j in erea11 %}
+<tr>
+
+ <td align="center"><a href="{% url 'masha:show_gata_masha' j.id  %}" 
+ 	class="form-control btn btn-outline-primary">  {{j.name}}</a> </td>
+
+</tr>
+  {% endfor %}
+          
+
+
+</table>
+
+{% endblock %}

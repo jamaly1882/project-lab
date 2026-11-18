@@ -1,0 +1,149 @@
+﻿
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>عنوان الصفحة</title>
+<style>
+   
+
+body {
+    direction: lft;
+    font-family: 'Sakkal Majalla', Arial, sans-serif;
+    font-size: 12px;
+}
+
+.header_report {
+    padding-top: 40px;
+    padding-right: 40px;
+    padding-left: 40px;
+    text-align: center;
+    background: #fff;
+    color: black;
+    font-size: 24px;
+    font-weight: bold;
+    border-top: 4px solid #000;
+    border-bottom: 3px solid #000;
+    width: 99%;
+    border-radius: 10px;
+}
+
+#report_left, #company__name_en, #name_en_branch, #address_en, #phone_en {
+    text-align: right;
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(26, 54, 126, 0.125);
+    border-rad
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: right;
+}
+
+th {
+    background-color: #eee;
+    font-weight: bold;
+}
+</style>
+</head>
+<table border="1" align="center">
+
+<tr>
+	<td colspan="3">
+
+	<font  style="font-family: Hanimation Arabic ;" size="+2">رقم الطلب      {{form.id}}
+
+	 		<br>
+	 	
+	 	 <font  style="font-family: Hanimation Arabic ;" size="+2">   تاريخ الطلب   {{form.ajaml}}
+	 		
+	
+	</td>
+
+	 	
+
+
+    	
+ 
+
+
+     <td colspan="3" align="right"><h1 align="center" style="font-family: Hanimation Arabic ;"></h1>
+
+    	
+
+    	 
+    </td>
+
+        <td  colspan="3"  align="right">
+        	<font  style="font-family: Hanimation Arabic ;" size="+2">الجمهورية اليمنية   </font>
+    	<br>
+    	<font  style="font-family: Hanimation Arabic ;" size="+2">وزارة الاشغال العامة والطرق   </font>
+    	 <br>
+
+    	<font  style="font-family: Hanimation Arabic ;" size="+2">مكتب محافظة صنعاء</font>
+
+    	
+ 
+
+</font>
+</font>
+</td>
+</font>
+</font>
+</td>
+</tr>
+
+	<tr> 
+    <td  colspan="9"   align="center"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;" size="+5">     اشعار استلم طلب  </font>
+    </td>
+
+	</tr>
+
+	<tr  colspan="9" >
+		
+	<td colspan="2" bgcolor="#E4E4E4" align="center"><font    style="font-family: Hanimation Arabic ;" size="+2"> رقم الهاتف </td>
+		<td colspan="2"  bgcolor="#E4E4E4" align="center"><font  style="font-family: Hanimation Arabic ;" size="+2">صفة مقدم الطلب  </font></td>
+		
+		<td colspan="3"  bgcolor="#E4E4E4" align="center"><font    style="font-family: Hanimation Arabic ;" size="+2"> اسم صاحب الطلب  </font></td>
+<td colspan="2" bgcolor="#E4E4E4" align="center"><font    style="font-family: Hanimation Arabic ;" size="+2">رقم الطلب  </font></td>
+	</tr>
+
+	<tr  colspan="9" >
+		<td colspan="2" align="center"><font    style="font-family: Hanimation Arabic ;" size="+2">{{form.phone}}</td>
+			<td colspan="2" align="center"><font  style="font-family: Hanimation Arabic ;" size="+2">{{form.saft_sahb_talab}}</td>
+			<td colspan="3" align="center"> <font  style="font-family: Hanimation Arabic ;" size="+2">          {{form.name}}  </td>
+			<td colspan="2"  align="center"><font  style="font-family: Hanimation Arabic ;" size="+2">{{form.id}}</td>
+		
+		
+	</tr>
+
+
+
+
+
+	
+
+
+</table>
+
+</body>
+</html>
+
+

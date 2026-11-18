@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>نظام المساحة الالكتروني</title>
+
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
+</head>
+
+<body>
+<div class="templatemo-flex-row">
+
+    <!-- Sidebar -->
+    <div class="templatemo-sidebar">
+        <header class="templatemo-site-header">
+            <div class="square"></div>
+            <h1>إدارة المساحة</h1>
+        </header>
+
+        <nav class="templatemo-left-nav">
+            <ul>
+
+                <li>
+                    <a href="{% url 'masha:screen_paesdint_masah' %}" class="active">
+                        <i class="fa fa-home fa-fw"></i> الرئيسية
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'masha:screen_enter_number_mahther_and_number_strate_and_unit' %}">
+                        <i class="fa fa-envelope"></i> إضافة محضر استلم
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'masha:show_convert_to_mashi_from_fero' %}" 
+                   >
+                        <i class="fa fa-envelope"></i> الوارد من الفروع
+                        <span id="badge1" class="badge badge-danger notification-badge">
+                            {{ num_unread_1 }}
+                        </span>
+                    </a>
+                </li>
+                      <li>
+                    <a href="{% url 'masha:show_convert_to_mashi_from_fero_nah_adrah' %}" >
+                        <i class="fa fa-envelope"></i>التقارير  المقبولة من الادارة
+                        <span id="badge3" class="badge badge-danger notification-badge">
+                            {{ num_unread_agree }}
+                        </span>
+
+                    </a>
+                </li>
+                      <li>
+                    <a href="{% url 'masha:rafth_by_manager_aldarah_generl_nah' %}" >
+                        <i class="fa fa-envelope"></i>التقارير المرفوضة من  الادارة
+    <span id="badge4" class="badge badge-danger notification-badge">
+                            {{ num_unread_rafth }}
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="loadContent_rafth(event, '{% url 'masha:show_conecctions' %}')">
+                        <i class="fa fa-envelope"></i> طلبات التقرير الخاصة بي
+                        <span id="badge2" class="badge badge-danger notification-badge">
+                            {{ num_unread }}
+                        </span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'accounts:user_logout' %}">
+                        <i class="fa fa-eject fa-fw"></i> تسجيل الخروج
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="templatemo-content col-1 light-gray-bg">
+        <div id="content-area"></div>
+    </div>
+
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'js/templatemo-script.js' %}"></script>
+
+<script>
+function loadContent_rafth(event, url) {
+    event.preventDefault();
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('content-area').innerHTML = data;
+        })
+        .catch(error => console.error('خطأ في تحميل المحتوى:', error));
+}
+</script>
+
+<!-- ✔ تحديث الوقت الحقيقي -->
+<script>
+function updateRealtimeBadges() {
+    fetch("{% url 'masha:realtime_counts' %}")
+        .then(res => res.json())
+        .then(data => {
+
+            // Badge1
+            const b1 = document.getElementById("badge1");
+            if (data.num_unread_1 > 0) {
+                b1.innerText = data.num_unread_1;
+                b1.style.display = "inline-block";
+            } else {
+                b1.style.display = "none";
+            }
+
+            // Badge2
+            const b2 = document.getElementById("badge2");
+            if (data.num_unread > 0) {
+                b2.innerText = data.num_unread;
+                b2.style.display = "inline-block";
+            } else {
+                b2.style.display = "none";
+            }
+            const b3= document.getElementById("badge3");
+            if (data.num_unread_agree > 0) {
+                b3.innerText = data.num_unread_agree;
+                b3.style.display = "inline-block";
+            } else {
+                b3.style.display = "none";
+            }
+            const b4= document.getElementById("badge4");
+            if (data.num_unread_rafth > 0) {
+                b4.innerText = data.num_unread_rafth;
+                b4.style.display = "inline-block";
+            } else {
+                b4.style.display = "none";
+            }
+        })
+        .catch(err => console.log("Real-time Error:", err));
+}
+
+// تحديث كل 5 ثوان
+setInterval(updateRealtimeBadges, 5000);
+
+// تشغيل عند فتح الصفحة
+updateRealtimeBadges();
+</script>
+
+</body>
+</html>

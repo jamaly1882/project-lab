@@ -1,0 +1,230 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>نظام المساحة الالكتروني</title>
+    <meta name="description" content="">
+    <meta name="author" content="templatemo">
+    <!-- <link rel="stylesheet" href="{% static 'css/sweetalert2.min.css' %}">
+ <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+    Visual Admin Template
+    http://www.templatemo.com/preview/templatemo_455_visual_admin
+    -->
+<link rel="stylesheet" href="{% static 'css/sweetalert2.min.css' %}">
+ <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+           <script type="text/javascript">
+// إضافة حالة جديدة إلى سجل المتصفح
+history.pushState(null, document.title, location.href);
+
+// الاستماع لحدث "popstate"
+window.addEventListener('popstate', function(event) {
+    // إذا حدثت محاولة للرجوع، أعد إضافة الحالة
+    history.pushState(null, document.title, location.href);
+});
+</script>
+
+
+  </head>
+  <body>
+
+    
+    <!-- right column -->
+    <div class="templatemo-flex-row">
+      <div class="templatemo-sidebar">
+        <header class="templatemo-site-header">
+          <div class="square"></div>                   <h1> رئيس  قسم   المساحة </h1>
+        </header>
+        <div class="profile-photo-container">
+          <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+          <div class="profile-photo-overlay"></div>
+        </div>
+        <!-- Search box -->
+
+        <div class="mobile-menu-icon">
+            <i class="fa fa-bars"></i>
+          </div>
+        <nav class="templatemo-left-nav">
+          <ul>
+             <li><a  href="{% url 'masha:show_manager_masah_nah'   %}"  class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+            <li><a href="#" class="toggle"><i class="fa fa-bar-chart fa-fw"></i>الطلبات </a>
+            
+            </li>
+       
+            <li><a href="#"><i class="fa fa-database fa-fw"></i>التقارير</a></li>
+          
+            <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج </a></li>
+
+          </ul>
+        </nav>
+      </div>
+      <!-- Main content -->
+      <div class="templatemo-content col-1 light-gray-bg">
+        <div class="templatemo-top-nav-container">
+          <div class="row">
+            <nav class="templatemo-top-nav col-lg-12 col-md-12">
+              <ul class="text-uppercase">
+            
+            
+              <li><a href="{% url 'masha:show_manager_masah_nah'   %}"   class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+                    <li><a href="">بيانات الطلب </a></li>
+                        <li><a href="" >تعديل الطلب </a></li>
+                <li><a href="">استعراض الطلب </a></li>
+              </ul>
+            </nav>
+          </div>
+
+        </div>
+
+
+
+<style type="text/css">
+    .container { max-width: 1200px; margin: 30px auto; }
+
+    /* صف الرأس */
+    th { 
+        background-color: #191970;  /* اللون المطلوب */
+        color: white; 
+        text-align: center; 
+    }
+
+    /* جميع الخلايا */
+    td, th { text-align: center; }
+
+    /* الصفوف الزوجية */
+    tr:nth-child(even) { background-color: #f2f2f2; }
+
+    /* عند المرور بالفأرة */
+    tr:hover { background-color: #ddd; }
+</style>
+
+<div class="container">
+    <h3 class="text-center mb-4">البحث اللحظي في الطلبات</h3>
+
+    <input type="text" id="live_search" class="form-control mb-3" placeholder="ابحث بالاسم أو الرقم..." dir="rtl">
+
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+              
+               
+                              
+                <th>عرض بيانات الارض</th>
+                  <th>عرض الموقع  الجغارفي</th>
+                  <th>الوحدة</th>
+                <th>القطاع</th>
+
+                <th>المديرية</th>
+                 <th>نوع المخطط</th>
+                    <th>اسم مقدم الطلب</th>
+                <th>رقم الطلب</th>
+            </tr>
+        </thead>
+       <tbody id="results_body">
+            {% for item in form %}
+                                     <td><a href="{% url  'masha:show_report_masah_by_eng_data' item.id %}"  class="btn outline-success">عرض بيانات الارض</a>
+</td>
+                
+             
+
+
+<td>
+<a href="{{item.kml_file}}" target="_blank">🌍 عرض الموقع الجغرافي</a>
+     
+</td>
+
+
+ 
+                        <td>{{item.form.unit.name}}</td>
+                             <td>{{item.gata_name}}</td>
+                            <td>{{item.form.mahfth.name}}</td>
+                                <td>{{item.type_map.name}}</td>
+                          <td>{{item.form.name}}</td>
+
+                               <td>{{item.id}}</td>
+                        </tr>
+                        {% endfor  %}
+        </tbody>
+    </table>
+     {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+</div>
+
+  <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+
+<script>
+$(document).ready(function(){
+    $('#live_search').on('input', function(){
+        let query = $(this).val().trim();
+        if(query === ""){
+            $('#results_body').html('');
+            return;
+        }
+        $.ajax({
+            url: "{% url 'masha:live_search_ajax_report_masha' %}",
+            data: { q: query },
+            success: function(res){
+                let tbody = '';
+                if(res.results.length > 0){
+                    res.results.forEach(function(item){
+                        tbody += `<tr>
+                          
+<td>
+  ${item.img_document  ? `` : ''}
+  <a href="${editUrlBase}/${item.id}" >عرض بيانات  الارض</a>
+</td>
+<td>
+  ${item.kml_file 
+      ? `<a href="${item.kml_file}" target="_blank">🌍 عرض الموقع الجغرافي</a>` 
+      : 'لا يوجد موقع'}
+</td>
+
+
+ 
+                        <td>${item.unit_name}</td>
+                             <td>${item.gata_name}</td>
+                            <td>${item.mahfth_name}</td>
+                                <td>${item.typ_name}</td>
+                          <td>${item.name}</td>
+
+                               <td>${item.id}</td>
+                        </tr>`;
+                    });
+                } else {
+                    tbody = "<tr><td colspan='7' style='text-align:center'>لا توجد نتائج</td></tr>";
+                }
+                $('#results_body').html(tbody);
+            },
+            error: function(err){
+                console.log(err);
+            }
+        });
+    });
+});
+</script>
+<script>
+  const editUrlBase = "{% url 'masha:show_report_masah_by_eng_data' 0  %}".slice(0, -2); 
+  // slice(-2) لإزالة الرقم 0 و الـ /
+</script>
+</body>
+</html>
+

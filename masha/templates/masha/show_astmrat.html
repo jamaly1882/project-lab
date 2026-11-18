@@ -1,0 +1,164 @@
+
+                  
+                           {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">  
+    <title>نظام المساحة الإلكتروني</title>
+    <meta name="description" content="">
+    <meta name="author" content="templatemo">
+
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="templatemo-flex-row">
+        <!-- Sidebar -->
+        <div class="templatemo-sidebar">
+            <header class="templatemo-site-header">
+                <div class="square"></div>
+                <h1>مهندس المساحة</h1>
+            </header>
+
+            <div class="profile-photo-container">
+                <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+                <div class="profile-photo-overlay"></div>
+            </div>
+
+            <!-- Search box -->
+            <form class="templatemo-search-form" role="search">
+                <div class="input-group">
+                    <button type="submit" class="fa fa-search"></button>
+                    <input type="text" class="form-control" placeholder="بحث" name="srch-term" id="srch-term">
+                </div>
+            </form>
+
+            <div class="mobile-menu-icon">
+                <i class="fa fa-bars"></i>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="templatemo-left-nav">
+                <ul>
+                    <li>
+                        <a href="{% url 'masha:screen_paesdint_masah' %}" class="active">
+                            <i class="fa fa-home fa-fw"></i>الرئيسية
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" onclick="loadContent(event, '{% url 'masha:show_tlabt_nah_rakis' %}')">
+                            <i class="fa fa-envelope"></i> طلبات جديدة
+                            <span class="badge badge-danger notification-badge" data-counter="form">{{ form }}</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" >
+                            <i class="fa fa-envelope"></i> طلبات مقبولة
+                            <span class="badge badge-danger notification-badge" data-counter="num_unread_1">{{ num_unread_1 }}</span>
+                        </a>
+                    </li>
+                       <li>
+                    <a href="#" onclick="loadContent(event, '{% url 'masha:show_report_nah_by_manager_rafth' %}')">
+                        <i class="fa fa-envelope"></i>طلبات التقارير المرفوضة
+                         <span class="badge badge-danger" data-counter="rafth_ald">{% if rafth_ald > 0 %}{{ rafth_ald }}{% endif %}</span>
+                     
+                    </a>
+                </li>
+
+                    <li>
+<a href="{% url 'masha:serch_data_report_mashi_to_update' %}" title="بحث">
+       <i class="fa fa-envelope"></i>تعديل  الابعاد
+    </a>
+</li>
+           <li>  
+         <a href="{% url 'masha:search_page' %}" title="بحث">
+       <i class="fa fa-envelope"></i>تعديل  بيانات التقرير 
+    </a>
+</li>
+       
+
+                    <li>
+                        <a href="{% url 'accounts:user_logout' %}">
+                            <i class="fa fa-eject fa-fw"></i>تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main content -->
+        <div class="templatemo-content col-1 light-gray-bg">
+            <div class="templatemo-top-nav-container">
+                <div class="row">
+                    <nav class="templatemo-top-nav col-lg-12 col-md-12">
+                        <ul class="text-uppercase">
+                            <li><a href="#" class="active">طلبات جديدة</a></li>
+                            <li><a href="#">طلبات مرفوضة</a></li>
+                            <li><a href="#">طلبات مكتملة</a></li>
+                            <li><a href="#">طلبات قيد الاجراء</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <div id="content-area"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+    window.onpopstate = function() {
+        window.location.href = "{% url 'masha:show_astmrat'  %}";
+    };
+</script>
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'js/templatemo-script.js' %}"></script>
+
+    <script>
+        let currentUrl = null;
+
+        function loadContent(event, url){
+            if(event) event.preventDefault();
+            currentUrl = url;
+
+            fetch(url)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('content-area').innerHTML = html;
+                })
+                .catch(err => console.error('خطأ في تحميل المحتوى:', err));
+        }
+
+        function updateNotifications(){
+            fetch("{% url 'masha:show_astmrat_json' %}")  // يجب أن يكون view JSON يعيد form و num_unread_1
+                .then(res => res.json())
+                .then(data => {
+                    const formEl = document.querySelector('.notification-badge[data-counter="form"]');
+                    const acceptedEl = document.querySelector('.notification-badge[data-counter="num_unread_1"]');
+
+                    if(formEl){
+                        formEl.textContent = data.form;
+                        formEl.style.display = data.form > 0 ? 'inline-block' : 'none';
+                    }
+                    if(acceptedEl){
+                        acceptedEl.textContent = data.num_unread_1;
+                        acceptedEl.style.display = data.num_unread_1 > 0 ? 'inline-block' : 'none';
+                    }
+
+                    // إعادة تحميل المحتوى المفتوح حالياً
+                    if(currentUrl) loadContent(null, currentUrl);
+                })
+                .catch(err => console.error('خطأ في تحديث الإشعارات:', err));
+        }
+
+        setInterval(updateNotifications, 5000); // تحديث كل 5 ثواني
+        document.addEventListener('DOMContentLoaded', updateNotifications);
+    </script>
+</body>
+</html>

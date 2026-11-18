@@ -1,0 +1,347 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>نظام المساحة الالكتروني</title>
+    <meta name="description" content="">
+    <meta name="author" content="templatemo">
+    <!-- <link rel="stylesheet" href="{% static 'css/sweetalert2.min.css' %}">
+ <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+    Visual Admin Template
+    http://www.templatemo.com/preview/templatemo_455_visual_admin
+    -->
+<link rel="stylesheet" href="{% static 'css/sweetalert2.min.css' %}">
+ <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,400italic,700' rel='stylesheet' type='text/css'>
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+           <script type="text/javascript">
+// إضافة حالة جديدة إلى سجل المتصفح
+history.pushState(null, document.title, location.href);
+
+// الاستماع لحدث "popstate"
+window.addEventListener('popstate', function(event) {
+    // إذا حدثت محاولة للرجوع، أعد إضافة الحالة
+    history.pushState(null, document.title, location.href);
+});
+</script>
+
+<style>
+.input-error {
+  border: 2px solid red !important;
+  animation: shake 0.2s linear 2;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+/* Highlight Checkbox label when invalid */
+.checkbox-error + label {
+  color: red !important;
+  font-weight: bold;
+}
+
+
+input[type="checkbox"] {
+    display: none; /* إخفاء الـ checkbox */
+}
+
+/* مربعل التحديد */
+input[type="checkbox"] + label span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #777;
+    border-radius: 3px;
+    margin-left: 8px; /* مسافة بين المربع والنص */
+    position: relative;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+/* عند التحديد */
+input[type="checkbox"]:checked + label span::after {
+ 
+    position: absolute;
+    left: 2px;
+    top: -4px;
+    font-size: 18px;
+    color: green;
+}
+
+</style>
+  </head>
+  <body>
+<div class="templatemo-flex-row">
+
+  <!-- Sidebar -->
+  <div class="templatemo-sidebar">
+    <header class="templatemo-site-header">
+      <div class="square"> </div>
+      <h1>نافذة منسق القسم</h1>
+    </header>
+    <div class="profile-photo-container">
+      <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+      <div class="profile-photo-overlay"></div>
+    </div>
+    <div class="mobile-menu-icon"><i class="fa fa-bars"></i></div>
+    <nav class="templatemo-left-nav">
+      <ul>   
+        <li><a href="{% url 'masha:interface_nah_astshr' %}" class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+        <li><a href="#" class="toggle"><i class="fa fa-bar-chart fa-fw"></i>الطلبات</a></li>
+        <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج </a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main content -->
+  <div class="templatemo-content col-1 light-gray-bg">
+    <div class="templatemo-top-nav-container">
+      <div class="row">
+        <nav class="templatemo-top-nav col-lg-12 col-md-12">
+          <ul class="text-uppercase">
+            <li><a href="{% url 'masha:interface_nah_astshr' %}" class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+            <li><a href="">بيانات الطلب</a></li>
+            <li><a href="">تعديل الطلب</a></li>
+            <li><a href="">استعراض الطلب</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <div align="right" class="templatemo-content-container mt-4">
+      <form name="registration_form" id="form_a" enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <div class="templatemo-content-widget white-bg p-3 mb-4">
+          <h2 class="margin-bottom-10">بيانات طلب تقرير مساحي استشارة</h2>
+
+          <!-- الغرض من الاستشارة -->
+          <div class="row form-group">
+            <div class="col-lg-4 col-md-4">
+              <label>الغرض من الاستشارة <span style="color: red; font-size: 1.5em;">*</span></label>
+              <select id="list_form_x" name="list_form_x" dir="rtl" class="form-control">
+  <option disabled>اختيار</option>
+  {% for i in type_s %}
+    <option value="{{ i.id }}" {% if ass.type_talb_astshr and ass.type_talb_astshr.id == i.id %}selected{% endif %}>
+      {{ i.name }}
+    </option>
+  {% endfor %}
+</select>
+
+            </div>
+
+            <!-- صفة مقدم الطلب -->
+            <div class="col-lg-4 col-md-4">
+              <label>صفة مقدم الطلب <span style="color: red; font-size: 1.5em;">*</span></label>
+              <select id="list_form" name="list_form" class="form-control" dir="rtl">
+  <option disabled>اختيار</option>
+  {% for i in saf %}
+    <option value="{{ i.name }}" {% if ass.safah and ass.safah.name == i.name %}selected{% endif %}>
+      {{ i.name }}
+    </option>
+  {% endfor %}
+</select>
+
+            </div>
+
+            <!-- نوع الطلب -->
+            <div class="col-lg-4 col-md-4">
+              <label>نوع الطلب <span style="color: red; font-size: 1.5em;">*</span></label>
+              <select id="ansh_hdm"  name="ansh_hdm"class="form-control" dir="rtl">
+                {% if ass.ansh_hdm %}
+                  <option value="{{ ass.ansh_hdm }}" selected>{{ ass.ansh_hdm }}</option>
+                {% endif %}
+                <option value="استشارة">استشارة</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- بيانات الوكيل -->
+          <div class="row form-group" id="agent_fields" {% if not form_a.agent_exists %}style="display:none;"{% endif %}>
+            <div class="col-lg-4 col-md-4">
+              <label>رقم الهوية <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="card_id_wk" class="form-control" dir="rtl" placeholder="ادخل رقم الهوية" value="{{ ass.card_id_wk }}">
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <label>رقم الهاتف <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="phone_wk" class="form-control" dir="rtl" placeholder="ادخل رقم هاتف الوكيل" value="{{ ass.phone_wk }}">
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <label>اسم الوكيل <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="name_wk" class="form-control" dir="rtl" placeholder="ادخل اسم الوكيل" value="{{ ass.name_wk }}">
+            </div>
+          </div>
+
+          <!-- بيانات المالك -->
+          <div class="row form-group">
+            <div class="col-lg-4 col-md-4">
+              <label>رقم الهوية <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="card_id" class="form-control" dir="rtl" placeholder="ادخل رقم الهوية" value="{{ ass.card_id }}">
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <label>رقم الهاتف <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="phone" class="form-control" dir="rtl" placeholder="ادخل رقم الهاتف" value="{{ ass.phone }}">
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <label>اسم المالك <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="name" class="form-control" dir="rtl" placeholder="ادخل اسم المالك" value="{{ ass.name }}">
+            </div>
+          </div>
+
+          <!-- الموقع -->
+          <div class="row form-group">
+            <div class="col-lg-4 col-md-4">
+              <label>الوصف / الحي <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="streat_name_gr" class="form-control" dir="rtl" placeholder="ادخل القرية او الحي" value="{{ ass.streat_name_gr }}">
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <label>القرية / الشارع <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="streat_name" class="form-control" dir="rtl" placeholder="ادخل الشارع" value="{{ ass.streat_name }}">
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <label>المديرية <span style="color: red; font-size: 1.5em;">*</span></label>
+             <select name="mderah" id="mderah" class="form-control" dir="rtl">
+  <option disabled>اختيار</option>
+  {% for i in mah %}
+    <option value="{{ i.id }}" {% if ass.mahfth and ass.mahfth.id == i.id %}selected{% endif %}>
+      {{ i.name }}
+    </option>
+  {% endfor %}
+</select>
+
+            </div>
+          </div>
+
+          <!-- نوع الوثيقة -->
+          <div class="row form-group">
+            <div class="col-lg-12 col-md-12">
+           <label>نوع الوثيقة <span style="color: red; font-size: 1.5em;">*</span></label>
+<select name="typ" id="type_document" class="form-control" dir="rtl">
+  <option disabled>اختيار</option>
+  {% for i in ty %}
+    <option value="{{ i.name }}" {% if ass.typ.name == i.name %}selected{% endif %}>
+      {{ i.name }}
+    </option>
+  {% endfor %}
+</select>
+
+            </div>
+          </div>
+
+          <!-- التحقق من العقد -->
+          <div class="row form-group" id="n_aq" {% if not ass.vald_document %}style="display:none;"{% endif %}>
+            <div class="col-lg-4 col-md-4">
+              <label>التحقق من العقد</label>
+              <select name="vald_document" id="vald_document" class="form-control" dir="rtl">
+                {% if ass.vald_document %}
+                  <option value="{{ ass.vald_document }}" selected>{{ ass.vald_document }}</option>
+                {% endif %}
+                {% for i in val %}
+                  {% if ass.vald_document != i.name %}
+                    <option value="{{ i.name }}">{{ i.name }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <label>تاريخ الإصدار</label>
+              <input type="date" name="year" class="form-control" id="year" dir="rtl" value="{{ ass.year }}">
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <label>رقم العقد</label>
+              <input type="text" name="month_a" class="form-control" id="month" dir="rtl" value="{{ ass.month_a }}">
+            </div>
+          </div>
+
+          <div class="form-group text-left">
+            <button type="submit" class="templatemo-blue-button">حفظ</button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+
+<script>
+$(document).ready(function(){
+
+    $('#form_a').on('submit', function(e){
+        e.preventDefault(); // منع إعادة تحميل الصفحة
+  const csrftoken = $('[name=csrfmiddlewaretoken]').val();
+        var form = $(this);
+        var formData = new FormData(this);
+
+        // إزالة الرسائل السابقة
+        form.find('.input-error').removeClass('input-error');
+
+        $.ajax({
+            url: "{% url 'masha:edit_form_talb' ass.id %}", // رابط الدالة في views
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            success: function(response){
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم الحفظ!',
+                    text: 'تم تعديل الاستمارة بنجاح.'
+                    
+                });interface_nah_astshr
+            },
+            error: function(xhr){
+                if(xhr.status === 400){
+                    var errors = xhr.responseJSON.errors;
+                    if(errors){
+                        // عرض الأخطاء على الفورم
+                        $.each(errors, function(field, message){
+                            var input = form.find('[name="' + field + '"]');
+                            input.addClass('input-error');
+                            // إضافة رسالة بجانب الحقل
+                            if(input.next('.error-msg').length === 0){
+                                input.after('<span class="error-msg" style="color:red;">'+message+'</span>');
+                            }
+                        });
+                        toastr.error('يرجى تصحيح الحقول المطلوبة.');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ',
+                            text: xhr.responseJSON.msg || 'حاول مرة أخرى.'
+                        });
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'حصل خطأ غير متوقع.'
+                    });
+                }
+            }
+        });
+    });
+
+});
+</script>

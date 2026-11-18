@@ -1,0 +1,42 @@
+{% extends  'masha/primry.html' %}
+
+{% load static %}
+
+
+{% load bootstrap4 %}
+{% block content %}
+ <a href="{% url 'masha:show_erea_masha' erea.mahfth.id %}" class="btn btn-outline-primary">
+  <font size="+1.5"            style="font-family:Noto Kufi Arabic Medium;">
+رجوع
+</font>
+</a> 
+<table border="3" align="center" style="width: 70%;">
+<tr   style="background-color:#424575;" >
+
+ 
+ 
+<td align="center"><font size="+2"    color="#FFFFFF"  style="font-family:Noto Kufi Arabic Light;"
+  > رقم المربع </td>
+
+</tr>
+
+{% for j in gata %}
+<tr>
+
+<td align="center"> <a href="{% url 'masha:show_unit_masha' j.number %}" 
+	class="form-control btn btn-outline-primary"> {{j.name}} </td>
+
+</tr>
+  {% endfor %}
+          
+
+
+</table>
+
+
+    
+
+
+
+  
+{% endblock %}

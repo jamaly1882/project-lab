@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>عنوان الصفحة</title>
+
+<style>
+
+/* =========================================================
+   الإعدادات العامة
+========================================================= */
+
+body {
+    font-size: 12px;
+    padding: 20px;
+    font-family:
+        'NotoKufiArabic',
+        Arial,
+        sans-serif;
+}
+
+
+/* =========================================================
+   الخط لجميع الجداول
+========================================================= */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+
+}
+
+
+/* =========================================================
+   رأس التقرير
+========================================================= */
+
+.header_report {
+    padding-top: 30px;
+    padding-right: 40px;
+    padding-left: 40px;
+
+    text-align: center;
+
+    background: #fff;
+    color: black;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    border-top: 4px solid #000;
+    border-bottom: 3px solid #000;
+
+    width: 99%;
+
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   المحاذاة
+========================================================= */
+
+#report_left,
+#company__name_en,
+#name_en_branch,
+#address_en,
+#phone_en {
+    text-align: right;
+}
+
+
+/* =========================================================
+   Card
+========================================================= */
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    word-wrap: break-word;
+
+    background-color: #fff;
+    background-clip: border-box;
+
+    border: 1px solid rgba(26, 54, 126, 0.125);
+
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   خلايا الجداول
+========================================================= */
+
+th,
+td {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: right;
+}
+
+
+/* =========================================================
+   رؤوس الخلايا
+========================================================= */
+
+th {
+    background-color: #eee;
+    font-weight: bold;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<br>
+<br>
+
+
+<!-- ===================================================== -->
+<!-- الجدول الأول -->
+<!-- ===================================================== -->
+
+<table border="1" align="center">
+
+
+<!-- ===================================================== -->
+<!-- رأس التقرير -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="2" align="center">
+
+        <font size="+1">
+            رقم التقرير : {{masah.id}}
+        </font>
+
+        <br>
+
+        <font size="+1">
+            التاريخ: {{masah.ajaml}}
+        </font>
+
+    </td>
+
+
+    <td colspan="3" align="center">
+
+        <h1 align="center">
+
+            <img
+                src="{{ image_base64 }}"
+                alt="شعار"
+                style="width: 40%; height: auto;"
+            >
+
+        </h1>
+
+    </td>
+
+
+    <td colspan="4" align="right">
+
+        <font size="+1">
+            الجمهورية اليمنية
+        </font>
+
+        <br>
+
+        <font size="+1">
+            وزارة النقل والاشغال العامة
+        </font>
+
+        <br>
+
+        <font size="+1">
+            مكتب محافظة صنعاء
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- عنوان التقرير -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td
+        colspan="9"
+        style="
+            background-color:#424575;
+            text-align:left;
+            padding-left:230px;
+        "
+    >
+
+        <font
+            size="+3"
+            color="#FFFFFF"
+        >
+            تقرير مساحي
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- بيانات مقدم الطلب -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="1" align="right">
+
+        <font size="+1">
+            {{masah.form.card_id_wk}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            رقم الهوية
+        </font>
+
+    </td>
+
+
+    <td colspan="1" align="right">
+
+        <font size="+1">
+            {{masah.form.phone}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            color="#FFFFFF"
+            size="+2"
+        >
+            رقم الهاتف
+        </font>
+
+    </td>
+
+
+    <td colspan="4" align="right">
+
+        <font size="+1">
+            {{masah.form.name_wk}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            color="#FFFFFF"
+            size="+2"
+        >
+            اسم مقدم الطلب
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- بيانات المالك -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="1" align="right">
+
+        <font size="+1">
+            {{masah.form.card_id_wk}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            color="#FFFFFF"
+            size="+2"
+        >
+            رقم الهوية
+        </font>
+
+    </td>
+
+
+    <td colspan="1" align="right">
+
+        <font size="+1">
+            {{masah.form.phone}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            color="#FFFFFF"
+            size="+2"
+        >
+            رقم الهاتف
+        </font>
+
+    </td>
+
+
+    <td colspan="4" align="right">
+
+        <font size="+1">
+            {{masah.form.name}}
+        </font>
+
+    </td>
+
+
+    <td
+        style="background-color:#424575;"
+        colspan="1"
+        align="right"
+    >
+
+        <font
+            color="#FFFFFF"
+            size="+2"
+        >
+            اسم المالك
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- بيانات الموقع -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="1" align="right">
+
+        <font size="+1">
+            {{masah.form.unit.name}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            رقم وحدة الجوار
+        </font>
+
+    </td>
+
+
+    <td colspan="1" align="right">
+
+        <font size="+1">
+            {{masah.form.streat_name}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            اسم الحي
+        </font>
+
+    </td>
+
+
+    <td colspan="4" align="right">
+
+        <font size="+1">
+            {{masah.form.mahfth.name}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            المديرية
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- عنوان الأبعاد والحدود -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td
+        colspan="9"
+        style="
+            background-color:#424575;
+            text-align:left;
+            padding-left:230px;
+        "
+    >
+
+        <font
+            size="+3"
+            color="#FFFFFF"
+        >
+            الابعاد والحدود حسب الاسقاط
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- عناوين الأعمدة -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td
+        colspan="1"
+        align="center"
+        style="background-color:#424575;"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            رقم الشارع
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        align="center"
+        style="background-color:#424575;"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            نوع الشارع
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="1"
+        align="center"
+        style="background-color:#424575;"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            عرض الشارع
+        </font>
+
+    </td>
+
+
+    <td
+        style="background-color:#424575;"
+        align="center"
+        colspan="2"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            الابعاد حسب الاسقاط
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="2"
+        style="background-color:#424575;"
+        align="center"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            الحدود
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="2"
+        style="background-color:#424575;"
+        align="center"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            الاتجاهات
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- بيانات الأبعاد -->
+<!-- ===================================================== -->
+
+{% for i in f %}
+
+<tr>
+
+    <td colspan="1" align="center">
+
+        <font size="+1">
+            {{i.number_strate}}
+        </font>
+
+    </td>
+
+
+    <td colspan="1" align="center">
+
+        <font size="+1">
+            {{i.type_street}}
+        </font>
+
+    </td>
+
+
+    <td colspan="1" align="center">
+
+        <font size="+1">
+
+            {% if i.width_street is not None %}
+                {{ i.width_street }}
+            {% endif %}
+
+        </font>
+
+    </td>
+
+
+    <td colspan="2" align="center">
+
+        <font size="+1">
+            {{i.quantity}}
+        </font>
+
+    </td>
+
+
+    <td colspan="2" align="center">
+
+        <font size="+1">
+            {{i.shar_atjah}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="2"
+        align="center"
+        style="background-color:#424575;"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            {{i.sh}}
+        </font>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+
+<!-- ===================================================== -->
+<!-- المساحات -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="2" align="right">
+
+        <font size="+1">
+            {{masah.form.erea_asqt}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="2"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            المساحة بحسب الاسقاط
+        </font>
+
+    </td>
+
+
+    <td colspan="2" align="right">
+
+        <font size="+1">
+            {{masah.form.erea_baser}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="3"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            المساحة بحسب وثيقة الملكية
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- طبيعة الأرض ونوع البلك -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="2" align="right">
+
+        <font size="+1">
+            {{masah.form.type_natural.name}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="2"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            طبيعة الارض
+        </font>
+
+    </td>
+
+
+    <td colspan="2" align="right">
+
+        <font size="+1">
+            {{masah.form.type_block.name}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="4"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            نوع البلك | المخطط
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- أبراج الضغط العالي والسيول -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="2" align="right">
+
+        <font size="+1">
+            {{masah.form.type_kah.name}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="2"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            موقع الارض من خطوط ابراج الضغط العالي
+        </font>
+
+    </td>
+
+
+    <td colspan="2" align="right">
+
+        <font size="+1">
+            {{masah.form.type_seol.name}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="4"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            موقع الارض من مجاري السيول
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- الكثافة ومنسوب الشارع -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="2" align="right">
+
+        <font size="+1">
+            {{masah.form.width_street_big}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="2"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            الكثافة حسب عرض الشارع
+        </font>
+
+    </td>
+
+
+    <td colspan="3" align="right">
+
+        <font size="+1">
+            {{masah.mnsobe}}
+        </font>
+
+    </td>
+
+
+    <td
+        colspan="2"
+        style="background-color:#424575;"
+        align="right"
+    >
+
+        <font
+            size="+2"
+            color="#FFFFFF"
+        >
+            منسوب الشارع
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- تذييل الصفحة الأولى -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="10" align="center">
+
+        <font size="+2">
+            <center>
+                صادر من قسم المساحة
+            </center>
+        </font>
+
+    </td>
+
+</tr>
+
+
+</table>
+
+
+<!-- ===================================================== -->
+<!-- بداية الصفحة الثانية -->
+<!-- ===================================================== -->
+
+<div style="page-break-before: always;"></div>
+
+
+<table
+    border="1"
+    align="center"
+    style="
+        width:100%;
+        border-collapse:collapse;
+        table-layout:fixed;
+    "
+>
+
+
+<!-- ===================================================== -->
+<!-- اسقاط الموقع -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td
+        colspan="10"
+        align="right"
+        style="
+            background-color:#424575;
+        "
+    >
+
+        <font
+            size="+3"
+            color="#FFFFFF"
+        >
+            اسقاط الموقع
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- صورة الاسقاط -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td
+        colspan="10"
+        style="
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+        "
+    >
+
+        {% if location_image_base64 %}
+
+            <img
+                src="{{ location_image_base64 }}"
+                alt="إسقاط الموقع"
+                style="
+                    display: block;
+                    margin: 0 auto;
+                    width: auto;
+                    height: auto;
+                    max-width: 95%;
+                    max-height: 500px;
+                "
+            >
+
+        {% else %}
+
+            <div
+                style="
+                    width: 100%;
+                    height: 180px;
+                    display: table-cell;
+                    text-align: center;
+                    vertical-align: middle;
+                    font-size: 14px;
+                "
+            >
+                لا توجد صورة لإسقاط الموقع
+            </div>
+
+        {% endif %}
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- احداثيات خط التنظيم -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td
+        colspan="10"
+        align="right"
+        style="
+            background-color:#424575;
+            color:#FFFFFF;
+        "
+    >
+
+        <font
+            size="+3"
+            color="#FFFFFF"
+        >
+            احداثيات خط التنظيم
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- عناوين الاحداثيات -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td
+        colspan="5"
+        align="right"
+        style="
+            background-color:#424575;
+            color:#FFFFFF;
+            font-size:18px;
+        "
+    >
+        Northings
+    </td>
+
+
+    <td
+        colspan="5"
+        align="center"
+        style="
+            background-color:#424575;
+            color:#FFFFFF;
+            font-size:18px;
+        "
+    >
+        Eastings
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- الاحداثيات -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="5" align="center">
+
+        <font size="+1">
+            {{ ss.longitude|default:"-" }}
+        </font>
+
+    </td>
+
+
+    <td colspan="5" align="center">
+
+        <font size="+1">
+            {{ ss.latitude|default:"-" }}
+        </font>
+
+    </td>
+
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- الصفوف الإضافية -->
+<!-- ===================================================== -->
+
+<tr>
+    <td colspan="5" align="center">--</td>
+    <td colspan="5" align="center">--</td>
+</tr>
+
+<tr>
+    <td colspan="5" align="center">--</td>
+    <td colspan="5" align="center">--</td>
+</tr>
+
+<tr>
+    <td colspan="5" align="center">--</td>
+    <td colspan="5" align="center">--</td>
+</tr>
+
+<tr>
+    <td colspan="5" align="center">--</td>
+    <td colspan="5" align="center">--</td>
+</tr>
+
+<tr>
+    <td colspan="5" align="center">--</td>
+    <td colspan="5" align="center">--</td>
+</tr>
+
+<tr>
+    <td colspan="5" align="center">--</td>
+    <td colspan="5" align="center">--</td>
+</tr>
+
+<tr>
+    <td colspan="5" align="center">--</td>
+    <td colspan="5" align="center">--</td>
+</tr>
+
+
+<!-- ===================================================== -->
+<!-- تذييل الصفحة الثانية -->
+<!-- ===================================================== -->
+
+<tr>
+
+    <td colspan="10" align="center">
+
+        <font size="+2">
+
+            <center>
+                صادر من قسم المساحة
+            </center>
+
+        </font>
+
+    </td>
+
+</tr>
+
+
+</table>
+
+</body>
+</html>

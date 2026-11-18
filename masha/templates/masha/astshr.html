@@ -1,0 +1,1078 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نظام المساحة الالكتروني</title>
+  <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/templatemo-style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sweetalert2.min.css' %}">
+
+  <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+
+</head>
+<body>
+
+
+
+<div class="templatemo-flex-row">
+
+  <!-- Sidebar -->
+  <div class="templatemo-sidebar">
+    <header class="templatemo-site-header">
+      <div class="square"> </div>
+      <h1>نافذة منسق القسم</h1>
+    </header>
+    <div class="profile-photo-container">
+      <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+      <div class="profile-photo-overlay"></div>
+    </div>
+    <div class="mobile-menu-icon"><i class="fa fa-bars"></i></div>
+    <nav class="templatemo-left-nav">
+      <ul>   
+
+           <li><a href="{% url 'masha:interface_nah_astshr' %}"   class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+        <li><a href="#" class="toggle"><i class="fa fa-bar-chart fa-fw"></i>الطلبات</a></li>
+       <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج </a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main content -->
+  <div class="templatemo-content col-1 light-gray-bg">
+    <div class="templatemo-top-nav-container">
+      <div class="row">
+        <nav class="templatemo-top-nav col-lg-12 col-md-12">
+          <ul class="text-uppercase">
+              <li><a href="{% url 'masha:interface_nah_astshr' %}"   class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+            <li><a href="">بيانات الطلب</a></li>
+            <li><a href="">تعديل الطلب</a></li>
+            <li><a href="">استعراض الطلب</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- نموذج متكامل -->
+    <div align="right" class="templatemo-content-container mt-4">
+      <form name="registration_form" id="form_a" enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+
+        <div class="templatemo-content-widget white-bg p-3 mb-4">
+          <h2 class="margin-bottom-10">  بيانات طلب تقرير مساحي استشارة</h2>
+
+          
+ <div class="row form-group">
+          <div class="col-lg-4 col-md-4">
+     <label> الغرض  من  الاستشارة  <span style="color: red; font-size: 1.5em;">*</span></label>
+
+           <select   id="list_form_x"  dir="rtl" class="form-control">
+         <option selected disabled>اختيار </option>
+     {% for i in type_s %}
+     <option value="{{i.id}}">{{i.name}}</option>
+
+     {% endfor %}
+</select>
+
+    </div>
+         
+            <div class="col-lg-4 col-md-4">
+              <label>صفة مقدم الطلب <span style="color: red; font-size: 1.5em;">*</span></label>
+              <select id="list_form" class="form-control" dir="rtl">
+                <option selected disabled>اختيار</option>
+                {% for i in saf %}
+     <option value="{{i.name}}">{{i.name}}</option>
+
+     {% endfor %}
+              </select>
+            </div>
+
+      <div class="col-lg-4 col-md-4">
+              <label>نوع الطلب    <span style="color: red; font-size: 1.5em;">*</span></label>
+              <select id="ansh_hdm" class="form-control" dir="rtl">
+       
+
+     <option selected disabled>اختيار </option>
+         
+          
+
+
+                <option value="استشارة"> استشارة  </option>
+              </select>
+            </div>
+       
+          </div>
+
+          <!-- بيانات الوكيل -->
+          <div class="row form-group" id="agent_fields" style="display:none;">
+          
+       
+            <div class="col-lg-4 col-md-4" >
+              <label  id="f5">رقم الهوية <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input id="f6" type="text" name="card_id_wk" class="form-control" dir="rtl" placeholder="ادخل رقم الهوية">
+            </div>
+
+     <div class="col-lg-4 col-md-4">
+              <label  id="f3">رقم الهاتف <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" id="f4" name="phone_wk" class="form-control"dir="rtl" placeholder="ادخل رقم هاتف الوكيل">
+            </div>
+              <div class="col-lg-4 col-md-4">
+              <label id="f1">اسم الوكيل <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="name_wk" class="form-control" id="f2"dir="rtl" placeholder="ادخل اسم الوكيل">
+            </div>
+          </div>
+
+          <!-- بيانات المالك -->
+          <div class="row form-group">
+           
+         
+            <div class="col-lg-4 col-md-4" >
+              <label>رقم الهوية <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="card_id" id="card_id"class="form-control" dir="rtl" placeholder="ادخل رقم الهوية">
+            </div>
+               <div class="col-lg-4 col-md-4">
+              <label>رقم الهاتف <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" name="phone" id="phone" class="form-control"dir="rtl" placeholder="ادخل رقم الهاتف">
+            </div>
+             <div class="col-lg-4 col-md-4">
+              <label>اسم المالك <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text"id="name_aml" name="name" class="form-control"dir="rtl" placeholder="ادخل اسم المالك">
+            </div>
+          </div>
+
+          <!-- بيانات الوثيقة -->
+
+
+          <!-- الموقع -->
+         <div class="row form-group">
+ 
+
+           
+         <div class="col-lg-4 col-md-4">
+              <label>الوصف / الحي   <span style="color: red; font-size: 1.5em;">*</span></label>
+                            <input type="text" id="streat_name_gr"name="streat_name_gr" class="form-control" dir="rtl"  placeholder="ادخل القرية او الحي ">
+            </div>
+
+             <div class="col-lg-4 col-md-4">
+              <label> القرية / الشارع    <span style="color: red; font-size: 1.5em;">*</span></label>
+              <input type="text" id="streat_name"name="streat_name" class="form-control" dir="rtl" placeholder="ادخل الشارع ">
+            </div>
+
+             <div class="col-lg-4 col-md-4">
+    <label>المديرية  <span style="color: red; font-size: 1.5em;">*</span></label>
+    <select name="mderah"id="mderah" class="form-control" dir="rtl">
+      <option selected disabled>اختيار</option>
+      {% if request.user.is_superuser %}
+        <!-- إذا كان المشرف، اعرض كل المديريات -->
+        {% for i in mah %}
+          <option value="{{ i.id }}">{{ i.name }}</option>
+        {% endfor %}
+      {% else %}
+        <!-- إذا لم يكن مشرف، اعرض مديرية المستخدم فقط -->
+        {% for i in mah %}
+          {% if i.name == zz.profile.city.city %}
+            <option value="{{ i.id }}">{{ i.name }}</option>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </select>
+
+</div>
+          </div>
+   <div class="row form-group">
+           
+                <div class="col-lg-4 col-md-4">
+              <label  style="display:none;">مساحة الوثيقة بالمتر المربع    <span style="color: red; font-size: 1.5em;">*</span></label></label>
+              <input type="text" name="erea_baser"   id="erea_11"class="form-control" style="display:none;">
+            </div>
+          
+ <div class="col-lg-4 col-md-4" style="display:none;">
+ <label   id="label1">التحقق من التسجيل العقاري  <span style="color: red; font-size: 1.5em;">*</span></label>
+         
+          <select  class="form-control"id="vald_tharb" dir="rtl"  >
+          <option selected disabled>اختيار </option>
+          
+ {% for i in val_m %}
+
+
+                <option value="{{i.name}}">{{i.name}}</option>
+             {% endfor %}
+
+              
+        </select>
+          
+            </div>
+        
+             <div class="col-lg-12 col-md-12">
+              <label>نوع الوثيقة <span style="color: red; font-size: 1.5em;">*</span></label>
+              <select class="form-control" id="type_document"  dir="rtl"  name="typ" >
+                <option selected disabled>اختيار</option>
+                {% for i in ty %}
+                  <option value="{{i.name}}">{{i.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="row form-group"  id="n_aq" style="display: none;">
+
+
+
+  <div class="col-lg-4 col-md-4 form-group">
+    <label for="vald_document" class="form-label">التحقق من العقد</label>
+    <select class="form-control" id="vald_document" name="vald_document" dir="rtl">
+      <option selected disabled>اختيار</option>
+      {% for i in val %}
+        <option value="{{ i.name }}">{{ i.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+    <div class="col-lg-4 col-md-4 form-group">
+    <label for="year" class="form-label">تاريخ الإصدار</label>
+    <input type="date" class="form-control" name="year" id="year" dir="rtl" onkeypress="return runScript_6(event)">
+  </div>
+    <div class="col-lg-4 col-md-4 form-group">
+    <label for="month" class="form-label">رقم العقد</label>
+    <input type="text" class="form-control" name="month_a" id="month" dir="rtl" onkeypress="return runScript_6(event)">
+  </div>
+
+</div>
+
+           <div class="form-group text-left">
+
+              
+                <button type="submit" class="templatemo-blue-button"  >حفظ</button>
+
+              </div> 
+
+      <input type="file" class="form-control" id="img_rakis_five_id"  name="img_rakis_five"  
+           style="display:none;" onkeypress="return runScript_8(event)" dir="rtl">
+        
+           <input type="checkbox" value="صورة الهوية " id="add_img_parsone_card" name="at" style="width:20px;height:20px;" > 
+          
+           <br>
+
+          
+          <input type="file" class="form-control" style="display: none;"   id="img_parson_card" name="img_parsone"  dir="rtl"> 
+               <input type="checkbox" value="صورة وثيقة الملكية " name="at" 
+               id="add_img_document_baser_nah"
+               style="width:20px;height:20px;"  >
+               <br>
+
+             
+               <input type="file"  dir="rtl" class="form-control" id="img_document_baser_nah"  name="img_document"  style="display: none;"
+
+           onkeypress="return runScript_8(event)">
+            <input type="file"  dir="rtl" class="form-control" id="add_img_back_baser"  
+          name="img_baser_back"   style="display: none;"
+           onkeypress="return runScript_8(event)" >
+        
+          
+     
+
+
+
+
+
+
+
+<br>
+
+     <div style="display:none;" id="wkile" > 
+        <input  type="checkbox" value="صورة الوكالة" name="at" style="width:20px;height:20px;"  id="wkl_check">
+  
+          <input type="file" value="" class="form-control" name="img_wk"
+           style="display:none;" dir="rtl">
+
+   
+
+              </div>
+
+<br>
+
+  <input type="hidden" id="text36"   name="text_36" onkeypress="return runScript_14(event)"
+class="form-control">
+  <input type="hidden" id="hid_mah"style="display:none;">
+   <input type="hidden" id="hid_er"style="display:none;">
+
+     <input type="hidden" id="hid_g"style="display:none;">
+    
+  <input type="hidden" id="hide_vald_tam_s"style="display:none;">
+  
+<hr>
+
+<input type="hidden" id="service_list_form_x" name="service_bana" style="display:none;">
+
+<input type="hidden" id="service_bana" name="service_bana" style="display:none;">
+  <input type="hidden" id="hid_gata" name="hidden_unit" style="display:none;">
+<input type="hidden" id="hid_type_alrth" name="hidden_type_alrth" style="display:none;">
+     <input type="hidden" id="hid_vald" name="hidden_vald"style="display:none;">
+
+     <input type="hidden" id="hid_type_bana" name="hidden_type_bana"style="display:none;">
+<input type="hidden" id="hid_number_dcoum_in" name="number_dcoum_in_3"style="display:none;">
+     <input type="hidden" id="hid_type_card" name="hidden_type_card" style="display:none;">
+      <input type="hidden" id="hid_type_aqure" name="hidden_type_aqure"style="display:none;" style="display:none;">
+        <input type="hidden" id="hid_type_month" name="hidden_month" style="display:none;">
+
+     <input type="hidden" id="hid_type_document" name="hidden_type_document"style="display:none;">
+     <input type="hidden" id="hid_type_form_rakash" name="hidden_type_form_rakash"style="display:none;"style="display:none;">
+     <input type="hidden" id="hid_type_sakn" name="hidden_type_form_sakn"style="display:none;">
+      <input type="hidden" id="hid_type_dore" name="hidden_type_dore"style="display:none;">
+       <input type="hidden" id="hid_ansh_hdm">
+        <input type="hidden" id="hidd_type_bana_a" name="hidden_type_bana_aa"style="display:none;">
+              <input type="hidden" id="hid_fah" name="hidden_type_fah"style="display:none;">
+               <input type="hidden" dir="rtl" class="form-control" id="asher"    > 
+             <input type="date" value=""    class="form-control"  id="date_str" dir="rtl"style="display:none;">
+<hr>
+<hr>
+
+
+
+   
+    <br>
+
+
+
+
+
+</div>
+
+
+<br>
+</div>
+         
+     
+           
+    
+
+</form>
+
+
+
+
+<br>
+<br>
+
+</font>
+</a>
+</div>
+</form>
+
+
+
+      <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+$j(document).ready(function() {
+
+    // عرض حقول الوكيل حسب الاختيار
+    $('#list_form').change(function(){
+        const selected = $(this).val();
+        if (selected === 'وكيل' || selected === 'مفوض') {
+            $('#agent_fields').show();
+        } else {
+            $('#agent_fields').hide();
+        }
+    });
+
+    // دالة لإظهار رسالة خطأ مع SweetAlert2
+    function errorAlert(message, selector = null, tabSelector = null) {
+        Swal.fire({
+            icon: 'error',
+            title: 'خطأ',
+            text: message,
+            confirmButtonText: 'موافق'
+        }).then(() => {
+            if (selector) {
+                $(selector).focus().css('border-color', 'red');
+            }
+            if (tabSelector) {
+                $('.nav-tabs a[href="' + tabSelector + '"]').trigger('click');
+            }
+        });
+    }
+
+    // إعادة تعيين اللون لجميع الحقول
+    function resetBorders() {
+        $('#f2, #f4, #name_aml, #phone, #streat_name, #streat_name_gr,#type_document,#list_form_x, #mderah,#month, #year, #vald_document, #img_parson_card, #img_document_baser_nah, #list_form, #ansh_hdm').css('border-color','');
+    }
+
+    // إزالة اللون الأحمر عند تعديل الحقل
+    $('#f2, #f4, #name_aml, #phone, #streat_name, #streat_name_gr, #month, #year, #vald_document, #img_parson_card, #img_document_baser_nah, #list_form, #hid_ansh_hdm').on('input change', function() {
+        $(this).css('border-color','');
+    });
+
+    $('#form_a').submit(function(e) {
+        e.preventDefault();
+        resetBorders();  // إعادة تعيين قبل أي تحقق
+
+        // تعيين التاريخ الحالي
+        var today = new Date();
+        var day = String(today.getDate()).padStart(2, '0');
+        var month = String(today.getMonth() + 1).padStart(2, '0');
+        var today = new Date();
+
+// تحويل التاريخ إلى سلسلة نصية باستخدام الصيغة المحددة.
+var date_string = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+// تعيين القيمة المستخدمة إلى حقل النص المحدد.
+$('#text36').val(date_string);
+        var year = today.getFullYear();
+        $('#date_str').val(day + '/' + month + '/' + year);
+
+        // قراءة القيم
+        var f2 = $.trim($('#f2').val());
+        var f4 = $.trim($('#f4').val());
+        var name_aml = $.trim($('#name_aml').val());
+        var phone = $.trim($('#phone').val());
+        var streat_name = $.trim($('#streat_name').val());
+        var streat_name_gr = $.trim($('#streat_name_gr').val());
+        var hid_ansh_hdm = $.trim($('#hid_ansh_hdm').val());
+        var hid_type_form_rakash = $.trim($('#hid_type_form_rakash').val());
+        var hid_type_document = $.trim($('#hid_type_document').val());
+        var hid_type_aqure = $.trim($('#hid_type_aqure').val());
+        var month_val = $('#month').val();
+        var year_val = $('#year').val();
+        var hide_vald_tam_s = $('#hide_vald_tam_s').val();
+        var service_list_form_x = $('#service_list_form_x').val();
+        var file_img = $('#img_parson_card')[0].files[0];
+        var file_img_baser = $('#img_document_baser_nah')[0].files[0];
+
+        // --- تحقق الحقول ---
+        if (!hid_ansh_hdm) return errorAlert('يرجى تحديد الغرض من التقرير', '#ansh_hdm');
+        if (!hid_type_form_rakash) return errorAlert('يرجى تحديد صفة مقدم الطلب', '#list_form',);
+        if (!service_list_form_x) return errorAlert('يرجى تحديد نوع الخدمة أو الغرض من الاستشارة', '#list_form_x', '#home');
+
+
+        if (hid_type_form_rakash !== "صاحب الطلب") {
+            if (!f2) return errorAlert('يرجى إدخال اسم الوكيل', '#f2', '#data_tlab');
+            if (!/^[ء-ي\s]+$/.test(f2)) return errorAlert('اسم الوكيل يجب أن يكون نص', '#f2');
+
+            if (!f4) return errorAlert('يرجى إدخال رقم هاتف الوكيل', '#f4', '#data_tlab');
+            if (!$.isNumeric(f4) || f4 <= 0) return errorAlert('رقم هاتف الوكيل يجب أن يكون رقم صحيح', '#f4', '#data_tlab');
+            if (f4.length < 9) return errorAlert('رقم هاتف الوكيل أقل من 9 أرقام', '#f4');
+        }
+
+        if (!name_aml) return errorAlert('يرجى إدخال اسم صاحب الطلب', '#name_aml');
+        if (!/^[ء-ي\s]+$/.test(name_aml)) return errorAlert('اسم صاحب الطلب يجب أن يكون نص', '#name_aml');
+
+        if (!phone) return errorAlert('يرجى إدخال رقم الهاتف', '#phone', '#data_tlab');
+        if (!$.isNumeric(phone) || phone <= 0) return errorAlert('رقم الهاتف يجب أن يكون رقم', '#phone', '#data_tlab');
+        if (phone.length < 9) return errorAlert('رقم الهاتف أقل من 9 أرقام', '#phone', '#data_tlab');
+
+        if (!$('#hid_mah').val()) return errorAlert('يرجى تحديد المديرية', '#mderah', '#location');
+        if (!streat_name) return errorAlert('يرجى إدخال اسم الحي', '#streat_name', '#location');
+        if (!/^[ء-ي\s]+$/.test(streat_name)) return errorAlert('اسم الحي يجب أن يكون نص وليس رقم', '#streat_name', '#location');
+        if (!streat_name_gr) return errorAlert('يرجى إدخال اسم الشارع', '#streat_name_gr', '#location');
+        if (!/^[ء-ي\s]+$/.test(streat_name_gr)) return errorAlert('اسم الشارع يجب أن يكون نص وليس رقم', '#streat_name_gr', '#location');
+ if (!hid_type_document) return errorAlert('يرجى  تحديد  نوع الوثيقة ', '#type_document');
+   
+            if (!hid_type_document) return errorAlert('يرجى تحديد نوع الوثيقة', '#type_document', '#profile');
+if ((hid_type_document === "عقد املاك" || hid_type_document === "عقد اوقاف") && (!month_val || !$.isNumeric(month_val) || month_val <= 0)) return errorAlert('يجب إدخال رقم العقد بشكل صحيح', '#month');
+          
+            if (!hide_vald_tam_s  && (hid_type_document === "عقد املاك" || hid_type_document === "عقد اوقاف")) return errorAlert('يرجى تحديد طريقة التحقق', '#vald_document');
+               
+            
+
+
+
+
+          
+        
+  
+
+
+
+    
+     
+else{
+         var form_data = new FormData(this);
+
+    var checked_boxes = $('input[type="checkbox"]:checked');
+    checked_boxes.each(function() {
+      form_data.append($(this).attr('basert'), $(this).val());
+    });
+
+form_data.append('service_list_form_x', document.querySelector('#service_list_form_x').value);  
+form_data.append('streat_name_gr', document.querySelector('#streat_name_gr').value);
+form_data.append('date_str', document.querySelector('#date_str').value);  
+form_data.append('hid_mah', document.querySelector('#hid_mah').value);    
+form_data.append('name_aml', document.querySelector('#name_aml').value);
+form_data.append('phone', document.querySelector('#phone').value);
+form_data.append('card_id', document.querySelector('#card_id').value);
+form_data.append('hid_type_form_rakash', document.querySelector('#hid_type_form_rakash').value);
+form_data.append('hid_type_document', document.querySelector('#hid_type_document').value);
+form_data.append('streat_name', document.querySelector('#streat_name').value);
+form_data.append('hid_type_aqure', document.querySelector('#hid_type_aqure').value);
+form_data.append('hid_ansh_hdm', document.querySelector('#hid_ansh_hdm').value);
+
+form_data.append('month', document.querySelector('#month').value);
+form_data.append('year', document.querySelector('#year').value);
+form_data.append('text_36', document.querySelector('#text36').value);
+
+form_data.append('f2', document.querySelector('#f2').value);
+form_data.append('f4', document.querySelector('#f4').value);
+form_data.append('f6', document.querySelector('#f6').value);
+form_data.append('erea_11', document.querySelector('#erea_11').value);
+form_data.append('asher', document.querySelector('#asher').value);
+form_data.append('img_parsone', document.querySelector('#img_parson_card').files[0]);
+form_data.append('img_document', document.querySelector('#img_document_baser_nah').files[1]);
+   var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/masha/form_add_masah');
+        xhr.onload = function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'تم بنجاح',
+                text: 'تم حفظ البيانات بنجاح',
+                confirmButtonText: 'موافق'
+            }).then(() => {
+                
+     window.open("{% url 'masha:tslam_astsh' %}", '_blank');
+    
+    // تصفير الحقول
+     $j('#form_a')[0].reset();
+            });
+        };
+        xhr.send(form_data);
+           document.getElementById("hid_type_sakn").value = "";
+      document.getElementById("hid_type_sakn").value = "";
+  document.getElementById("phone").value = "";
+    document.getElementById("name_aml").value = "";
+  document.getElementById("card_id").value = "";
+    document.getElementById("erea_11").value = "";
+  document.getElementById("hid_ansh_hdm").value = "";
+    document.getElementById("hid_type_form_rakash").value = "";
+  document.getElementById("hid_type_document").value = "";
+    document.getElementById("hid_type_aqure").value = "";
+  document.getElementById("streat_name").value = "";
+
+  
+
+
+
+  
+    document.getElementById("hid_one").value = "";
+        }
+    });
+
+
+
+     
+ 
+
+$('#mderah').change(function() {
+    var selectedOption = $(this).val();
+ $('#hid_mah').val(selectedOption);
+  $('#asher').val(selectedOption);  
+  
+
+  });
+
+
+$('#list_form_x').change(function() {
+    var selectedOption = $(this).val();
+ $('#service_list_form_x').val(selectedOption);
+  
+  
+
+  });
+});
+</script>
+
+
+
+
+<script type="text/javascript">
+
+  var ansh_hdm=document.querySelector('#ansh_hdm')
+ansh_hdm.addEventListener('change',function(){
+x=ansh_hdm.value;
+ document.getElementById("hid_ansh_hdm").value=x;
+
+
+y=document.getElementById("hid_fah").value;
+if (x=="استشارة"){
+    document.getElementById("erea_11").style.display="none";
+     document.getElementById("lab_erea_11").style.display="none";
+      document.getElementById("add_img_document_baser_nah").style.display="none";
+     document.getElementById("add_img_parsone_card").style.display="none";
+ document.getElementById("img_document_baser_nah").style.display="none";
+     document.getElementById("add_img_back_baser").style.display="none";
+      document.getElementById("img_parson_card").style.display="none";
+    
+
+}
+else {
+     document.getElementById("erea_11").style.display="block";
+     document.getElementById("lab_erea_11").style.display="block";
+      document.getElementById("add_img_document_baser_nah").style.display="block";
+     document.getElementById("add_img_parsone_card").style.display="block";
+
+
+}
+
+
+
+
+
+
+
+});
+var list_form=document.querySelector('#list_form')
+ list_form.addEventListener('change',function(){
+ yy=list_form.value;
+
+   document.getElementById("hid_type_form_rakash").value=yy;
+
+ if (yy=="وكيل"){
+ 
+  document.getElementById("f1").style.display = "block";
+    document.getElementById("f2").style.display = "block";
+    document.getElementById("f3").style.display = "block";
+   document.getElementById("f4").style.display = "block";
+  document.getElementById("f5").style.display = "block";
+    document.getElementById("f6").style.display = "block";
+      document.getElementById("wkile").style.display ="block";
+
+
+  
+}
+else  if (yy=="صاحب الطلب"){
+  document.getElementById("f1").style.display = "none";
+    document.getElementById("f2").style.display = "none";
+    document.getElementById("f3").style.display = "none";
+   document.getElementById("f4").style.display = "none";
+  document.getElementById("f5").style.display = "none";
+    document.getElementById("f6").style.display = "none";
+  
+   
+    xx=document.getElementById("name_aml").value;
+     yy=document.getElementById("card_id").value;
+     document.getElementById("hide_wk").value=xx;
+      document.getElementById("hide_c_wk").value=yy;
+
+  
+}
+else if(yy=="مفوض"){
+  document.getElementById("f1").style.display = "block";
+    document.getElementById("f2").style.display = "block";
+    document.getElementById("f3").style.display = "block";
+   document.getElementById("f4").style.display = "block";
+  document.getElementById("f5").style.display = "block";
+    document.getElementById("f6").style.display = "block";
+
+}
+ });
+
+ function set(a){
+
+    document.getElementById("hiden_sh").value=a;
+
+}
+
+
+  var type_document=document.querySelector('#type_document')
+type_document.addEventListener('change',function(){
+z=type_document.value;
+
+  document.getElementById("hid_type_document").value=z;
+ if(z=="بصيرة"){
+
+   
+  document.getElementById("number_dcoum_in_back").style.display="block";
+    document.getElementById("n_aq").style.display="none";
+    document.getElementById("vlad_lable").style.display="none";
+      document.getElementById("n_aq").style.display="none";
+      document.getElementById("vald_document").style.display="none";
+      document.getElementById("number_dcoum_in_1").style.display="block";
+  document.getElementById("number_dcoum_lab_1").style.display="block";
+        document.getElementById("mastrk_lab").style.display="none";
+      document.getElementById("mastrk_in").style.display ="none";
+        document.getElementById("vald_document").style.display="none";
+           document.getElementById("vald_document_ogf").style.display="none";
+            document.getElementById("join_ojf").style.display="none";
+  document.getElementById("join_co").style.display="none";
+   document.getElementById("vlad_lable").style.display="none";
+       
+
+}
+else if(z=="مشتركة" ) { 
+ document.getElementById("vlad_lable").style.display="none";
+      document.getElementById("mastrk_lab").style.display="block";
+      document.getElementById("mastrk_in").style.display ="block";
+    document.getElementById("number_dcoum_in_1").style.display ="block";
+  document.getElementById("number_dcoum_lab_1").style.display ="block";
+    document.getElementById("vald_document").style.display="none";
+
+        document.getElementById("vald_document_ogf").style.display="none";
+         document.getElementById("join_ojf").style.display="none";
+  document.getElementById("join_co").style.display="none";
+
+  document.getElementById("n_aq").style.display="none";
+  
+
+}
+else if(z=="عقد املاك" ) { 
+  document.getElementById("vlad_lable").style.display="block";
+      document.getElementById("n_aq").style.display="block";
+      document.getElementById("vald_document").style.display="block";
+      document.getElementById("mastrk_lab").style.display="none";
+      document.getElementById("mastrk_in").style.display ="none";
+    document.getElementById("number_dcoum_in_1").style.display ="none";
+  document.getElementById("number_dcoum_lab_1").style.display ="none";
+   
+  document.getElementById("number_dcoum_in_back").style.display="none";
+  
+  
+
+   
+  
+    document.getElementById("vald_document_ogf").style.display="none";
+ document.getElementById("join_ojf").style.display="none";
+  document.getElementById("join_co").style.display="none";
+
+}
+else if( z=="عقد اوقاف" ) { 
+      document.getElementById("vlad_lable").style.display="block";
+  document.getElementById("vald_document_ogf").style.display="block";
+    document.getElementById("n_aq").style.display="block";
+
+      document.getElementById("mastrk_lab").style.display="none";
+      document.getElementById("mastrk_in").style.display ="none";
+    document.getElementById("number_dcoum_in_1").style.display ="none";
+  document.getElementById("number_dcoum_lab_1").style.display ="none";
+      document.getElementById("number_dcoum_back_22").style.display="none";
+  document.getElementById("number_dcoum_in_back").style.display="none";
+   
+  document.getElementById("vald_document").style.display="none";
+
+  
+
+
+}
+
+
+
+
+});
+
+
+
+
+
+var vald_document=document.querySelector('#vald_document')
+vald_document.addEventListener('change',function(){
+z=vald_document.value;
+   document.getElementById("hide_vald_tam_s").value=z;
+if(z=="نظري"){
+      document.getElementById("number_dcoum_back_22").style.display="block";
+  document.getElementById("number_dcoum_in_back").style.display="block";
+   
+      document.getElementById("number_dcoum_in_1").style.display="block";
+  document.getElementById("number_dcoum_lab_1").style.display="block";
+  document.getElementById("join_co").style.display="none";
+   document.getElementById("join_ojf").style.display="none";
+
+
+}
+else if(z=="اليا"){
+  document.getElementById("number_dcoum_back_22").style.display="none";
+  document.getElementById("number_dcoum_in_back").style.display="none";
+   
+      document.getElementById("number_dcoum_in_1").style.display="none";
+  document.getElementById("number_dcoum_lab_1").style.display="none";
+  document.getElementById("join_co").style.display="block";
+   document.getElementById("join_ojf").style.display="none";
+
+
+}
+});
+
+var vald_tharb=document.querySelector('#vald_tharb')
+vald_tharb.addEventListener('change',function(){
+xx=vald_tharb.value;
+
+ document.getElementById("hid_type_aqure").value=xx;
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var vald_document_ogf=document.querySelector('#vald_document_ogf')
+vald_document_ogf.addEventListener('change',function(){
+z=vald_document_ogf.value;
+  alert(z)  ;
+if(z=="نظري"){
+      document.getElementById("number_dcoum_back_22").style.display="block";
+  document.getElementById("number_dcoum_in_back").style.display="block";
+   
+      document.getElementById("number_dcoum_in_1").style.display="block";
+  document.getElementById("number_dcoum_lab_1").style.display="block";
+  document.getElementById("join_co").style.display="none";
+   document.getElementById("join_ojf").style.display="none";
+ 
+
+
+}
+else if(z=="اليا"){
+  document.getElementById("number_dcoum_back_22").style.display="none";
+  document.getElementById("number_dcoum_in_back").style.display="none";
+   
+      document.getElementById("number_dcoum_in_1").style.display="none";
+  document.getElementById("number_dcoum_lab_1").style.display="none";
+  document.getElementById("join_co").style.display="none";
+   document.getElementById("join_ojf").style.display="block";
+
+
+}
+});
+
+
+
+  
+
+
+
+var type_arth_er=document.querySelector('#type_arth_er')
+ type_arth_er.addEventListener('change',function(){
+ yy=type_arth_er.value;
+ document.getElementById("hid_type_alrth").value=yy;
+
+
+ });
+
+
+
+
+
+
+
+function sahb(a){
+ 
+
+     document.getElementById("hid_type_form_rakash").value=a;
+    
+    
+
+}
+    
+
+
+
+
+
+
+
+function runScript(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+        var tb = document.getElementById("f2");
+        var tb_1= document.getElementById("f4");
+        var tb_2= document.getElementById("f6");
+        eval(tb.value);
+        return false;
+         eval(tb_1.value);
+        return false;
+         eval(tb_2.value);
+        return false;
+    }
+}
+
+function runScript_2(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+       
+        var tb_1= document.getElementById("f4");
+    
+       
+         eval(tb_1.value);
+        return false;
+       
+    }
+}
+function runScript_3(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("f6");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+
+function runScript_4(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("name_aml");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+function runScript_5(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("phone");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+function runScript_6(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("card_id");
+    
+         eval(tb_2.value);number_dcoum_in
+        return false;
+    }
+}
+
+function runScript_7(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("erea_11");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+function runScript_8(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("number_dcoum_lab_1");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+function runScript_9(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("number_dcoum_in");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+function runScript_11(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("number_dcoum_in_3");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+function runScript_12(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("text32");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+function runScript_13(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("text33");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+function runScript_14(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("text36");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+
+
+function runScript_15(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+
+        var tb_2= document.getElementById("streat_name");
+    
+         eval(tb_2.value);
+        return false;
+    }
+}
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+ 
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const typeDocument = document.getElementById("type_document");
+    const nAq = document.getElementById("n_aq");
+
+    typeDocument.addEventListener("change", function() {
+      const value = typeDocument.value.trim();
+      if (value === "عقد اوقاف" || value === "عقد املاك") {
+        nAq.style.display = "flex"; // أو "block" حسب الحاجة
+      } else {
+        nAq.style.display = "none";
+      }
+    });
+  });
+</script>
+
+
+
+ <script src="{% static 'assets/js/wow.js' %}"></script>
+      <script>
+         new WOW().init();
+      </script>
+      <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+      <script src="{% static 'assets/js/popper.min.js' %}"> </script>
+      <script src="{% static 'assets/js/bootstrap.min.js' %}"> </script>
+      <script src="{% static 'assets/js/custom-script.js' %}"> </script>
+   </body>
+</html>
+ 
+  

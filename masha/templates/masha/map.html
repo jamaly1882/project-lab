@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Map</title>
+    {{ map_html|safe }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Add a click event listener to the map
+            $("div.leaflet-marker-icon").click(function(event) {
+                // Get the latitude and longitude of the clicked point
+                var latitude = event.target._latlng.lat;
+                var longitude = event.target._latlng.lng;
+
+                // Update the form fields with the clicked coordinates
+                $("input[name='latitude']").val(latitude);
+                $("input[name='longitude']").val(longitude);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Add a New Location</h1>
+    <form method="post" action="">
+        {% csrf_token %}
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"><br>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description"></textarea><br>
+        <label for="latitude">Latitude:</label>
+        <input type="text" id="latitude" name="latitude"><br>
+        <label for="longitude">Longitude:</label>
+        <input type="text" id="longitude" name="longitude"><br>
+        <input type="submit" value="Save">
+    </form>
+</body>
+</html>

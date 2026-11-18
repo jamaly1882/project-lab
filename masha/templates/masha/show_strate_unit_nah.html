@@ -1,0 +1,45 @@
+{% extends  'masha/primry.html' %}
+
+
+{% load static %}
+{% load bootstrap4 %}
+{% block content %}
+ <a href="{% url 'masha:show_unit_masha' uu.gata.id %}" class="btn btn-outline-primary">
+  <font size="+1.5"            style="font-family:Noto Kufi Arabic Medium;">
+رجوع
+</font>
+</a> 
+<table border="3" align="center" style="width: 70%;">
+<tr  >
+
+ 
+ 
+  <td align="center" style="background-color:#424575;" ><font size="+2"    color="#FFFFFF"  style="font-family:Noto Kufi Arabic Light;"
+  >رقم الشارع</td>
+
+</tr>
+
+{% for m in aa %}
+<tr>
+
+ <td align="center"> <a href="{% url 'masha:show_strate_masha_hadod_information' m.streat.id   %}" 
+ 	class="form-control btn btn-outline-primary"> {{m.streat.number_strate}}</a> </td>
+
+</tr>
+
+
+
+
+
+  {% endfor %}
+</table>
+
+
+
+
+
+
+
+
+  
+{% endblock %}

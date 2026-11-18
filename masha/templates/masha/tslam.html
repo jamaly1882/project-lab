@@ -1,0 +1,233 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>عنوان الصفحة</title>
+<style>
+   
+
+  body {
+            direction: lft;
+
+
+            font-family:
+                'NotoKufiArabic',
+                Arial,
+                sans-serif;
+
+            font-size: 12px;
+
+            padding: 20px;
+        }
+
+.header_report {
+    padding-top: 40px;
+    padding-right: 40px;
+    padding-left: 40px;
+    text-align: center;
+    background: #fff;
+    color: black;
+    font-size: 24px;
+    font-weight: bold;
+    border-top: 4px solid #000;
+    border-bottom: 3px solid #000;
+    width: 99%;
+    border-radius: 10px;
+}
+
+#report_left, #company__name_en, #name_en_branch, #address_en, #phone_en {
+    text-align: right;
+}
+.logo {
+    display: block;
+    width: 90px;
+    height: 55px;
+    object-fit: contain;
+    margin: 0 auto;
+}
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(26, 54, 126, 0.125);
+    border-rad
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: right;
+}
+
+th {
+    background-color: #eee;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+<table border="1"  align="center">
+
+
+<tr>
+   <td  colspan="2" align="right"><table border="2">
+    <tr>
+      <td  colspan="1"  align="center"><font   style="font-family: Hanimation Arabic ;">{{aa.id}}</td>
+      <td ><font  style="font-family: Hanimation Arabic ;"  size="+1">رقم الطلب</td>
+      
+    </tr>
+    <tr>
+      <td  colspan="1"><font style="font-family: Hanimation Arabic ;" >{{aa.ajaml}}</td>
+      <td ><font style="font-family: Hanimation Arabic ;"  size="+1"> تاريخ الطلب </td>
+      
+    </tr>
+   </table>
+  </td>
+
+    
+
+
+      
+ 
+
+
+    <td colspan="5" align="right" style="text-align: center; vertical-align: middle; width: 40%;"> 
+    	    <img
+                src="{{ image_base64 }}"
+                alt="شعار"
+                class="logo"
+            >
+
+  <td  colspan="3"  align="right">
+          <font  style="font-family: Hanimation Arabic ;" size="+1">الجمهورية اليمنية   </font>
+      <br>
+      <font  style="font-family: Hanimation Arabic ;" size="+1">وزارة النقل والاشغال العامة  </font>
+       <br>
+
+  <font  style="font-family: Hanimation Arabic ;"size="+1"> مكتب محافظة  صنعاء</font>
+
+      <br>
+
+      
+  <font  style="font-family: Hanimation Arabic ;" size="+1">مكتب   {{aa.mahfth.name}}</font>
+
+</font>
+</td>
+  </tr>
+
+<tr> 
+  <td colspan="10" align="center">
+    <h1 align="center" style="font-family: Hanimation Arabic; font-size: 26px; margin-right: 80px;">
+      طلب رفع مساحي
+    </h1>
+  </td>
+</tr>
+
+
+
+       
+
+
+	<tr> 
+    <td  colspan="10" style="background-color:#424575;" align="right"><font style="font-family: Hanimation Arabic ;"  color="#FFFFFF"   size="+2">بيانات الطلب   </h1> 
+</h1>
+</td>
+
+         </tr>
+
+	        
+		
+
+
+
+
+	
+			<tr>
+
+		  <td  colspan="4" align="right"><font    style="font-family: Hanimation Arabic ;"size="+1"> {{aa.saft_sahb_talab}}       </td>
+		<td  style="background-color:#424575;"  colspan="1"  align="right"><font   style="font-family: Hanimation Arabic ;"size="+2" color="#FFFFFF">صفة مقدم الطلب</td>
+			  <td  colspan="4" align="right"><font    style="font-family: Hanimation Arabic ;"size="+1"> {{aa.hidden_ansh_hdm}}       </td>
+		<td  style="background-color:#424575;"  colspan="1"  align="right"><font   style="font-family: Hanimation Arabic ;"size="+2" color="#FFFFFF">الغرض التقرير</td>
+
+			
+	</tr>
+
+			
+			<tr>
+			<td  colspan="4" align="right"><font  style="font-family: Hanimation Arabic ;" size="+1">{{aa.phone}}</td>
+			<td colspan="1" style="background-color:#424575;" align="right"><font    style="font-family: Hanimation Arabic ;" size="+2" color="#FFFFFF">رقم الهاتف </td>
+	
+		
+		  <td  colspan="4" align="right"><font    style="font-family: Hanimation Arabic ;" size="+1"> {{aa.name_wk}}       </td>
+		<td  style="background-color:#424575;" colspan="1"  align="right"><font    style="font-family: Hanimation Arabic ;" size="+2" color="#FFFFFF">  اسم صاحب الطلب</td>
+	</tr>
+
+			<tr>
+
+		
+			<td  colspan="4" align="right"><font  style="font-family: Hanimation Arabic ;" size="+1">{{aa.phone}}</td>
+			<td colspan="1" style="background-color:#424575;" align="right"><font    style="font-family: Hanimation Arabic ;" size="+2" color="#FFFFFF">رقم الهاتف </td>
+		
+		  <td  colspan="4" align="right"><font    style="font-family: Hanimation Arabic ;" size="+1"> {{aa.name}}       </td>
+		<td  style="background-color:#424575;"  colspan="1"  align="right"><font    style="font-family: Hanimation Arabic ;" size="+2"color="#FFFFFF">اسم المالك الرئيسي</td>
+	</tr>
+
+<tr> 
+    <td  colspan="10"  style="background-color:#424575;" align="right"><font   color="#FFFFFF" style="font-family: blod ;"size="+2" color="#FFFFFF">بيانات الموقع والوثيقة</font></td>
+
+	</tr>
+
+	<tr>
+		
+		
+			<td  colspan="4" align="right"><font    style="font-family: Hanimation Arabic ;" size="+1">{{aa.unit.name}}
+		<td colspan="1" style="background-color:#424575;"align="right"><font    style="font-family: Hanimation Arabic ;" size="+2" color="#FFFFFF"> رقـم وحدة الجوار</td>
+		
+
+		  <td  colspan="4" align="right"><font   style="font-family: Hanimation Arabic ;" size="+1">
+		 {{aa.streat_name}}</td>
+		<td colspan="1" style="background-color:#424575;" align="right"><font  style="font-family: Hanimation Arabic ;" size="+2" color="#FFFFFF">الحـــي</td>
+		
+
+	</tr>
+	<tr>
+		
+		
+			  <td  colspan="4" align="right"><font   style="font-family: Hanimation Arabic ;" size="+1">
+		 {{aa.erea_baser}}</td>
+		<td colspan="1" style="background-color:#424575;" align="right"><font   style="font-family: Hanimation Arabic ;"size="+2" color="#FFFFFF">  مساحة وثيقـة الملكــيـة</td>
+
+		  <td  colspan="4" align="right"><font   style="font-family: Hanimation Arabic ;" size="+1">
+		 {{aa.typ.name}}</td>
+		<td colspan="1" style="background-color:#424575;" align="right"><font    style="font-family: Hanimation Arabic ;" size="+2" color="#FFFFFF">نوع وثيقـة الملكية</td>
+		
+       </tr>
+	
+	
+    
+	
+	
+	
+	
+	
+
+
+</table>
+
+</body>
+</html>
+
+
+
+

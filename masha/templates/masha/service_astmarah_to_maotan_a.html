@@ -1,0 +1,268 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<table border="2"  align="center">
+
+
+<tr  colspan="10">
+	 <td  colspan="3" align="center">
+
+	 		<font  style="font-family: Hanimation Arabic ;">رقم الطلب : {{aa.id}} </font>
+
+	 		<br>
+	 	
+	 	 <font  style="font-family: Hanimation Arabic ;">تاريخ الطلب:   {{aa.ajaml}}</font>
+	 		
+	
+	</td>
+
+	 	
+
+
+    	
+ 
+
+
+     <td colspan="4" align="right"><h1 align="center" style="font-family: Hanimation Arabic ;">طلب   معاينة موقع   </h1> 
+
+    	
+
+    	 
+    </td>
+
+        <td  colspan="3"  align="right">
+        	<font  style="font-family: Hanimation Arabic ;">الجمهورية اليمنية   </font>
+    	<br>
+    	<font  style="font-family: Hanimation Arabic ;">وزارة الاشغال العامة والطرق   </font>
+    	 <br>
+
+    	<font  style="font-family: Hanimation Arabic ;">مكتب امانة العاصمة </font>
+
+    	
+    </td>
+	</tr>
+	<tr> 
+    <td  colspan="10"  align="right"></td>
+
+         </tr>
+
+
+	<tr> 
+	         <tr>
+		
+			<td  colspan="3" align="right"><font  style="font-family: Hanimation Arabic ;">{{aa.typ_aqur}}</td>
+			<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">الدور</td>
+
+        
+		<td  colspan="1" align="right"><font   style="font-family: Hanimation Arabic ;">{{aa.content}}</td>
+			<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">نوع المبنى</td>
+		  <td  colspan="2" align="right"><font    style="font-family: Hanimation Arabic ;"></font></td>
+		<td colspan="2" bgcolor="#D1A151" align="right">ا<font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">نوع الطلب</td>
+	</tr>
+		<tr> 
+    <td  colspan="10"  align="right"></td>
+
+         </tr>
+
+
+	<tr> 
+    <td   colspan="10"  bgcolor="#493023" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">بيانات طلب  معاينة الموقع</font></td>
+
+	</tr>
+
+			<tr>
+			<td  colspan="2" align="right"><font  style="font-family: Hanimation Arabic ;"></td>
+			<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">تاريخ التفويض</td>
+	
+		<td  colspan="1" align="right"><font    style="font-family: Hanimation Arabic ;"></td>
+			<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">رقم التفويض</td>
+		  <td  colspan="4" align="right"><font    style="font-family: Hanimation Arabic ;"> {{aa.saft_sahb_talab}}       </td>
+		<td  bgcolor="#D1A151"  colspan="1"  align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">صفة مقدم الطلب</td>
+	</tr>
+			
+			<tr>
+			<td  colspan="2" align="right"><font  style="font-family: Hanimation Arabic ;">{{aa.day}}</td>
+			<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">تاريخ الاصدار </td>
+	
+		<td  colspan="1" align="right"><font    style="font-family: Hanimation Arabic ;">{{aa.card_id_wk}}</td>
+			<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">رقم الهوية </td>
+		  <td  colspan="4" align="right"><font    style="font-family: Hanimation Arabic ;"> {{aa.name_wk}}       </td>
+		<td  bgcolor="#D1A151"  colspan="1"  align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">اسم صاحب الطلب</td>
+	</tr>
+
+			<tr>
+		
+			<td  colspan="2" align="right"><font  style="font-family: Hanimation Arabic ;">{{aa.day}}</td>
+			<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">تاريخ الاصدار </td>
+	
+		<td  colspan="1" align="right"><font    style="font-family: Hanimation Arabic ;">{{aa.card_id}}</td>
+			<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">رقم الهوية </td>
+		  <td  colspan="4" align="right"><font    style="font-family: Hanimation Arabic ;"> {{aa.name}}       </td>
+		<td  bgcolor="#D1A151"  colspan="1"  align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">اسم المالك الرئيسي</td>
+	</tr>
+
+<tr> 
+    <td  colspan="10"   bgcolor="#493023" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">بيانات الموقع والوثيقة</font></td>
+
+	</tr>
+
+	<tr>
+		
+		
+			<td  colspan="2" align="right"><font    style="font-family: Hanimation Arabic ;">{{aa.unit.name}}
+		<td colspan="1" bgcolor="#D1A151"align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"> رقم وحدة الجوار</td>
+			<td  colspan="1" align="right"><font    style="font-family: Hanimation Arabic ;">{{aa.unit.gata.name}}</td>
+		<td colspan="1" bgcolor="#D1A151" align="right"> <font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">القطاع </td>
+
+		  <td  colspan="4" align="right"><font   style="font-family: Hanimation Arabic ;">
+		 {{aa.streat_name}}</td>
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">الحي</td>
+		
+
+	</tr>
+	<tr>
+		
+		
+			<td  colspan="2" align="right">
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">تاريخ الوثيقة </td>
+			<td  colspan="1" align="right">{{aa.document_number}}</td>
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">رقم الوثيقة </td>
+
+		  <td  colspan="4" align="right"><font   style="font-family: Hanimation Arabic ;">
+		 {{aa.typ.name}}</td>
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">نوع وثيقة الملكية</td>
+		
+       </tr>
+	<tr>
+			<tr>
+		
+		
+			<td  colspan="2" align="right">
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">مساحة  البناء </td>
+			<td  colspan="1" align="right"></td>
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">مساحة الدور </td>
+
+		  <td  colspan="4" align="right"><font   style="font-family: Hanimation Arabic ;">
+		 {{aa.erea_baser}}</td>
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">مساحة وثيقة المليكة</td>
+		
+       </tr>
+	<tr>
+		
+       <tr> 
+    <td   colspan="10"   bgcolor="#493023" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">بيانات المصمم والمشرف </font></td>
+
+	</tr>
+
+	<tr>
+		
+		<td colspan="2" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"> </font></td>
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">تاريخ التصنيف  </td>
+			<td colspan="1" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"></td>
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">رقم التصنيف </td>
+
+		 <td colspan="4"  align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"></td>
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">اسم الاستشاري المصمم</td>
+		
+ </tr>
+	<tr>
+		
+		
+		<td colspan="2"  align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"> </font></td>
+	<td colspan="1" bgcolor="#D1A151" align="right"><font  color="#FFFFFF"  style="font-family: Hanimation Arabic ;"> تاريخ التصنيف  </td>
+		<td colspan="1" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"> </td>
+			<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"> رقم التصنيف </td>
+
+			<td colspan="4"  align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"> </td>
+		<td colspan="1" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;"> اسم الاستشاري المشرف </td>
+		
+	</tr>
+
+		<tr> 
+    <td  colspan="10"  align="right"><br></td>
+
+         </tr>
+	<tr> 
+    <td  colspan="10"  bgcolor="#493023" align="right"><font size="+1" color="#FFFFFF" style="font-family: Hanimation Arabic ;">االمرفقات</font></td>
+
+	</tr>
+
+
+
+			<tr> 
+
+         </tr>
+
+	 <tr  colspan="10">
+		
+			
+			<td colspan="5"bgcolor="#D1A151" align="right" ><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">الوثائق المطلوبة </td>
+
+		        
+			<td colspan="5" bgcolor="#D1A151" align="right"><font   color="#FFFFFF" style="font-family: Hanimation Arabic ;">الوثائق المرفقة </td>
+
+	</tr>
+	{% for i in  s %}
+	         	 <tr colspan="9">
+		
+						<td colspan="5" align="right"><font   style="font-family: Hanimation Arabic ;"></td>
+			<td colspan="5" align="right" ><font   style="font-family: Hanimation Arabic ;">{{i.name}}</td>
+
+		        
+
+
+	</tr>
+			{% endfor  %}
+		<tr>
+			<td  colspan="3">	
+		البصمة
+	
+</td>
+
+	<td  colspan="3">	
+		التوقيع
+	
+</td>
+
+<td  colspan="4">	
+		الاسم
+	
+</td>	
+</tr>
+</tr>
+			
+		<tr>
+	
+	<td  colspan="3">	
+		--------
+	
+</td>
+
+	<td  colspan="3">	
+		--------
+	
+</td>
+<td  colspan="4">	
+		--------
+	
+</td>
+</tr>		
+
+	
+	
+
+
+</table>
+
+</body>
+</html>
+
+
+
+
+
+

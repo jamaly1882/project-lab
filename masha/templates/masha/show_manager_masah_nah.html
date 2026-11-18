@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>نظام المساحة الالكتروني</title>
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
+</head>
+<body>
+
+<div class="templatemo-flex-row">
+    <!-- Sidebar -->
+    <div class="templatemo-sidebar">
+        <header class="templatemo-site-header">
+            <div class="square"></div>
+            <h1>رئيس القسم</h1>
+        </header>
+        <div class="profile-photo-container">
+            <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+            <div class="profile-photo-overlay"></div>
+        </div>
+
+        <!-- Search -->
+        <form class="templatemo-search-form" role="search">
+            <div class="input-group">
+                <button type="submit" class="fa fa-search"></button>
+                <input type="text" class="form-control" placeholder="بحث" name="srch-term" id="srch-term">
+            </div>
+        </form>
+
+        <div class="mobile-menu-icon">
+            <i class="fa fa-bars"></i>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="templatemo-left-nav">
+            <ul>
+                <li><a href="{% url 'masha:interface' %}"><i class="fa fa-home fa-fw"></i> الرئيسية</a></li>
+
+                <li>
+                    <a href="{% url 'masha:agree_tsrah_xx' %}" >
+                        <i class="fa fa-envelope"></i> طلبات جديدة
+                        <span class="badge badge-danger" data-counter="num_unread">{% if num_unread > 0 %}{{ num_unread }}{% endif %}</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'masha:serch_talbt_report_by_mnager_nah' %}" >
+                        <i class="fa fa-envelope"></i> الموافقة النهائية للتقرير
+                        <span class="badge badge-danger" data-counter="num_unread_1">{% if num_unread_1 > 0 %}{{ num_unread_1 }}{% endif %}</span>
+                    </a>
+                </li>
+                   
+
+
+              <li>
+                    <a href="{% url 'masha:show_tsrah_exit_eng_by_manger_by_manger' %}" >
+                        <i class="fa fa-eject fa-fw"></i> تصاريح  الخروج المقبولة
+                        <span class="badge badge-danger" data-counter="num_unread_3">{% if num_unread_3 > 0 %}{{ num_unread_3 }}{% endif %}</span>
+                    </a>
+                </li>
+                <!-- أضف هذا داخل <ul class="text-uppercase"> -->
+
+                <li>
+                    <a href="{% url 'masha:print_report' %}" >
+                        <i class="fa fa-eject fa-fw"></i> طلبات التقارير المقبولة
+                        <span class="badge badge-danger" data-counter="print_report_a">{% if print_report_a > 0 %}{{ print_report_a }}{% endif %}</span>
+                    </a>
+                </li>
+
+
+
+ 
+ <li>
+
+                    <a href="{% url 'masha:show_report_nah_by_manager' %}" >
+                        <i class="fa fa-envelope"></i> التقارير   الجاهزة  
+                     
+                    </a>
+                </li>
+               <li><a href="{% url 'masha:asder_nah_report_masah' %}"><i class="fa fa-eject fa-fw"></i>البحث عن التقرير</a></li>
+
+
+<li><a href="{% url 'masha:serch_in_screen_prisdent_masah_talbt' %}"><i class="fa fa-eject fa-fw"></i>الارشيف</a></li>
+                    <li >
+   
+                   <li>
+                    <a href="{% url 'masha:show_convert_to_mashi_from_fero_nah' %}">
+                        <i class="fa fa-envelope"></i>التقارير  المقبولة من الادارة
+                        <span class="badge badge-danger" data-counter="num_unread_agree_mahfth">{% if num_unread_agree_mahfth > 0 %}{{ num_unread_agree_mahfth }}{% endif %}</span>
+                       
+                    </a>
+                </li>
+                      <li>
+                    <a href="{% url 'masha:reason_rafth_managmnat_generl_to_convert_maderah' %}" >
+                        <i class="fa fa-envelope"></i>التقارير المرفوضة من  الادارة
+    <span class="badge badge-danger" data-counter="num_unread_rafth_mahfth">{% if num_unread_rafth_mahfth > 0 %}{{ num_unread_rafth_mahfth }}{% endif %}</span>
+                    </a>
+                </li>
+
+                <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i> تسجيل الخروج</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="templatemo-content col-1 light-gray-bg">
+        <div class="templatemo-top-nav-container">
+            <div class="row">
+                <nav class="templatemo-top-nav col-lg-12 col-md-12">
+                    <ul class="text-uppercase">
+                        <li><a href="#" class="active">طلبات جديدة</a></li>
+                        <li><a href="#">طلبات مرفوضة</a></li>
+                        <li><a href="#">طلبات مكتملة</a></li>
+                        <li><a href="#">طلبات قيد الاجراء</a></li>
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div id="content-area">
+            <!-- سيتم تحميل المحتوى هنا -->
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'js/templatemo-script.js' %}"></script>
+
+<script>
+let currentUrl = null;
+
+// تحميل المحتوى داخل content-area
+function loadContent(event, url){
+    if(event) event.preventDefault();
+    currentUrl = url;
+    fetch(url)
+        .then(res => res.text())
+        .then(html => document.getElementById('content-area').innerHTML = html)
+        .catch(err => console.error('خطأ في تحميل المحتوى:', err));
+}
+
+// تحديث الإشعارات في الوقت الحقيقي
+function updateNotifications(){
+    fetch("{% url 'masha:show_manager_masah_nah_json' %}")
+        .then(res => res.json())
+        .then(data => {
+            const counters = ['num_unread', 'num_unread_1', 'num_unread_3', 'print_report_a','rafth_ald','num_unread_rafth_mahfth','num_unread_agree_mahfth'];
+            counters.forEach(key => {
+                const el = document.querySelector(`.badge[data-counter="${key}"]`);
+                if(el){
+                    el.textContent = data[key];
+                    el.style.display = data[key] > 0 ? 'inline-block' : 'none';
+                }
+            });
+
+            // إعادة تحميل المحتوى الحالي تلقائيًا
+            if(currentUrl) loadContent(null, currentUrl);
+        })
+        .catch(err => console.error('خطأ في تحديث الإشعارات:', err));
+}
+
+// تحديث كل 5 ثواني
+setInterval(updateNotifications, 5000);
+document.addEventListener('DOMContentLoaded', () => updateNotifications());
+
+</script>
+
+</body>
+</html>

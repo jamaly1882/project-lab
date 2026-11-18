@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>نظام المساحة الالكتروني</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/templatemo-style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+
+
+    <style>
+        .container { max-width: 1200px; margin: 30px auto; }
+        th { background-color: #191970; color: white; text-align: center; }
+        td, th { text-align: center; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        tr:hover { background-color: #ddd; }
+    </style>
+</head>
+
+    <div class="templatemo-flex-row">
+    <!-- Sidebar -->
+    <div class="templatemo-sidebar">
+        <header class="templatemo-site-header">
+            <h1> منسق   القسم  </h1>   <div class="square"></div> <br>
+          <p>إصدار تقرير مساحي  للاستشارة  - شاشة التقارير</p>
+        </header>
+        <div class="profile-photo-container">
+            <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
+            <div class="profile-photo-overlay"></div>
+        </div>
+
+        <!-- Search -->
+        <form class="templatemo-search-form" role="search">
+            <div class="input-group">
+                <button type="submit" class="fa fa-search"></button>
+                <input type="text" class="form-control" placeholder="بحث" name="srch-term" id="srch-term">
+            </div>
+        </form>
+
+        <div class="mobile-menu-icon">
+            <i class="fa fa-bars"></i>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="templatemo-left-nav">
+            <ul>
+                <li><a href="{% url 'masha:report_state_talbat_nah_astshr' %}"><i class="fa fa-home fa-fw"></i> الرئيسية</a></li>
+</ul>
+</nav>
+</div>
+
+<div class="container">
+    <h3 class="text-center mb-4">البحث اللحظي في تصاريح استكمال الوثائق</h3>
+
+    <!-- حقل البحث -->
+    <input type="text" id="live_search" class="form-control mb-3" placeholder="ابحث بالاسم أو رقم الطلب..." dir="rtl">
+
+    <!-- جدول البيانات -->
+    <div class="templatemo-content-widget no-padding">
+        <div class="panel panel-default table-responsive">
+            <table class="table table-striped table-bordered templatemo-user-table">
+                <thead>
+                    <tr>
+                        <th>طباعة</th>
+                        <th>اسم الوثيقة الناقصة</th>
+                        <th>اسم الحي</th>
+                        <th>اسم المالك</th>
+                        <th>اسم مقدم الطلب</th>
+                        <th>وحدة الجوار</th>
+                        <th>القطاع</th>
+                        <th>المديرية</th>
+                        <th>نوع الطلب</th>
+                        <th>تاريخ الطلب</th>
+                        <th>رقم الطلب</th>
+                    </tr>
+                </thead>
+                <tbody id="results_body">
+                {% for i in form %}
+                    <tr>
+                        <td><a href="{% url 'masha:talb_astkmal_by_manger' i.id %}" target="_blank">طباعة</a></td>
+                        <td>{{i.name_documnt}}</td>
+                        <td>{{i.streat_name}}</td>
+                        <td>{{i.name}}</td>
+                        <td>{{i.name_wk}}</td>
+                        <td>{{i.unit.name}}</td>
+                        <td>{{i.unit.gata.name}}</td>
+                        <td>{{i.mahfth.name}}</td>
+                        <td>{{i.hidden_ansh_hdm}}</td>
+                        <td>{{i.ajaml}}</td>
+                        <td>{{i.id}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
+
+<!-- البحث اللحظي AJAX -->
+<script>
+$(document).ready(function(){
+    $('#live_search').on('input', function(){
+        let query = $(this).val().trim();
+        if(query === ""){
+            $('#results_body').html('');
+            return;
+        }
+        $.ajax({
+            url: "{% url 'masha:live_search_talb_astkmal' %}",
+            data: { q: query },
+            success: function(res){
+                let tbody = '';
+                if(res.results.length > 0){
+                    res.results.forEach(function(item){
+                        tbody += `<tr>
+                            <td><a href="/talb_astkmal_by_manger/${item.id}/" target="_blank">طباعة</a></td>
+                            <td>${item.name_documnt}</td>
+                            <td>${item.streat_name}</td>
+                            <td>${item.name}</td>
+                            <td>${item.name_wk}</td>
+                            <td>${item.unit_name}</td>
+                            <td>${item.gata_name}</td>
+                            <td>${item.mahfth_name}</td>
+                            <td>${item.hidden_ansh_hdm}</td>
+                            <td>${item.ajaml}</td>
+                            <td>${item.id}</td>
+                        </tr>`;
+                    });
+                } else {
+                    tbody = "<tr><td colspan='11' style='text-align:center'>لا توجد نتائج</td></tr>";
+                }
+                $('#results_body').html(tbody);
+            },
+            error: function(err){ console.log(err); }
+        });
+    });
+});
+</script>
+
+<script src="{% static 'assets/js/popper.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/js/custom-script.js' %}"></script>
+</body>
+</html>
