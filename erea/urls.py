@@ -22,10 +22,12 @@ from django.urls import re_path
 from django.views.static import serve
 
 urlpatterns = [
+    # Put the project's login/logout routes before Django's built-in auth URLs,
+    # otherwise /accounts/login/ is handled by Django's LoginView instead.
+    path('accounts/', include('accounts.urls', namespace='accounts')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
     path('', include('masha.urls',namespace='masha')),
-    path('accounts/' , include('accounts.urls',namespace='accounts')),
      re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
     
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),

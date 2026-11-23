@@ -14,6 +14,7 @@ from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.sessions.models import Session
+from django.utils.http import url_has_allowed_host_and_scheme
 def Signup(request):
 		 if request.method=="POST":
 		 	form=SignupForm(request.POST)
@@ -54,6 +55,12 @@ def profile_edite(request):
 
 def login_view(request):
     next_url = request.GET.get('next') or request.POST.get('next') or ''
+    if next_url and not url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        next_url = ''
 
     if request.method == "POST":
         username = request.POST.get("username")

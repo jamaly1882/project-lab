@@ -85,7 +85,7 @@
                 {% endif %}
               {% endif %}
 
-              <form method="post" action="{% url 'login' %}" dir="rtl">
+              <form method="post" action="{% url 'accounts:login' %}" dir="rtl">
                 {% csrf_token %}
                 <div data-mdb-input-init class="form-outline form-white mb-4">
                      <label class="form-label" for="typeEmailX"  style="direction: rtl; text-align: right;">اسم  المستخدم  :</label>
