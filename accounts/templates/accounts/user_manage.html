@@ -1,0 +1,461 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>إدارة المستخدمين - نظام المساحة الإلكتروني</title>
+
+  <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
+  <link href="{% static 'css/sweetalert2.min.css' %}" rel="stylesheet">
+
+  <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+  <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
+
+  <style>
+    body, input, select, textarea, button, table {
+      font-family: Tahoma, "Segoe UI", sans-serif;
+      direction: rtl;
+      text-align: right;
+    }
+    body { background: #f5f6fa; }
+
+    .templatemo-flex-row {
+      display: flex;
+      flex-direction: row-reverse;
+      min-height: 100vh;
+    }
+    .templatemo-sidebar {
+      order: 1;
+      right: 0;
+      left: auto;
+      background: #1f2b3c;
+      min-height: 100vh;
+      width: 250px;
+      flex-shrink: 0;
+    }
+    .templatemo-content {
+      order: 2;
+      width: 100%;
+      padding: 30px;
+    }
+    .templatemo-left-nav ul { list-style: none; padding: 0; margin: 0; }
+    .templatemo-left-nav li a {
+      display: block;
+      color: #cfd8e3;
+      padding: 12px 18px;
+      text-decoration: none;
+      border-right: 3px solid transparent;
+      transition: all .2s;
+    }
+    .templatemo-left-nav li a:hover,
+    .templatemo-left-nav li a.active {
+      background: #2d3e55;
+      color: #fff;
+      border-right-color: #ffcf09;
+    }
+    .templatemo-left-nav li a i { width: 22px; }
+
+    h2.page-title {
+      font-weight: bold;
+      margin-bottom: 25px;
+      text-align: center;
+      color: #122062;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      margin-bottom: 20px;
+    }
+    .stat-card .num { font-size: 30px; font-weight: bold; color: #122062; }
+    .stat-card .lbl { color: #6b7a90; font-size: 15px; }
+
+    .panel {
+      background: #fff;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.07);
+      margin-bottom: 30px;
+    }
+    .panel h4 {
+      font-weight: bold;
+      color: #122062;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ffcf09;
+      padding-bottom: 10px;
+    }
+
+    label { font-weight: bold; color: #33475b; margin-bottom: 6px; display: block; }
+    .form-control { font-size: 16px; padding: 9px 12px; height: auto; }
+    .help-text { color: #8494a8; font-size: 13px; }
+    .errorlist {
+      color: #c0392b;
+      list-style: none;
+      padding: 0;
+      margin: 5px 0 0;
+      font-size: 14px;
+    }
+
+    .btn-save {
+      background: #122062;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 28px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn-save:hover { background: #1d3285; }
+
+    table.users-table th {
+      background: #122062;
+      color: #fff;
+      text-align: right;
+      vertical-align: middle;
+      font-size: 15px;
+    }
+    table.users-table td {
+      vertical-align: middle;
+      font-size: 15px;
+    }
+    .badge-mahfth {
+      background: #e8eefc;
+      color: #122062;
+      border-radius: 15px;
+      padding: 4px 12px;
+      display: inline-block;
+      font-size: 14px;
+    }
+    .badge-none {
+      background: #fdeaea;
+      color: #b03a2e;
+      border-radius: 15px;
+      padding: 4px 12px;
+      display: inline-block;
+      font-size: 14px;
+    }
+    .badge-active { background: #e6f7ec; color: #1e8449; }
+    .badge-inactive { background: #f2f2f2; color: #7f8c8d; }
+    .badge-role { padding: 4px 10px; border-radius: 15px; font-size: 13px; }
+    .role-admin { background: #fdf1d7; color: #9a6b00; }
+    .role-user { background: #eaf1f8; color: #2c5f8a; }
+
+    .action-btn {
+      border: none;
+      border-radius: 5px;
+      padding: 5px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 2px;
+      color: #fff;
+    }
+    .btn-edit { background: #2980b9; }
+    .btn-toggle { background: #e67e22; }
+    .btn-activate { background: #27ae60; }
+    .btn-delete { background: #c0392b; }
+    .action-btn:hover { opacity: .85; }
+
+    .empty-row { text-align: center; color: #8494a8; padding: 30px 0 !important; }
+
+    .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+    .search-box input { flex: 1; }
+
+    @media (max-width: 768px) {
+      .templatemo-flex-row { flex-direction: column; }
+      .templatemo-sidebar { width: 100%; min-height: auto; }
+      .templatemo-content { padding: 15px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="templatemo-flex-row">
+
+    <!-- القائمة الجانبية -->
+    <div class="templatemo-sidebar">
+      <header class="templatemo-site-header">
+        <div class="square"></div>
+        <h1>مدير النظام</h1>
+      </header>
+
+      <nav class="templatemo-left-nav">
+        <ul>
+          <li><a href="{% url 'masha:index' %}"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+          <li><a href="{% url 'masha:mahfth_list' %}"><i class="fa fa-building fa-fw"></i>المديريات</a></li>
+          <li><a href="{% url 'accounts:user_manage' %}" class="active"><i class="fa fa-users fa-fw"></i>إدارة المستخدمين</a></li>
+          <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- المحتوى -->
+    <div class="templatemo-content">
+      <h2 class="page-title">إدارة المستخدمين والمديريات</h2>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- إحصائيات سريعة -->
+      <div class="row">
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="num">{{ users_count }}</div>
+            <div class="lbl">إجمالي المستخدمين</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="num">{{ active_count }}</div>
+            <div class="lbl">حسابات مفعّلة</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="num">{{ mahfth_users_count }}</div>
+            <div class="lbl">مستخدمون مرتبطون بمديرية</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- نموذج الإضافة -->
+      <div class="panel">
+        <h4><i class="fa fa-user-plus"></i> إضافة مستخدم جديد</h4>
+
+        <form id="user_create_form" method="post" action="{% url 'accounts:user_manage' %}">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <div class="row">
+            <div class="col-md-4">
+              <label for="{{ form.username.id_for_label }}">{{ form.username.label }} <span style="color:#c0392b">*</span></label>
+              {{ form.username }}
+              {{ form.username.errors }}
+            </div>
+            <div class="col-md-4">
+              <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }} <span style="color:#c0392b">*</span></label>
+              {{ form.password1 }}
+              {{ form.password1.errors }}
+            </div>
+            <div class="col-md-4">
+              <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }} <span style="color:#c0392b">*</span></label>
+              {{ form.password2 }}
+              {{ form.password2.errors }}
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:15px;">
+            <div class="col-md-4">
+              <label for="{{ form.mahfth.id_for_label }}">{{ form.mahfth.label }} <span style="color:#c0392b">*</span></label>
+              {{ form.mahfth }}
+              {{ form.mahfth.errors }}
+              <div class="help-text">عند دخول المستخدم ستظهر له مديريته المحددة هنا فقط.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
+              {{ form.phone_number }}
+              {{ form.phone_number.errors }}
+            </div>
+            <div class="col-md-2">
+              <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+              {{ form.first_name }}
+              {{ form.first_name.errors }}
+            </div>
+            <div class="col-md-2">
+              <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+              {{ form.last_name }}
+              {{ form.last_name.errors }}
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:15px;">
+            <div class="col-md-6">
+              <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+              {{ form.email }}
+              {{ form.email.errors }}
+            </div>
+            <div class="col-md-6" style="display:flex;align-items:flex-end;">
+              <button type="submit" class="btn-save"><i class="fa fa-save"></i> إنشاء المستخدم</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- جدول المستخدمين -->
+      <div class="panel">
+        <h4><i class="fa fa-users"></i> المستخدمون المسجّلون</h4>
+
+        <form method="get" class="search-box">
+          <input type="text" name="q" class="form-control" placeholder="ابحث باسم المستخدم أو الاسم أو المديرية..." value="{{ query }}">
+          <button type="submit" class="btn-save" style="padding:8px 20px;"><i class="fa fa-search"></i> بحث</button>
+          {% if query %}
+            <a href="{% url 'accounts:user_manage' %}" class="btn-save" style="background:#7f8c8d;padding:8px 20px;text-decoration:none;">إلغاء</a>
+          {% endif %}
+        </form>
+
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped users-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>اسم المستخدم</th>
+                <th>الاسم الكامل</th>
+                <th>المديرية</th>
+                <th>الهاتف</th>
+                <th>الصلاحية</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for u in users %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td dir="ltr" style="text-align:right;">{{ u.username }}</td>
+                  <td>{{ u.get_full_name|default:"—" }}</td>
+                  <td>
+                    {% if u.profile.mahfth %}
+                      <span class="badge-mahfth">{{ u.profile.mahfth.name }}</span>
+                    {% else %}
+                      <span class="badge-none">غير محددة</span>
+                    {% endif %}
+                  </td>
+                  <td dir="ltr" style="text-align:right;">{{ u.profile.phone_number|default:"—" }}</td>
+                  <td>
+                    {% if u.is_superuser %}
+                      <span class="badge-role role-admin">مدير النظام</span>
+                    {% elif u.is_staff %}
+                      <span class="badge-role role-admin">مشرف</span>
+                    {% else %}
+                      <span class="badge-role role-user">مستخدم</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if u.is_active %}
+                      <span class="badge-active badge-role">مفعّل</span>
+                    {% else %}
+                      <span class="badge-inactive badge-role">معطّل</span>
+                    {% endif %}
+                  </td>
+                  <td style="white-space:nowrap;">
+                    <a href="{% url 'accounts:user_edit' u.pk %}" class="action-btn btn-edit" style="text-decoration:none;"><i class="fa fa-pencil"></i> تعديل</a>
+
+                    {% if u.pk != request.user.pk %}
+                      <button type="button"
+                              class="action-btn {% if u.is_active %}btn-toggle{% else %}btn-activate{% endif %} toggle-btn"
+                              data-id="{{ u.pk }}"
+                              data-active="{{ u.is_active|yesno:'1,0' }}"
+                              data-username="{{ u.username }}">
+                        {% if u.is_active %}<i class="fa fa-ban"></i> تعطيل{% else %}<i class="fa fa-check"></i> تفعيل{% endif %}
+                      </button>
+
+                      <button type="button"
+                              class="action-btn btn-delete delete-btn"
+                              data-id="{{ u.pk }}"
+                              data-username="{{ u.username }}">
+                        <i class="fa fa-trash"></i> حذف
+                      </button>
+                    {% else %}
+                      <span class="help-text">(حسابك)</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="8" class="empty-row">لا يوجد مستخدمون مطابقون</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function csrfToken() {
+      return $('input[name="csrfmiddlewaretoken"]').first().val();
+    }
+
+    // تعطيل / تفعيل
+    $(document).on('click', '.toggle-btn', function () {
+      var btn = $(this);
+      var id = btn.data('id');
+      var username = btn.data('username');
+      var isActive = btn.data('active') === '1' || btn.data('active') === 1 || btn.data('active') === true;
+      var title = isActive ? 'تعطيل الحساب' : 'تفعيل الحساب';
+
+      Swal.fire({
+        icon: 'question',
+        title: title,
+        text: 'المستخدم: ' + username,
+        showCancelButton: true,
+        confirmButtonText: 'نعم',
+        cancelButtonText: 'إلغاء'
+      }).then(function (result) {
+        if (!result.isConfirmed) return;
+        $.ajax({
+          url: '/accounts/users/' + id + '/toggle/',
+          type: 'POST',
+          headers: { 'X-CSRFToken': csrfToken() },
+          data: { csrfmiddlewaretoken: csrfToken() },
+          success: function () { window.location.reload(); },
+          error: function (xhr) {
+            var msg = 'تعذّر تنفيذ العملية';
+            if (xhr.responseJSON && xhr.responseJSON.error) msg = xhr.responseJSON.error;
+            Swal.fire('خطأ', msg, 'error');
+          }
+        });
+      });
+    });
+
+    // حذف
+    $(document).on('click', '.delete-btn', function () {
+      var btn = $(this);
+      var id = btn.data('id');
+      var username = btn.data('username');
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'هل أنت متأكد؟',
+        text: 'سيتم حذف المستخدم: ' + username,
+        showCancelButton: true,
+        confirmButtonText: 'نعم، احذف',
+        cancelButtonText: 'إلغاء',
+        confirmButtonColor: '#c0392b'
+      }).then(function (result) {
+        if (!result.isConfirmed) return;
+        $.ajax({
+          url: '/accounts/users/' + id + '/delete/',
+          type: 'POST',
+          headers: { 'X-CSRFToken': csrfToken() },
+          data: { csrfmiddlewaretoken: csrfToken() },
+          success: function () { window.location.reload(); },
+          error: function (xhr) {
+            var msg = 'تعذّر حذف المستخدم';
+            if (xhr.responseJSON && xhr.responseJSON.error) msg = xhr.responseJSON.error;
+            Swal.fire('خطأ', msg, 'error');
+          }
+        });
+      });
+    });
+  </script>
+
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>

@@ -1,157 +1,403 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">  
-     <title>الادارة  العامة  للاستثمار</title>
-    
-    <meta name="description" content="">
-    <meta name="author" content="templatemo">
-    <!-- 
-    Visual Admin Template
-    http://www.templatemo.com/preview/templatemo_455_visual_admin
-    -->
-  
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>الادارة العامة للاستثمار - لوحة التحكم</title>
+
     <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
-        <link href="{% static 'css/templatemo-style.css' %}" rel="stylesheet">
-  
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
 
+    <style>
+      body, input, select, textarea, button, table {
+        font-family: Tahoma, "Segoe UI", sans-serif;
+        direction: rtl;
+        text-align: right;
+      }
+      body { background: #f5f6fa; }
+
+      .templatemo-flex-row {
+        display: flex;
+        flex-direction: row-reverse;
+        min-height: 100vh;
+      }
+      .templatemo-sidebar {
+        order: 1;
+        right: 0;
+        left: auto;
+        width: 260px;
+        flex-shrink: 0;
+        background: #1f2b3c;
+        min-height: 100vh;
+      }
+      .templatemo-content {
+        order: 2;
+        width: 100%;
+        padding: 30px;
+      }
+      .templatemo-left-nav ul { list-style: none; padding: 0; margin: 0; }
+      .templatemo-left-nav li.nav-item { padding: 14px 20px 6px; color: #ffcf09; font-size: 14px; }
+      .templatemo-left-nav li a {
+        display: block;
+        color: #cfd8e3;
+        padding: 10px 20px;
+        text-decoration: none;
+        font-size: 15px;
+        border-right: 3px solid transparent;
+        transition: all .2s;
+      }
+      .templatemo-left-nav li a:hover,
+      .templatemo-left-nav li a.active {
+        background: #2d3e55;
+        color: #fff;
+        border-right-color: #ffcf09;
+      }
+      .templatemo-left-nav li a i { width: 22px; }
+
+      .page-title {
+        font-weight: bold;
+        color: #122062;
+        margin: 0 0 25px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid #ffcf09;
+      }
+
+      .stat-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.07);
+        margin-bottom: 20px;
+        border-right: 5px solid #122062;
+      }
+      .stat-card .num { font-size: 32px; font-weight: bold; color: #122062; }
+      .stat-card .lbl { color: #6b7a90; font-size: 15px; margin-top: 4px; }
+      .stat-card.gold { border-right-color: #f6c410; }
+      .stat-card.gold .num { color: #b8860b; }
+      .stat-card.green { border-right-color: #27ae60; }
+      .stat-card.green .num { color: #1e8449; }
+
+      .panel {
+        background: #fff;
+        border-radius: 10px;
+        padding: 22px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.07);
+        margin-bottom: 25px;
+      }
+      .panel h4 {
+        font-weight: bold;
+        color: #122062;
+        margin-bottom: 18px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #eef1f6;
+        font-size: 18px;
+      }
+      .panel h4 i { color: #f6c410; }
+
+      table.dash-table th {
+        background: #122062;
+        color: #fff;
+        font-size: 14px;
+        text-align: right;
+        vertical-align: middle;
+      }
+      table.dash-table td { font-size: 14px; vertical-align: middle; }
+      .muted { color: #8494a8; }
+
+      .badge-mahfth {
+        background: #e8eefc;
+        color: #122062;
+        border-radius: 15px;
+        padding: 4px 12px;
+        display: inline-block;
+        font-size: 13px;
+      }
+      .badge-none {
+        background: #fdeaea;
+        color: #b03a2e;
+        border-radius: 15px;
+        padding: 4px 12px;
+        display: inline-block;
+        font-size: 13px;
+      }
+
+      .directorate-card {
+        background: linear-gradient(135deg, #122062 0%, #24408f 100%);
+        color: #fff;
+        border-radius: 12px;
+        padding: 25px 28px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 14px rgba(18,32,98,.25);
+      }
+      .directorate-card h3 { margin: 0 0 8px; font-weight: bold; }
+      .directorate-card p { color: #d7def5; margin: 0; font-size: 15px; }
+
+      .alert-mahfth {
+        background: #fff4e5;
+        border-right: 5px solid #e67e22;
+        padding: 18px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        color: #8a5000;
+      }
+
+      .quick-link {
+        display: block;
+        background: #fff;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 15px;
+        text-align: center;
+        color: #122062;
+        font-weight: bold;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        border: 1px solid #eef1f6;
+        transition: all .2s;
+        font-size: 15px;
+      }
+      .quick-link:hover {
+        background: #122062;
+        color: #fff;
+        text-decoration: none;
+        transform: translateY(-2px);
+      }
+      .quick-link i { display: block; font-size: 26px; margin-bottom: 8px; color: #f6c410; }
+
+      @media (max-width: 768px) {
+        .templatemo-flex-row { flex-direction: column; }
+        .templatemo-sidebar { width: 100%; min-height: auto; }
+        .templatemo-content { padding: 15px; }
+      }
+    </style>
   </head>
-  <body>  
-    <!-- Left column -->
+
+  <body>
+    <!-- flex row -->
     <div class="templatemo-flex-row">
+
+      <!-- ================= القائمة الجانبية ================= -->
       <div class="templatemo-sidebar">
         <header class="templatemo-site-header">
           <div class="square"></div>
-          <h1>لوحة  التحكم</h1>
+          <h1>لوحة التحكم</h1>
+          <p style="color:#9fb0c7;font-size:14px;padding:0 20px;margin-top:6px;">
+            {{ request.user.get_full_name|default:request.user.username }}
+          </p>
         </header>
-        <div class="profile-photo-container">
-      <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
-          <div class="profile-photo-overlay"></div>
-        </div>      
-        <!-- Search box -->
-        <form class="templatemo-search-form" role="search">
-          <div class="input-group">
-              <button type="submit" class="fa fa-search"></button>
-              <input type="text" class="form-control" placeholder="بحث" name="srch-term" id="srch-term">           
+
+        <nav class="templatemo-left-nav">
+          <ul>
+            <li class="nav-item"><strong>📊 الرئيسية</strong></li>
+            <li><a href="{% url 'masha:index' %}" class="active"><i class="fa fa-home fa-fw"></i> لوحة التحكم</a></li>
+            <li><a href="{% url 'masha:interface' %}"><i class="fa fa-globe fa-fw"></i> الموقع الرئيسي</a></li>
+
+            {% if request.user.is_superuser or request.user.is_staff %}
+              <li class="nav-item"><strong>📍 بيانات جغرافية</strong></li>
+              <li><a href="{% url 'masha:mahfth_list' %}"><i class="fa fa-building fa-fw"></i> المديريات</a></li>
+              <li><a href="{% url 'masha:manage_eng' %}"><i class="fa fa-user-secret fa-fw"></i> ادخال المهندسين</a></li>
+              <li><a href="{% url 'masha:unit_list' %}"><i class="fa fa-cubes fa-fw"></i> وحدات الجوار</a></li>
+              <li><a href="{% url 'masha:manage_blocks' %}"><i class="fa fa-cube fa-fw"></i> نوع البلوك</a></li>
+              <li><a href="{% url 'masha:manage_naturals' %}"><i class="fa fa-tree fa-fw"></i> طبيعة الأرض</a></li>
+              <li><a href="{% url 'masha:manage_kah' %}"><i class="fa fa-tachometer fa-fw"></i> الضغط العالي</a></li>
+              <li><a href="{% url 'masha:manage_seol' %}"><i class="fa fa-tint fa-fw"></i> مجاري السيول</a></li>
+              <li><a href="{% url 'masha:manage_typ' %}"><i class="fa fa-file fa-fw"></i> أنواع الوثائق</a></li>
+              <li><a href="{% url 'masha:type_map_list_create' %}"><i class="fa fa-map-o fa-fw"></i> أنواع نظام الإسقاط</a></li>
+              <li><a href="{% url 'masha:manage_talb_astshr' %}"><i class="fa fa-life-ring fa-fw"></i> أنواع طلبات الاستشارة</a></li>
+
+              <li class="nav-item"><strong>👥 المستخدمون والصلاحيات</strong></li>
+              <li><a href="{% url 'accounts:user_manage' %}" id="nav_add_user"><i class="fa fa-user-plus fa-fw"></i> إضافة مستخدم</a></li>
+            {% endif %}
+
+            <li class="nav-item"><strong>⚙️ الحساب</strong></li>
+            <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-sign-out fa-fw"></i> تسجيل الخروج</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- ================= المحتوى ================= -->
+      <div class="templatemo-content">
+        <h2 class="page-title">
+          <i class="fa fa-dashboard"></i>
+          لوحة التحكم
+          {% if is_manager %}
+            <span class="muted" style="font-size:15px;font-weight:normal;">— مدير النظام (جميع المديريات)</span>
+          {% endif %}
+        </h2>
+
+        <!-- بطاقة المديرية للمستخدم العادي -->
+        {% if not is_manager %}
+          {% if my_mahfth %}
+            <div class="directorate-card">
+              <h3><i class="fa fa-map-marker"></i> مديريتك: {{ my_mahfth.name }}</h3>
+              <p>تظهر لك البيانات والطلبات الخاصة بمديريتك فقط داخل النظام.</p>
+            </div>
+          {% else %}
+            <div class="alert-mahfth">
+              <strong><i class="fa fa-exclamation-triangle"></i> لم يتم ربط حسابك بأي مديرية بعد.</strong><br>
+              يرجى التواصل مع مدير النظام لتحديد مديريتك من صفحة «إدارة المستخدمين».
+            </div>
+          {% endif %}
+        {% endif %}
+
+        <!-- الإحصائيات -->
+        <div class="row">
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+              <div class="num">{{ forms_total }}</div>
+              <div class="lbl">إجمالي الطلبات</div>
+            </div>
           </div>
-        </form>
-        <div class="mobile-menu-icon">
-            <i class="fa fa-bars"></i>
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card gold">
+              <div class="num">{{ reports_total }}</div>
+              <div class="lbl">التقارير المساحية</div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="stat-card green">
+              <div class="num">{{ mahfth_total }}</div>
+              <div class="lbl">{% if is_manager %}عدد المديريات{% else %}مديريتك{% endif %}</div>
+            </div>
+          </div>
+          {% if is_manager %}
+            <div class="col-md-3 col-sm-6">
+              <div class="stat-card">
+                <div class="num">{{ users_total }}</div>
+                <div class="lbl">المستخدمون</div>
+              </div>
+            </div>
+          {% endif %}
         </div>
 
-    <nav class="templatemo-left-nav">
-  <ul class="nav flex-column">
-    <li class="nav-item mt-3"><strong>📍 بيانات جغرافية</strong></li>
-     <li><a href="{% url 'masha:interface' %}"><i class="fa fa-building fa-fw"></i> الرئيسية</a></li>
-    <li><a href="{% url 'masha:mahfth_list' %}"><i class="fa fa-building fa-fw"></i> المديريات</a></li>
-    
-        <li><a href="{% url 'masha:manage_eng' %}"><i class="fa fa-building fa-fw"></i>ادخال المهندسين</a></li>
-        <li><a href="{% url 'masha:unit_list' %}"><i class="fa fa-cubes fa-fw"></i> وحدات الجوار</a></li>
-    <li><a href="{% url 'masha:manage_blocks' %}"><i class="fa fa-cube fa-fw"></i> نوع البلوك</a></li>
-    <li><a href="{% url 'masha:manage_naturals' %}"><i class="fa fa-tree fa-fw"></i> طبيعة الأرض</a></li>
-    <li><a href="{% url 'masha:manage_kah' %}"><i class="fa fa-tachometer fa-fw"></i> الضغط العالي</a></li>
-    <li><a href="{% url 'masha:manage_seol' %}"><i class="fa fa-tachometer fa-fw"></i>مجاري السيول</a></li>
-    <li><a href="{% url 'masha:manage_typ' %}"><i class="fa fa-file fa-fw"></i> أنواع الوثائق</a></li>
+        <div class="row">
+          <!-- روابط سريعة -->
+          <div class="col-md-4">
+            <div class="panel">
+              <h4><i class="fa fa-bolt"></i> إجراءات سريعة</h4>
+              <a href="{% url 'masha:enter_data_report_masahi_screen' %}" class="quick-link">
+                <i class="fa fa-file-text-o"></i> إصدار تقرير مساحي
+              </a>
+              <a href="{% url 'masha:manage_eng' %}" class="quick-link">
+                <i class="fa fa-user-secret"></i> المهندسون
+              </a>
+              {% if my_mahfth_name %}
+                <div class="quick-link" style="cursor:default;background:#e8eefc;border-color:#122062;">
+                  <i class="fa fa-map-marker"></i> {{ my_mahfth_name }}
+                </div>
+              {% endif %}
+              {% if is_manager %}
+                <a href="{% url 'accounts:user_manage' %}" class="quick-link">
+                  <i class="fa fa-users"></i> إدارة المستخدمين
+                </a>
+                <a href="{% url 'masha:mahfth_list' %}" class="quick-link">
+                  <i class="fa fa-building"></i> إدارة المديريات
+                </a>
+              {% endif %}
+            </div>
+          </div>
 
-    <li><a href="{% url 'masha:type_map_list_create' %}"><i class="fa fa-building fa-fw"></i>انوع نظام الاسقاط</a></li>
-     <li><a href="{% url 'masha:manage_talb_astshr' %}"><i class="fa fa-building fa-fw"></i>انواع طلبات الاستشارة</a></li>
+          <!-- المديريات -->
+          <div class="col-md-8">
+            <div class="panel">
+              <h4><i class="fa fa-building"></i> {% if is_manager %}المديريات{% else %}مديريتك{% endif %}</h4>
+              <div class="table-responsive">
+                <table class="table table-bordered table-striped dash-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>اسم المديرية</th>
+                      <th>عدد الطلبات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for m in mahfth_stats %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><span class="badge-mahfth">{{ m.name }}</span></td>
+                        <td>{{ m.forms_count }}</td>
+                      </tr>
+                    {% empty %}
+                      <tr>
+                        <td colspan="3" class="text-center muted">لا توجد مديريات مرتبطة بحسابك</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <li class="nav-item mt-3"><a href="#"><i class="fa fa-sign-out fa-fw"></i> تسجيل الخروج</a></li>
-    
-  </ul>
-</nav>
+        <!-- آخر الطلبات -->
+        <div class="panel">
+          <h4><i class="fa fa-list"></i> آخر الطلبات</h4>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped dash-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>اسم صاحب الطلب</th>
+                  <th>نوع الوثيقة</th>
+                  <th>المديرية</th>
+                  <th>الغرض</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for f in latest_forms %}
+                  <tr>
+                    <td>{{ f.id }}</td>
+                    <td>{{ f.name|default:"—" }}</td>
+                    <td>{{ f.typ.name|default:"—" }}</td>
+                    <td>{{ f.mahfth.name|default:"—" }}</td>
+                    <td>{{ f.hidden_ansh_hdm|default:"—" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="5" class="text-center muted">لا توجد طلبات</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-
+        <!-- آخر التقارير -->
+        <div class="panel">
+          <h4><i class="fa fa-file-pdf-o"></i> آخر التقارير المساحية</h4>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped dash-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>اسم صاحب الطلب</th>
+                  <th>المديرية</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in latest_reports %}
+                  <tr>
+                    <td>{{ r.id }}</td>
+                    <td>{{ r.form.name|default:"—" }}</td>
+                    <td>{{ r.form.mahfth.name|default:"—" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="3" class="text-center muted">لا توجد تقارير</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
       </div>
-      <!-- Main content --> 
-      <div class="templatemo-content col-1 light-gray-bg">
-        <div class="templatemo-top-nav-container">
-          <div class="row">
-            <nav class="templatemo-top-nav col-lg-12 col-md-12">
-              <ul class="text-uppercase">
-             
-              </ul>  
-            </nav> 
-          </div>
-        </div>
-        
-            
-        
-    
-    <!-- JS -->
-    <script src="{% static 'js/jquery-1.11.2.min.js' %}"></script>      <!-- jQuery -->
-    <script src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script> <!--  jQuery Migrate Plugin -->
-    <script src="https://www.google.com/jsapi"></script> <!-- Google Chart -->
-    <script>
-      /* Google Chart 
-      -------------------------------------------------------------------*/
-      // Load the Visualization API and the piechart package.
-      google.load('visualization', '1.0', {'packages':['corechart']});
+    </div>
 
-      // Set a callback to run when the Google Visualization API is loaded.
-      google.setOnLoadCallback(drawChart); 
-      
-      // Callback that creates and populates a data table,
-      // instantiates the pie chart, passes in the data and
-      // draws it.
-      function drawChart() {
-
-          // Create the data table.
-          var data = new google.visualization.DataTable();
-          data.addColumn('string', 'Topping');
-          data.addColumn('number', 'Slices');
-          data.addRows([
-            ['Mushrooms', 3],
-            ['Onions', 1],
-            ['Olives', 1],
-            ['Zucchini', 1],
-            ['Pepperoni', 2]
-          ]);
-
-          // Set chart options
-          var options = {'title':'How Much Pizza I Ate Last Night'};
-
-          // Instantiate and draw our chart, passing in some options.
-          var pieChart = new google.visualization.PieChart(document.getElementById('pie_chart_div'));
-          pieChart.draw(data, options);
-
-          var barChart = new google.visualization.BarChart(document.getElementById('bar_chart_div'));
-          barChart.draw(data, options);
-      }
-
-      $(document).ready(function(){
-        if($.browser.mozilla) {
-          //refresh page on browser resize
-          // http://www.sitepoint.com/jquery-refresh-page-browser-resize/
-          $(window).bind('resize', function(e)
-          {
-            if (window.RT) clearTimeout(window.RT);
-            window.RT = setTimeout(function()
-            {
-              this.location.reload(false); /* false to get page from cache */
-            }, 200);
-          });      
-        } else {
-          $(window).resize(function(){
-            drawChart();
-          });  
-        }   
-      });
-      
-    </script>
-    <script type="text/javascript" src="{% static 'js/templatemo-script.js' %}"></script>      <!-- Templatemo Script -->
-
+    <script src="{% static 'js/jquery-1.11.2.min.js' %}"></script>
+    <script src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
   </body>
 </html>

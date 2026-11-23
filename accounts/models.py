@@ -9,6 +9,15 @@ class Profile(models.Model):
      user=models.OneToOneField(User,null=True, blank=True,on_delete=models.CASCADE)
      city=models.ForeignKey('City',related_name='user_city',on_delete=models.CASCADE ,null=True, blank=True)
      phone_number=models.CharField(max_length=100)
+     # المديرية (من جدول mahfth) التي يتبع لها المستخدم
+     mahfth=models.ForeignKey(
+          'masha.Mahfth',
+          related_name='user_profile_mahfth',
+          on_delete=models.SET_NULL,
+          null=True,
+          blank=True,
+          verbose_name='المديرية',
+     )
      
      
      @receiver(post_save,sender=User)
@@ -23,7 +32,16 @@ class City(models.Model):
      
      city=models.CharField(max_length=200)
      phone_number=models.CharField(max_length=200)
+
+     # المديرية المرتبطة بالمدينة (إن وجدت)
+     mahfth=models.ForeignKey(
+          'masha.Mahfth',
+          related_name='city_mahfth',
+          on_delete=models.SET_NULL,
+          null=True,
+          blank=True,
+          verbose_name='المديرية',
+     )
     
      def __str__(self):
            return   self.city
-

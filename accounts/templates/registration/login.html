@@ -63,7 +63,11 @@
  <h1 class="small-title">تسجيل الدخول لمنسوبي ادارة المساحة</h1>
             
 
-              {% if form.errors %}
+              {% if error %}
+                <div class="alert alert-danger" role="alert" dir="rtl" align="right">
+                  {{ error }}
+                </div>
+              {% elif form.errors %}
                 <div class="alert alert-danger" role="alert" dir="rtl" align="right">
                   اسم المستخدم او كلمة السر ادخلتها بشكل خاطئ
                 </div>
