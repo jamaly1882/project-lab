@@ -66,16 +66,9 @@ def login_view(request):
             if next_url:
                 return redirect(next_url)
 
-            if user.is_superuser:
-                return redirect('masha:interface')
-            elif user.has_perm('masha.add_shift_form_hadod'):
-                return redirect('masha:show_astmrat')
-            elif user.has_perm('masha.add_form'):
-                return redirect('masha:enter_data_report_masahi_screen')
-            elif user.has_perm('masha.add_unit'):
-                return redirect('masha:show_manager_masah_nah')
-            else:
-                return redirect('masha:interface')
+            # الجميع يذهب إلى لوحة التحكم: المدير يرى كل المديريات
+            # والمستخدم العادي يرى مديريته فقط.
+            return redirect('masha:index')
 
         else:
             return render(request, "registration/login.html", {"error": "اسم المستخدم أو كلمة المرور غير صحيحة", "next": next_url})

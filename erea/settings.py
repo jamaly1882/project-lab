@@ -107,6 +107,26 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
 ]
+if DEBUG:
+    # يسمح باختبارات Django (Client) دون التأثير على التشغيل الفعلي
+    ALLOWED_HOSTS.append("testserver")
+
+# ################################################################
+# الإعدادات التالية لا تؤثر على التشغيل المحلي (127.0.0.1 / localhost).
+# الغرض منها السماح بفتح النظام من خلال رابط المعاينة (بروكسي) عند
+# تشغيله على شبكة أو استضافة، مع الحفاظ على الحماية من CSRF.
+# ################################################################
+
+# أسماء النطاقات التي يسمح بها (تمنع خطأ 400 DisallowedHost)
+_EXTRA_HOST = os.environ.get("EREA_EXTRA_HOST", "").strip()
+if _EXTRA_HOST:
+    ALLOWED_HOSTS.append(_EXTRA_HOST)
+
+# السماح بكل النطاقات الفرعية للمعاينة (مثل https://xxxx.e2b.app)
+ALLOWED_HOSTS += [
+    ".e2b.app",
+    ".e2b.local",
+]
 
 
 # ============================================================
@@ -137,6 +157,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
 
     "django.middleware.security.SecurityMiddleware",
+
+    # يسمح بعرض النظام داخل إطار المعاينة فقط (لا يؤثر محلياً)
+    "erea.middleware.PreviewEmbedMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
 
@@ -185,6 +208,9 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
 
                 "django.contrib.messages.context_processors.messages",
+
+                # مديرية المستخدم الحالي (تظهر في القوالب)
+                "accounts.context_processors.user_mahfth",
 
             ],
 
@@ -523,4 +549,32 @@ LOGGING = {
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",
+]
+
+
+def _add_csrf_tls_origins(hosts):
+    """إضافة نسخة https من كل نطاق معروف حتى تعمل المعاينة عن بُعد."""
+    for host in hosts:
+        host = (host or "").strip().lstrip(".")
+        if not host or host in ("127.0.0.1", "localhost"):
+            continue
+        for scheme in ("http", "https"):
+            origin = f"{scheme}://{host}"
+            if origin not in CSRF_TRUSTED_ORIGINS:
+                CSRF_TRUSTED_ORIGINS.append(origin)
+
+
+# نطاق المعاينة يُمرَّر عبر متغير البيئة عند التشغيل
+_add_csrf_tls_origins(
+    [
+        os.environ.get("EREA_EXTRA_HOST", ""),
+        os.environ.get("EREA_PREVIEW_HOST", ""),
+    ]
+)
+
+# السماح بكل نطاقات المعاينة عبر النطاق الأعلى
+CSRF_TRUSTED_ORIGINS += [
+    "https://e2b.app",
+    "https://e2b.dev",
+    "http://e2b.local",
 ]

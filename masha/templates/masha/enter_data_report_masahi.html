@@ -22,7 +22,8 @@
     <header class="templatemo-site-header">
       <div class="square"></div>
       <h1>نافذة منسق القسم</h1>
-    </header>
+    {% if my_mahfth_name %}<p style="color:#ffcf09;font-size:14px;margin:6px 20px 0;">المديرية: {{ my_mahfth_name }}</p>{% endif %}
+</header>
     <div class="profile-photo-container">
  <img src="{% static 'assets/image/bg-head-03.jpg' %}" alt="Profile Photo" class="img-responsive">
       <div class="profile-photo-overlay"></div>
