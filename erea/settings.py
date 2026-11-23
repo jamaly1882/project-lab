@@ -96,7 +96,7 @@ SECRET_KEY = (
 # DEBUG
 # ============================================================
 
-DEBUG = False
+DEBUG = True
 
 
 # ============================================================
@@ -121,6 +121,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "import_export",  # مهم جداً
+
 
     "masha",
     "accounts",
