@@ -85,53 +85,83 @@
                 {% endif %}
               {% endif %}
 
-              <form method="post" action="{% url 'login' %}" dir="rtl">
+              <form method="post" action="{% url 'accounts:login' %}" dir="rtl" id="login_form" autocomplete="on">
                 {% csrf_token %}
-                <div data-mdb-input-init class="form-outline form-white mb-4">
-                     <label class="form-label" for="typeEmailX"  style="direction: rtl; text-align: right;">اسم  المستخدم  :</label>
+
+                <div class="login-field text-right">
+                  <label class="login-label" for="id_username">اسم المستخدم :</label>
                   {{ form.username }}
-                 
                   {% if form.username.errors %}
-                    <div class="text-danger">{{ form.username.errors }}</div>
+                    <div class="login-error">{{ form.username.errors }}</div>
                   {% endif %}
                 </div>
 
-                <div data-mdb-input-init class="form-outline form-white mb-4">
-                   <label class="form-label" for="typeEmailX">كلمة المرور :</label>
-                   <br>
-                     {{ form.password }}
-                
+                <div class="login-field text-right">
+                  <label class="login-label" for="id_password">كلمة المرور :</label>
+                  {{ form.password }}
                   {% if form.password.errors %}
-                    <div class="text-danger">{{ form.password.errors }}</div>
+                    <div class="login-error">{{ form.password.errors }}</div>
                   {% endif %}
                 </div>
 
-                
-
-                <button data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-light btn-lg px-5" type="submit">تسجل الدخول</button>
-<input type="hidden" name="next" value="{{ next }}" />
-
-               
-                  <style>
-    .form-outline input[type="text"],
-    .form-outline input[type="password"] {
-      width: 100%;
-      max-width: 300px; /* Adjust the width as needed */
-
-    }
-      .small-title {
-            font-size: 24px; /* تغيير حجم الخط إلى 24 بكسل */
-            font-weight: bold; /* جعل النص عريض */
-            margin-bottom: 10px; /* تباعد أسفل العنوان */
-            text-transform: uppercase; /* تحويل النص إلى أحرف كبيرة */
-        }
-      body {
-            font-family: Arial, sans-serif; /* خط الصفحة */
-            background-color: #f4f4f4; /* لون خلفية الصفحة */
-            text-align: right; /* محاذاة النص إلى اليمين بشكل عام */
-        }
-  </style>
+                <button class="btn btn-outline-light btn-lg px-5 login-submit" type="submit">تسجيل الدخول</button>
+                <input type="hidden" name="next" value="{{ next }}" />
               </form>
+
+              <style>
+                /* تنسيق حقول الدخول حتى تظهر بوضوح على البطاقة الزرقاء */
+                #login_form .login-field {
+                  margin-bottom: 18px;
+                  max-width: 320px;
+                  margin-right: auto;
+                  margin-left: auto;
+                }
+                #login_form .login-label {
+                  display: block;
+                  color: #ffffff;
+                  font-weight: bold;
+                  font-size: 16px;
+                  margin-bottom: 6px;
+                }
+                #login_form input[type="text"],
+                #login_form input[type="password"] {
+                  display: block;
+                  width: 100%;
+                  max-width: 320px;
+                  height: 46px;
+                  padding: 8px 14px;
+                  font-size: 16px;
+                  color: #122062;
+                  background-color: #ffffff;
+                  border: 1px solid #ffffff;
+                  border-radius: 6px;
+                  direction: ltr;
+                  text-align: left;
+                }
+                #login_form input[type="text"]:focus,
+                #login_form input[type="password"]:focus {
+                  outline: none;
+                  border-color: #ffcf09;
+                  box-shadow: 0 0 0 3px rgba(255, 207, 9, .35);
+                }
+                #login_form .login-error {
+                  color: #ffd0d0;
+                  font-size: 14px;
+                  margin-top: 5px;
+                }
+                #login_form .login-submit { margin-top: 8px; }
+                .small-title {
+                  font-size: 24px;
+                  font-weight: bold;
+                  margin-bottom: 20px;
+                  text-transform: uppercase;
+                }
+                body {
+                  font-family: Arial, sans-serif;
+                  background-color: #f4f4f4;
+                  text-align: right;
+                }
+              </style>
 
             </div>
 

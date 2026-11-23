@@ -164,17 +164,15 @@
     <label>المديرية  <span style="color: red; font-size: 1.5em;">*</span></label>
     <select name="mderah"id="mderah" class="form-control" dir="rtl">
       <option selected disabled>اختيار</option>
-      {% if request.user.is_superuser %}
-        <!-- إذا كان المشرف، اعرض كل المديريات -->
+      {% if is_system_manager %}
+        <!-- مدير النظام: كل المديريات -->
         {% for i in mah %}
           <option value="{{ i.id }}">{{ i.name }}</option>
         {% endfor %}
       {% else %}
-        <!-- إذا لم يكن مشرف، اعرض مديرية المستخدم فقط -->
+        <!-- المستخدم العادي: مديريته فقط (تُحدد من ملفه الشخصي) -->
         {% for i in mah %}
-          {% if i.name == zz.profile.city.city %}
-            <option value="{{ i.id }}">{{ i.name }}</option>
-          {% endif %}
+          <option value="{{ i.id }}" selected>{{ i.name }}</option>
         {% endfor %}
       {% endif %}
     </select>

@@ -22,12 +22,15 @@ from django.urls import re_path
 from django.views.static import serve
 
 urlpatterns = [
-    path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
-    path('', include('masha.urls',namespace='masha')),
-    path('accounts/' , include('accounts.urls',namespace='accounts')),
-     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
-    
+    # مسارات تطبيق accounts أولاً حتى تعمل صفحة الدخول المخصّصة
+    # (اسم المستخدم + كلمة المرور) على /accounts/login/ بدلاً من صفحة
+    # django.contrib.auth الافتراضية.
+    path('accounts/', include('accounts.urls', namespace='accounts')),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('', include('masha.urls', namespace='masha')),
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
+
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
 ]
 

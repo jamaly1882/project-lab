@@ -57,9 +57,70 @@ import pytz
 timezone = pytz.timezone('Asia/Riyadh')
 current_datetime = datetime.now(timezone)
 from django.core import serializers
+from functools import wraps
+from django.contrib.auth.views import redirect_to_login
 from django.http import JsonResponse
 from django.contrib.auth import authenticate,login
 from django.contrib.auth.decorators import login_required ,permission_required
+from django.contrib.auth.decorators import user_passes_test as _user_passes_test
+
+
+# ============================================================
+# صلاحيات الوصول المبنية على المدينة / المديرية
+#
+# * مدير النظام (superuser / staff) يصل لكل شيء.
+# * المستخدم العادي يصل لأقسام مدينته/مديريته فقط، دون الحاجة إلى
+#   صلاحية Django خاصة — لأن نطاق البيانات مقيّد أصلاً في scoping.py.
+# ============================================================
+
+
+def _user_in_scope(user):
+    """هل المستخدم مرتبط بمدينة أو مديرية؟"""
+    if user is None or not getattr(user, "is_authenticated", False):
+        return False
+
+    from .scoping import get_user_city_name, get_user_mahfth
+
+    return bool(get_user_mahfth(user) or get_user_city_name(user))
+
+
+def is_manager(user):
+    return bool(
+        getattr(user, "is_authenticated", False)
+        and (user.is_superuser or user.is_staff)
+    )
+
+
+def can_access_mahfth_screen(user):
+    """الوصول إلى شاشات الأقسام: المدير أو مستخدم مرتبط بمدينة/مديرية."""
+    return is_manager(user) or _user_in_scope(user)
+
+
+def mahfth_screen_required(view_func):
+    """بديل permission_required لشاشات الأقسام المقيّدة بالمدينة/المديرية.
+
+    * غير مسجّل الدخول      → صفحة الدخول مع next.
+    * مسجّل بدون مدينة/مديرية → لوحة التحكم مع رسالة توضيحية.
+    * أو مستخدم مرتبط بمدينة/مديرية → يُسمح له.
+    """
+
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.get_full_path(), "accounts:login")
+
+        if not can_access_mahfth_screen(request.user):
+            messages.warning(
+                request,
+                "لم يتم ربط حسابك بأي مدينة أو مديرية بعد، "
+                "يرجى مراجعة مدير النظام لتفعيل الوصول إلى الأقسام.",
+            )
+            return redirect("masha:index")
+
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped
+
 import folium
 from folium.plugins import FastMarkerCluster
 from folium.plugins import MiniMap
@@ -3642,7 +3703,7 @@ def agree_tsrah_xx(request):
     form = Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=False, return_form=False, digital=False).order_by('-id')
     context = {'form': form, 'zz': request.user}
     return render(request, 'masha/agree_to_tsrah_kroj.html', context)
-@permission_required("masha.add_unit")
+@mahfth_screen_required
 def add_motan_service_jamhore_to_fane(request,id):
     eng_nazol=Eng_nazol.objects.all()
 
@@ -3658,12 +3719,12 @@ def add_motan_service_jamhore_to_fane(request,id):
     return render(request,'masha/add_unit_to_masha.html',context)
 def is_admin_or_has_permission(user):
     return user.is_superuser or user.has_perm("masha.add_form")
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_form'))
+@mahfth_screen_required
 def serch_page_talb_bana(request):
     return render(request,'masha/serch_page_talb_bana.html')
 def is_admin_or_has_permission(user):
     return user.is_superuser or user.has_perm("masha.add_form")
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_form'))
+@mahfth_screen_required
 def search_edit_form_talb_bana(request,id):
 
     ty = typ.objects.all()
@@ -3771,7 +3832,7 @@ def add_unit_nah_eng_masha(request):
 
 def screen_show_report(request):
          return render(request,'masha/screen_show_report.html')
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_shift_form_hadod'))
+@mahfth_screen_required
 def show_astmrat(request):
     form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=True), request.user).count()
     rafth_ald= filter_reports(report_masahi.objects.filter( rafth_adarah_generl=True), request.user).count()
@@ -3788,7 +3849,7 @@ def show_astmrat_json(request):
     ), request.user).count()
     return JsonResponse({'form': form_count})
     
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_shift_form_hadod'))
+@mahfth_screen_required
 def show_tlabt_nah_rakis(request):
     
 
@@ -3805,14 +3866,14 @@ def show_tlabt_nah_rakis(request):
    
 
 
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_unit'))
+@mahfth_screen_required
 def search_page(request):
     return render(request, 'masha/search_page.html')
 # صفحة البحث
 def is_admin_or_has_permission(user):
     return user.is_superuser or user.has_perm("masha.add_form")
 
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_form'))    
+@mahfth_screen_required
 def search_page_talb(request):
     return render(request, 'masha/search_page_talb.html')
 from django.http import JsonResponse, HttpResponse
@@ -3987,11 +4048,10 @@ def search_edit_form(request, id):
     return render(request, 'masha/search_edit.html',context)
 def is_admin_or_has_permission(user):
     return user.is_superuser or user.has_perm("masha.add_form")
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_form'))    
+@mahfth_screen_required
 def search_edit_form_talb(request, id):
     # جلب العنصر أو إظهار 404 إذا لم يوجد
-    if not is_admin_or_has_permission(request.user):
-        return HttpResponseForbidden("ليس لديك الصلاحية للوصول إلى هذه الصفحة.")
+    # (الوصول مسموح للمدير أو لمستخدم مرتبط بمدينة/مديرية، والبيانات مقيّدة)
 
     ty = typ.objects.all()
     type_s = Type_talb_astshr.objects.all()
@@ -4020,7 +4080,7 @@ def search_edit_form_talb(request, id):
 
     return render(request, 'masha/update_talbt_form_by_manger.html',context)
 
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_form'))
+@mahfth_screen_required
 def edit_form_talb(request, id):
     if request.method == "POST":
         ass = get_object_or_404(Form, id=id)
@@ -4193,7 +4253,7 @@ def edit_form(request, id):
     return render(request, 'masha/search_edit.html', {'form': form_obj})
 
 
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_shift_form_hadod'))
+@mahfth_screen_required
 def astkmal_report_masah_nah(request,id):
    
       form=Form.objects.get(id=id)
@@ -4519,7 +4579,7 @@ def reason_rafth_managmnat_generl_to_convert_maderah(request):
            show_manger_form=report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True)
            context={'show_manger_form':show_manger_form}
            return render(request,'masha/reason_rafth_managmnat_generl_to_convert_maderah.html',context)
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_unit'))
+@mahfth_screen_required
 
 def show_manager_masah_nah(request):
     # جلب المستخدم الحالي ورقم الهاتف
@@ -4632,7 +4692,7 @@ def serch_in_screen_prisdent_masah_talbt_to_data_base(request):
 from django.http import JsonResponse
 
 
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_unit'))
+@mahfth_screen_required
 def show_manager_masah_nah_json(request):
     user = request.user
 
@@ -4682,7 +4742,7 @@ def show_manager_masah_nah_json(request):
     })
 
 
-@permission_required("masha.add_unit")
+@mahfth_screen_required
 def show_report_masah_by_eng_data(request,id):
      mas=report_masahi.objects.get(id=id)
      resone=Resone.objects.all()
@@ -4690,7 +4750,7 @@ def show_report_masah_by_eng_data(request,id):
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
      context={'mas':mas,'f':f,'resone':resone}
      return render(request,'masha/show_report_masah_by_eng_data.html',context)
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def show_report_adrah(request,id):
      mas=report_masahi.objects.get(id=id)
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
@@ -4791,7 +4851,7 @@ def agree_report_masahi_by_manager_mangmant(request, id):
 
 
 @csrf_exempt
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def agree_report_masahi_by_manager_mangmant_adarah(request, id):
     exit_action = request.POST.get('exit')
     no_salm_5 = request.POST.get('no_salm_5', '')
@@ -4870,10 +4930,10 @@ def red_bol_massage(request):
     return HttpResponse(status=200)
 
 
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_unit'))
+@mahfth_screen_required
 def asder_nah_report_masah(request):
     return render(request,'masha/asder_nah_report_masah.html')
-@permission_required("masha.add_unit")
+@mahfth_screen_required
 def asder_report_masah_db_nah_project(request):
     if 'q' in request.GET:
         q=request.GET['q']
@@ -4962,13 +5022,13 @@ def show_managmant_masah(request)  :
     context={'num_unread':num_unread}
     return render(request,'masha/show_managmant_masah.html',context)
     
-@permission_required("masha.add_unit")
+@mahfth_screen_required
 def show_managment_nah(request):
     return render(request,'masha/show_managment_nah.html')
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def werd_sader_manager(request):
     return render(request,'masha/werd_sader_manager.html')
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def screen_adrat_ver(request):
     num_unread =Conection.objects.filter().count()
     num_unread_1 =report_masahi.objects.filter(masahi_convert=True,convert_agin=False,convert_agin_agree=False,agree_adarah_generl_by_manager_mahfth=False,rafth_adarah_generl_by_manager_mahfth=False).count()
@@ -4976,7 +5036,7 @@ def screen_adrat_ver(request):
     num_unread_rafth =report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True).count()
     context={'num_unread':num_unread,'num_unread_1':num_unread_1,'num_unread_agree':num_unread_agree,'num_unread_rafth':num_unread_rafth}
     return render(request,'masha/show_managment_nah.html',context)
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def get_realtime_counts(request):
     num_unread = Conection.objects.filter().count()
     num_unread_1 = report_masahi.objects.filter(
@@ -5002,10 +5062,10 @@ def screen_paesdint_masah(request):
     
 
     return render(request,'masha/show_managmant_masah.html')
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def screen_interface_line_tslime_nah(request):
         return render(request,'masha/screen_interface_line_tslime_nah.html')
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def add_tlab_tslime_line_organzatio_add_db(request):
     x=Mahther_line.objects.first()
     try:
@@ -5048,7 +5108,7 @@ def add_tlab_tslime_line_organzatio_add_db(request):
         return HttpResponse('shift_form_hadod not found', status=404)
     
     return render(request,'masha/add_tlab_tslime_line_organzation.html',context)
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def add_tlab_tslime_line_organzatio_add_db_strate(request):
 
  
@@ -5132,42 +5192,42 @@ def add_tlab_tslime_line_organzatio_add_strate_and_unit_to_data_base(request):
     messages.success(request, f"تمت إضافة المحضر رقم {xx.id}")
     return HttpResponseRedirect(reverse('masha:add_tlab_tslime_line_organzatio_add_db'))
 
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def show_center(request):
     mahf=visible_mahfth_list(request.user)
     context={'mahf':mahf}
     return render(request,'masha/show_center.html',context)
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def show_erea_masha(request,id):
     mahf=Mahfth.objects.get(id=id)
     erea11=Erea.objects.filter(mahfth=mahf)
     context={'erea11':erea11,'mahf':mahf}
     return render(request,'masha/show_erea_masha.html',context)
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def show_gata_masha(request,id):
      erea=Erea.objects.get(id=id)
      gata=Gata.objects.filter(erea=erea)
      context={'gata':gata,'erea':erea}
      return render(request,'masha/show_gata_masha.html',context)
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def show_unit_masha(request,id):
      g=Gata.objects.get(number=id)
      unit11=Unit.objects.filter(gata=g)
      context={'unit11':unit11,'g':g}
      return render(request,'masha/show_unit_masha.html',context)
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def show_strate_masha_mahter(request,id):
     uu=Unit.objects.get(id=id)
     aa=Mahther_line.objects.filter(unit=uu)
     context={'aa':aa,'uu':uu}
     return render(request,'masha/show_strate_unit_nah.html',context)
-@permission_required("masha.add_mahther_line")
+@mahfth_screen_required
 def show_strate_masha_hadod_information(request,id):
     xx=Streat.objects.get(id=id)
     yy=Shift_streatr.objects.filter(streat=xx)
     context={'yy':yy}
     return render(request,'masha/show_atjah_strate_line_nah.html',context)
-@permission_required("masha.add_form")
+@mahfth_screen_required
 def enter_face_enter_nah(request):
     user = request.user
 
@@ -5398,7 +5458,7 @@ def show_form_shifts(request, id):
             'shifts': shifts
         }
     )
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_shift_form_hadod'))
+@mahfth_screen_required
 def serch_data_report_mashi_to_update(request):
     return render(
             request,
@@ -5406,7 +5466,7 @@ def serch_data_report_mashi_to_update(request):
            
         )
 from django.forms import modelformset_factory
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_shift_form_hadod'))
+@mahfth_screen_required
 def edit_form_shifts(request, id):
     form_obj = get_object_or_404(Form, id=id)
 
@@ -5472,7 +5532,7 @@ def edit_form_shifts(request, id):
         'formset': formset
     })
 from django.forms import modelformset_factory
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_shift_form_hadod'))
+@mahfth_screen_required
 def edit_form_shifts_nah(request,id):
         form_obj = get_object_or_404(Form, id=id)
         
@@ -5553,6 +5613,18 @@ from .models import Valdtion, Conection
 
 @login_required
 def interface(request):
+    # ----- نطاق المستخدم (مدينة/مديرية) -----
+    # المستخدم العادي يرى فقط روابط الأقسام المرتبطة بمدينته/مديريته،
+    # ومدير النظام يرى كل الأقسام.
+    from .scoping import get_user_city_name, get_user_mahfth
+
+    my_city_name = get_user_city_name(request.user)
+    has_mahfth_access = bool(get_user_mahfth(request.user) or my_city_name)
+    scope_context = {
+        "my_city_name": my_city_name,
+        "has_mahfth_access": has_mahfth_access,
+    }
+
     if request.method == "POST":
         form = verificationForm(request.POST)
         if form.is_valid():
@@ -5568,12 +5640,14 @@ def interface(request):
                 form.add_error('verification_code', 'رمز التحقق غير صحيح')
 
         # لو هناك أخطاء، نرجع النموذج مع الأخطاء
-        response = render(request, 'masha/interface.html', {'form': form})
+        scope_context['form'] = form
+        response = render(request, 'masha/interface.html', scope_context)
 
     else:
         # GET request
         form = verificationForm()
-        response = render(request, 'masha/interface.html', {'form': form})
+        scope_context['form'] = form
+        response = render(request, 'masha/interface.html', scope_context)
 
     # ----- إضافة حماية من الرجوع بعد logout -----
     response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
@@ -5805,8 +5879,11 @@ from django.http import HttpResponseForbidden
 def is_admin_or_has_permission(user):
     return user.is_superuser or user.has_perm("masha.add_form")
 
+@login_required
 def astshr(request):
-    if not is_admin_or_has_permission(request.user):
+    # الوصول مسموح للمدير أو لمستخدم مرتبط بمدينة/مديرية،
+    # والبيانات (المديرية) مقيّدة في القالب وscoping.
+    if not can_access_mahfth_screen(request.user):
         return HttpResponseForbidden("ليس لديك الصلاحية للوصول إلى هذه الصفحة.")
 
     ty = typ.objects.all()
@@ -6524,7 +6601,7 @@ def print_report(request):
     print_report_x= report_masahi.objects.filter( return_masah_jm=True, print_nah=False )
     context={'print_report_x':print_report_x}
     return render(request,'masha/print_report.html',context)
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_form'))
+@mahfth_screen_required
 def interface_nah_astshr(request):
     num_unread=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,hidden_ansh_hdm="استشارة"), request.user).count()
     num_unread_2=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,hidden_ansh_hdm="استشارة"), request.user).count()
@@ -6817,7 +6894,7 @@ def report_state_talbat_nah_json_astsherh(request):
     })
 
 
-@user_passes_test(is_admin_or_has_permission)
+@mahfth_screen_required
 def enter_data_report_masahi_screen(request):
     num_unread=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).count()
     num_unread_3 = filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False, tr_masah=False,exit_eng=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).count() 

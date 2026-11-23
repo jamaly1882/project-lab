@@ -5,7 +5,9 @@ from . import views
 from . import user_views
 app_name='accounts' 
 urlpatterns = [
-path('login', views.login_view, name='login'),
+path('login/', views.login_view, name='login'),
+     # اسم بديل بدون شرطة أخيرة (لروابط قديمة مثل /accounts/login)
+     path('login', views.login_view, name='login_no_slash'),
 path('profile/', views.profile,name='profile'),
   path('accounts/logout/',views.logout_view, name='user_logout'),
      path('logout_user/', views.logout_user, name='logout_user'),

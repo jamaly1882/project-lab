@@ -267,16 +267,25 @@
               <div class="help-text">عند دخول المستخدم ستظهر له مديريته المحددة هنا فقط.</div>
             </div>
             <div class="col-md-4">
+              <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+              {{ form.city }}
+              {{ form.city.errors }}
+              <div class="help-text">المدينة التي تظهر روابطها وبياناتها للمستخدم.</div>
+            </div>
+            <div class="col-md-4">
               <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
               {{ form.phone_number }}
               {{ form.phone_number.errors }}
             </div>
-            <div class="col-md-2">
+          </div>
+
+          <div class="row" style="margin-top:15px;">
+            <div class="col-md-6">
               <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
               {{ form.first_name }}
               {{ form.first_name.errors }}
             </div>
-            <div class="col-md-2">
+            <div class="col-md-6">
               <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
               {{ form.last_name }}
               {{ form.last_name.errors }}
@@ -316,6 +325,7 @@
                 <th>اسم المستخدم</th>
                 <th>الاسم الكامل</th>
                 <th>المديرية</th>
+                <th>المدينة</th>
                 <th>الهاتف</th>
                 <th>الصلاحية</th>
                 <th>الحالة</th>
@@ -331,6 +341,13 @@
                   <td>
                     {% if u.profile.mahfth %}
                       <span class="badge-mahfth">{{ u.profile.mahfth.name }}</span>
+                    {% else %}
+                      <span class="badge-none">غير محددة</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if u.profile.city %}
+                      <span class="badge-mahfth">{{ u.profile.city.city }}</span>
                     {% else %}
                       <span class="badge-none">غير محددة</span>
                     {% endif %}
@@ -377,7 +394,7 @@
                 </tr>
               {% empty %}
                 <tr>
-                  <td colspan="8" class="empty-row">لا يوجد مستخدمون مطابقون</td>
+                  <td colspan="9" class="empty-row">لا يوجد مستخدمون مطابقون</td>
                 </tr>
               {% endfor %}
             </tbody>

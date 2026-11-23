@@ -114,14 +114,9 @@
    <div class="col-lg-6">
 <a class="form-control btn btn-outline-primary"  
     href="{% url 'masha:show_tsrah_exit_eng_by_manger' %}" style="height:70px;">
-      {% if num_unread_3.mahfth.name == zz.profile.city.city %}
-    {% if   num_unread_3 > 0 %}
-
- 
-  <span  class="badge badge-danger" style="font-size: 15px;">{{num_unread}}</span>
-
-{% endif  %}
-{% endif  %}<br><font             style="font-family:Noto Kufi Arabic ExtraBold;"  size="+1">عرض تصاريخ الخروج</font>
+      {% if num_unread_3 > 0 %}
+  <span class="badge badge-danger" style="font-size: 15px;">{{ num_unread_3 }}</span>
+{% endif %}<br><font             style="font-family:Noto Kufi Arabic ExtraBold;"  size="+1">عرض تصاريخ الخروج</font>
 
 
 </a>
