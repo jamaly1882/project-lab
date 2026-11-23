@@ -29,6 +29,13 @@ class _BaseUserForm(RedirectAfterSaveMixin, forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"}),
         empty_label="--- اختر المديرية ---",
     )
+    city = forms.ModelChoiceField(
+        label="المدينة",
+        queryset=None,           # يُحدد في __init__
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        empty_label="--- اختر المدينة ---",
+    )
     phone_number = forms.CharField(
         label="رقم الهاتف (اختياري)",
         required=False,
@@ -74,6 +81,10 @@ class _BaseUserForm(RedirectAfterSaveMixin, forms.ModelForm):
 
         super().__init__(*args, **kwargs)
         self.fields["mahfth"].queryset = Mahfth.objects.all().order_by("name")
+
+        from accounts.models import City
+
+        self.fields["city"].queryset = City.objects.all().order_by("city")
         if self.instance and self.instance.pk:
             try:
                 profile = self.instance.profile
@@ -81,6 +92,7 @@ class _BaseUserForm(RedirectAfterSaveMixin, forms.ModelForm):
                 profile = None
             if profile is not None:
                 self.fields["mahfth"].initial = profile.mahfth_id
+                self.fields["city"].initial = profile.city_id
                 self.fields["phone_number"].initial = profile.phone_number
 
     def clean_username(self):
@@ -103,6 +115,7 @@ class _BaseUserForm(RedirectAfterSaveMixin, forms.ModelForm):
             user=user, defaults={"phone_number": ""}
         )
         profile.mahfth = self.cleaned_data.get("mahfth")
+        profile.city = self.cleaned_data.get("city")
         phone = (self.cleaned_data.get("phone_number") or "").strip()
         if phone or not profile.phone_number:
             profile.phone_number = phone

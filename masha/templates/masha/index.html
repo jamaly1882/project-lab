@@ -229,12 +229,23 @@
           {% endif %}
         </h2>
 
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
         <!-- بطاقة المديرية للمستخدم العادي -->
         {% if not is_manager %}
           {% if my_mahfth %}
             <div class="directorate-card">
               <h3><i class="fa fa-map-marker"></i> مديريتك: {{ my_mahfth.name }}</h3>
-              <p>تظهر لك البيانات والطلبات الخاصة بمديريتك فقط داخل النظام.</p>
+              {% if user_city and user_city.city %}
+                <p><i class="fa fa-map-signs"></i> المدينة: {{ user_city.city }}</p>
+              {% endif %}
+              <p>تظهر لك البيانات والطلبات والروابط الخاصة بمدينتك/مديريتك فقط داخل النظام.</p>
             </div>
           {% else %}
             <div class="alert-mahfth">

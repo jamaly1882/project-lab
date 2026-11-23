@@ -119,3 +119,44 @@ def resolve_mahfth_for_user(user, mahfth_id):
         return None, "لم يتم ربط حسابك بأي مديرية، راجع مدير النظام."
 
     return my_mahfth, None
+
+
+def get_user_city(user):
+    """إرجاع «مدينة» المستخدم من ملفه الشخصي (إن وجدت)."""
+    if user is None or not user.is_authenticated:
+        return None
+
+    profile = getattr(user, "profile", None)
+    if profile is None:
+        return None
+
+    return getattr(profile, "city", None)
+
+
+def get_user_city_name(user):
+    """اسم مدينة المستخدم.
+
+    الأولوية:
+        1) Profile.city.city  (المدينة المسجّلة في الملف الشخصي)
+        2) اسم مديرية المستخدم  (Profile.mahfth أو Profile.city.mahfth)
+    """
+    city = get_user_city(user)
+    if city is not None:
+        name = (city.city or "").strip()
+        if name:
+            return name
+
+    mahfth = get_user_mahfth(user)
+    if mahfth is not None:
+        return (mahfth.name or "").strip()
+
+    return ""
+
+
+def scope_name_for_user(user):
+    """الاسم المستخدم لمطابقة «مدينة» المستخدم مع المديريات/الروابط.
+
+    يجمع بين المدينة والمديرية حتى تعمل المقارنة في القوالب سواء رُبط
+    المستخدم بمدينة أو بمديرية مباشرة.
+    """
+    return get_user_city_name(user)

@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from  .form import SignupForm,UserForm,ProfileForm
+from  .form import SignupForm,UserForm,ProfileForm,LoginForm
 from .models import Profile
 from django.contrib.auth import authenticate,login
 from django.contrib.auth import authenticate,login
@@ -54,6 +54,11 @@ def profile_edite(request):
 
 
 def login_view(request):
+    """صفحة تسجيل الدخول الرئيسية للنظام.
+
+    ملاحظة مهمة: هذه الصفحة يجب أن تعرض حقلي «اسم المستخدم» و«كلمة المرور»
+    دائماً، حتى لا تظهر بطاقة الدخول فارغة (بدون حقول إدخال).
+    """
     next_url = request.GET.get('next') or request.POST.get('next') or ''
     if next_url and not url_has_allowed_host_and_scheme(
         next_url,
@@ -63,11 +68,22 @@ def login_view(request):
         next_url = ''
 
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        username = (request.POST.get("username") or "").strip()
+        password = request.POST.get("password") or ""
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            if not user.is_active:
+                return render(
+                    request,
+                    "registration/login.html",
+                    {
+                        "form": LoginForm(request),
+                        "error": "هذا الحساب معطّل، يرجى مراجعة مدير النظام.",
+                        "next": next_url,
+                    },
+                )
+
             login(request, user)
 
             if next_url:
@@ -77,10 +93,21 @@ def login_view(request):
             # والمستخدم العادي يرى مديريته فقط.
             return redirect('masha:index')
 
-        else:
-            return render(request, "registration/login.html", {"error": "اسم المستخدم أو كلمة المرور غير صحيحة", "next": next_url})
+        return render(
+            request,
+            "registration/login.html",
+            {
+                "form": LoginForm(request, data=request.POST),
+                "error": "اسم المستخدم أو كلمة المرور غير صحيحة",
+                "next": next_url,
+            },
+        )
 
-    return render(request, "registration/login.html", {"next": next_url})
+    return render(
+        request,
+        "registration/login.html",
+        {"form": LoginForm(request), "next": next_url},
+    )
 
 # ----- تسجيل الخروج -----
 @login_required

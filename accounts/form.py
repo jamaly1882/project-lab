@@ -52,3 +52,39 @@ class ProfileForm(forms.ModelForm):
 	class Meta:
 		  model=Profile
 		  fields=['city','phone_number']
+
+class LoginForm(AuthenticationForm):
+    """نموذج تسجيل الدخول: حقلان فقط (اسم المستخدم وكلمة المرور).
+
+    يُستخدم في صفحة `/accounts/login` مع تسميات عربية واتجاه من اليمين إلى
+    اليسار، ويضمن ظهور الحقلين دائماً في القالب.
+    """
+
+    username = forms.CharField(
+        label="اسم المستخدم",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control login-input",
+                "placeholder": "ادخل اسم المستخدم",
+                "autofocus": True,
+                "autocomplete": "username",
+                "id": "id_username",
+            }
+        ),
+    )
+    password = forms.CharField(
+        label="كلمة المرور",
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control login-input",
+                "placeholder": "ادخل كلمة المرور",
+                "autocomplete": "current-password",
+                "id": "id_password",
+            }
+        ),
+    )
+
+    error_messages = {
+        "invalid_login": "اسم المستخدم أو كلمة المرور غير صحيحة.",
+        "inactive": "هذا الحساب معطّل، يرجى مراجعة مدير النظام.",
+    }
