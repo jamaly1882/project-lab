@@ -6,8 +6,15 @@ from django.core.signals import request_finished
 from django.dispatch import receiver
 
 class Profile(models.Model):
+     ROLE_CHOICES = (
+          ("رئيس قسم مساحة", "رئيس قسم مساحة"),
+          ("مهندس مساحة", "مهندس مساحة"),
+          ("منسق قسم مساحة", "منسق قسم مساحة"),
+     )
+
      user=models.OneToOneField(User,null=True, blank=True,on_delete=models.CASCADE)
      city=models.ForeignKey('City',related_name='user_city',on_delete=models.CASCADE ,null=True, blank=True)
+     role=models.CharField(max_length=50, choices=ROLE_CHOICES, blank=True, default="", verbose_name="الدور")
      phone_number=models.CharField(max_length=100)
      # المديرية (من جدول mahfth) التي يتبع لها المستخدم
      mahfth=models.ForeignKey(

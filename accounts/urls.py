@@ -5,6 +5,7 @@ from . import views
 from . import user_views
 app_name='accounts' 
 urlpatterns = [
+path('login', views.login_view, name='login_no_slash'),
 path('login/', views.login_view, name='login'),
 
 path('profile/', views.profile,name='profile'),

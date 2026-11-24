@@ -91,6 +91,36 @@ def is_manager(user):
     )
 
 
+SPACE_ROLE_HEAD = "رئيس قسم مساحة"
+SPACE_ROLE_ENGINEER = "مهندس مساحة"
+SPACE_ROLE_COORDINATOR = "منسق قسم مساحة"
+SPACE_ROLES = {SPACE_ROLE_HEAD, SPACE_ROLE_ENGINEER, SPACE_ROLE_COORDINATOR}
+
+
+def get_space_role(user):
+    """الدور المساحي المختار للمستخدم من لوحة إدارة المستخدمين."""
+    try:
+        return user.profile.role
+    except Exception:
+        return ""
+
+
+def space_roles_only(allowed_roles=None, block_management=False):
+    """حماية روابط الأيقونات؛ المديرون والحسابات القديمة تظل على سلوكها المعتاد."""
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped(request, *args, **kwargs):
+            user = request.user
+            role = get_space_role(user)
+            if role in SPACE_ROLES and not is_manager(user):
+                if block_management or (allowed_roles and role not in allowed_roles):
+                    messages.warning(request, "لا تملك صلاحية الدخول إلى هذه الأيقونة.")
+                    return redirect("masha:screen_paesdint_masah")
+            return view_func(request, *args, **kwargs)
+        return _wrapped
+    return decorator
+
+
 def can_access_mahfth_screen(user):
     """الوصول إلى شاشات الأقسام: المدير أو مستخدم مرتبط بمدينة/مديرية."""
     return is_manager(user) or _user_in_scope(user)
@@ -3832,6 +3862,7 @@ def add_unit_nah_eng_masha(request):
 
 def screen_show_report(request):
          return render(request,'masha/screen_show_report.html')
+@space_roles_only(allowed_roles={SPACE_ROLE_ENGINEER})
 @mahfth_screen_required
 def show_astmrat(request):
     form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=True), request.user).count()
@@ -4524,6 +4555,7 @@ def live_search_ajax_report_masha_to_agree_manager_generl_mang(request):
 def serch_agree_tsrah_karoj(request):
     return render(request,'masha/serch_agree_tsrah_karoj.html',context)
 
+@space_roles_only(block_management=True)
 def show_convert_to_mashi_from_fero(request):
             show_manger_form=report_masahi.objects.filter(tr_masah=True,return_masah_jm=False,rafth_adarah_generl=False,masahi_convert=True,convert_agin=False,convert_agin_agree=False,agree_adarah_generl_by_manager_mahfth=False,rafth_adarah_generl_by_manager_mahfth=False)
             context={'show_manger_form':show_manger_form}
@@ -4532,6 +4564,7 @@ def show_convert_to_mashi_from_fero_nah(request):
             show_manger_form=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True)
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero_nah.html',context)
+@space_roles_only(block_management=True)
 def show_convert_to_mashi_from_fero_nah_adrah(request):
         show_manger_form=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True)
         context={'show_manger_form':show_manger_form}
@@ -4571,6 +4604,7 @@ def live_search_ajax_report_masha_to_rafth_aldarah_to_report(request):
             })
 
     return JsonResponse({"results": results})
+@space_roles_only(block_management=True)
 def rafth_by_manager_aldarah_generl_nah(request):
            show_manger_form=report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True)
            context={'show_manger_form':show_manger_form}
@@ -4579,8 +4613,8 @@ def reason_rafth_managmnat_generl_to_convert_maderah(request):
            show_manger_form=report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True)
            context={'show_manger_form':show_manger_form}
            return render(request,'masha/reason_rafth_managmnat_generl_to_convert_maderah.html',context)
+@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
 @mahfth_screen_required
-
 def show_manager_masah_nah(request):
     # جلب المستخدم الحالي ورقم الهاتف
     zz = request.user
@@ -5017,17 +5051,20 @@ def image_to_base64(image_path):
 
         
 
+@login_required
 def show_managmant_masah(request)  :
     num_unread =Form.objects.filter(tr_masah=False,show_tasrah_karoj=True).count()
     context={'num_unread':num_unread}
     return render(request,'masha/show_managmant_masah.html',context)
     
+@space_roles_only(block_management=True)
 @mahfth_screen_required
 def show_managment_nah(request):
     return render(request,'masha/show_managment_nah.html')
 @mahfth_screen_required
 def werd_sader_manager(request):
     return render(request,'masha/werd_sader_manager.html')
+@space_roles_only(block_management=True)
 @mahfth_screen_required
 def screen_adrat_ver(request):
     num_unread =Conection.objects.filter().count()
@@ -5036,6 +5073,7 @@ def screen_adrat_ver(request):
     num_unread_rafth =report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True).count()
     context={'num_unread':num_unread,'num_unread_1':num_unread_1,'num_unread_agree':num_unread_agree,'num_unread_rafth':num_unread_rafth}
     return render(request,'masha/show_managment_nah.html',context)
+@space_roles_only(block_management=True)
 @mahfth_screen_required
 def get_realtime_counts(request):
     num_unread = Conection.objects.filter().count()
@@ -5057,6 +5095,7 @@ def get_realtime_counts(request):
         "num_unread_rafth":num_unread_rafth
 
     })
+@login_required
 def screen_paesdint_masah(request):
 
     
@@ -5292,6 +5331,8 @@ def add_form_new_talb(request):
     return response
 
 
+@space_roles_only(block_management=True)
+@mahfth_screen_required
 def screen_enter_number_mahther_and_number_strate_and_unit(request):
     mah=visible_mahfth_list(request.user)
     
@@ -5726,6 +5767,7 @@ def red_bol(request,id) :
     context={'f':f}
     return render(request,'masha/red_bol.html',context)
 
+@space_roles_only(block_management=True)
 def show_conecctions(request):
     conection=Conection.objects.filter(red_bol=False)
     context={'conection':conection}
@@ -6894,6 +6936,7 @@ def report_state_talbat_nah_json_astsherh(request):
     })
 
 
+@space_roles_only(allowed_roles={SPACE_ROLE_COORDINATOR})
 @mahfth_screen_required
 def enter_data_report_masahi_screen(request):
     num_unread=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).count()

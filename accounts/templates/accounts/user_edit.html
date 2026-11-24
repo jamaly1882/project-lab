@@ -104,17 +104,17 @@
             </div>
           </div>
 
-          <div class="section-title">المديرية والاتصال</div>
+          <div class="section-title">الدور والمديرية والاتصال</div>
           <div class="row">
+            <div class="col-md-6">
+              <label for="{{ form.role.id_for_label }}">{{ form.role.label }} <span style="color:#c0392b">*</span></label>
+              {{ form.role }}{{ form.role.errors }}
+              <div class="help-text">يحدد الدور أيقونة القسم التي يمكن للمستخدم الدخول إليها.</div>
+            </div>
             <div class="col-md-6">
               <label for="{{ form.mahfth.id_for_label }}">{{ form.mahfth.label }} <span style="color:#c0392b">*</span></label>
               {{ form.mahfth }}{{ form.mahfth.errors }}
-              <div class="help-text">عند دخول المستخدم ستظهر له هذه المديرية فقط.</div>
-            </div>
-            <div class="col-md-6">
-              <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
-              {{ form.city }}{{ form.city.errors }}
-              <div class="help-text">المدينة التي تظهر روابطها وبياناتها لهذا المستخدم.</div>
+              <div class="help-text">تظهر للمستخدم بيانات هذه المديرية فقط.</div>
             </div>
             <div class="col-md-6">
               <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>

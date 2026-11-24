@@ -22,6 +22,7 @@ def user_mahfth(request):
             "my_city_name": "",
             "my_scope_name": "",
             "is_system_manager": False,
+            "user_role": "",
         }
 
     from masha.scoping import get_user_city, get_user_city_name, get_user_mahfth
@@ -30,6 +31,11 @@ def user_mahfth(request):
     city = get_user_city(user)
     scope_name = get_user_city_name(user)
 
+    try:
+        role = user.profile.role
+    except Exception:
+        role = ""
+
     return {
         "user_mahfth": mahfth,
         "my_mahfth_name": mahfth.name if mahfth else "",
@@ -37,4 +43,5 @@ def user_mahfth(request):
         "my_city_name": scope_name,
         "my_scope_name": scope_name,
         "is_system_manager": bool(user.is_superuser or user.is_staff),
+        "user_role": role,
     }

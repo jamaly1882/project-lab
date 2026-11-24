@@ -34,6 +34,7 @@ def _search_users(query):
             | Q(first_name__icontains=query)
             | Q(last_name__icontains=query)
             | Q(profile__mahfth__name__icontains=query)
+            | Q(profile__role__icontains=query)
         )
     return users
 

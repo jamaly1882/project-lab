@@ -267,10 +267,10 @@
               <div class="help-text">عند دخول المستخدم ستظهر له مديريته المحددة هنا فقط.</div>
             </div>
             <div class="col-md-4">
-              <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
-              {{ form.city }}
-              {{ form.city.errors }}
-              <div class="help-text">المدينة التي تظهر روابطها وبياناتها للمستخدم.</div>
+              <label for="{{ form.role.id_for_label }}">{{ form.role.label }} <span style="color:#c0392b">*</span></label>
+              {{ form.role }}
+              {{ form.role.errors }}
+              <div class="help-text">يحدد الدور أيقونة القسم التي يمكن للمستخدم الدخول إليها.</div>
             </div>
             <div class="col-md-4">
               <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
@@ -310,7 +310,7 @@
         <h4><i class="fa fa-users"></i> المستخدمون المسجّلون</h4>
 
         <form method="get" class="search-box">
-          <input type="text" name="q" class="form-control" placeholder="ابحث باسم المستخدم أو الاسم أو المديرية..." value="{{ query }}">
+          <input type="text" name="q" class="form-control" placeholder="ابحث باسم المستخدم أو الاسم أو المديرية أو الدور..." value="{{ query }}">
           <button type="submit" class="btn-save" style="padding:8px 20px;"><i class="fa fa-search"></i> بحث</button>
           {% if query %}
             <a href="{% url 'accounts:user_manage' %}" class="btn-save" style="background:#7f8c8d;padding:8px 20px;text-decoration:none;">إلغاء</a>
@@ -325,7 +325,7 @@
                 <th>اسم المستخدم</th>
                 <th>الاسم الكامل</th>
                 <th>المديرية</th>
-                <th>المدينة</th>
+                <th>الدور</th>
                 <th>الهاتف</th>
                 <th>الصلاحية</th>
                 <th>الحالة</th>
@@ -346,10 +346,10 @@
                     {% endif %}
                   </td>
                   <td>
-                    {% if u.profile.city %}
-                      <span class="badge-mahfth">{{ u.profile.city.city }}</span>
+                    {% if u.profile.role %}
+                      <span class="badge-mahfth">{{ u.profile.role }}</span>
                     {% else %}
-                      <span class="badge-none">غير محددة</span>
+                      <span class="badge-none">غير محدد</span>
                     {% endif %}
                   </td>
                   <td dir="ltr" style="text-align:right;">{{ u.profile.phone_number|default:"—" }}</td>

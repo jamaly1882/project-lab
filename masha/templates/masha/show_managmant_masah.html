@@ -91,6 +91,7 @@
                <div class="row wow fadeInUp">
                  
                 
+                  {% if is_system_manager or not user_role or user_role == "رئيس قسم مساحة" %}
                   <div class="col-lg-6 col-md-4 col-6">
                      <div class="partner-box text-center">
                         <figure class="mb-0">
@@ -104,6 +105,8 @@
                         </figure>
                      </div>
                   </div>
+                  {% endif %}
+                  {% if is_system_manager or not user_role or user_role == "مهندس مساحة" %}
   <div class="col-lg-6 col-md-4 col-6">
                      <div class="partner-box text-center">
                         <figure class="mb-0">
@@ -116,9 +119,19 @@
                         </figure>
                      </div>
                   </div>
-
-
-
+                  {% endif %}
+                  {% if is_system_manager or user_role == "منسق قسم مساحة" %}
+                  <div class="col-lg-6 col-md-4 col-6">
+                     <div class="partner-box text-center">
+                        <figure class="mb-0">
+                           <a href="{% url 'masha:enter_data_report_masahi_screen' %}" style="height:100px;">
+                              <i class="fa fa-tasks" style="font-size:50px;"></i><br>
+                              <font style="font-family:Noto Kufi Arabic Medium;" size="+1.5">منسق قسم المساحة</font>
+                           </a>
+                        </figure>
+                     </div>
+                  </div>
+                  {% endif %}
 
   <script src="{% static 'assets/js/wow.js' %}"></script>
       <script>

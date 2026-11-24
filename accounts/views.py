@@ -89,8 +89,14 @@ def login_view(request):
             if next_url:
                 return redirect(next_url)
 
-            # الجميع يذهب إلى لوحة التحكم: المدير يرى كل المديريات
-            # والمستخدم العادي يرى مديريته فقط.
+            # أصحاب الأدوار المساحية يدخلون مباشرة إلى شاشة قسمهم؛ بقية
+            # المستخدمين يستمرون بالذهاب إلى لوحة التحكم.
+            try:
+                role = user.profile.role
+            except Exception:
+                role = ""
+            if role in {"رئيس قسم مساحة", "مهندس مساحة", "منسق قسم مساحة"}:
+                return redirect("masha:screen_paesdint_masah")
             return redirect('masha:index')
 
         return render(
