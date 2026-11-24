@@ -154,6 +154,19 @@ def coordinator_or_manager_required(view_func):
     return _wrapped
 
 
+def department_head_or_system_manager_required(view_func):
+    """حماية كل روابط ملف رئيس القسم بصلاحية موحّدة."""
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        user = request.user
+        if not getattr(user, "is_authenticated", False):
+            return redirect_to_login(request.get_full_path(), "accounts:login")
+        if is_manager(user) or get_space_role(user) == SPACE_ROLE_HEAD:
+            return view_func(request, *args, **kwargs)
+        return render(request, "masha/no_permission.html", status=403)
+    return _wrapped
+
+
 def can_access_mahfth_screen(user):
     """الوصول إلى شاشات الأقسام وفق المديريات أو الدور الإداري العام."""
     return (
@@ -3763,12 +3776,8 @@ def image_to_base64(image_path):
         )
 
         return ""
-@login_required
+@department_head_or_system_manager_required
 def agree_tsrah_xx(request):
-    role = get_space_role(request.user)
-    if not (is_manager(request.user) or role == SPACE_ROLE_HEAD):
-        return render(request, 'masha/no_permission.html', status=403)
-
     forms = Form.objects.filter(
         show_tasrah_karoj=False,
         rafth_maml=False,
@@ -4475,13 +4484,15 @@ def agree_rafth_report_masah_nah_tamp(request):
     }
 
     return render(request, 'masha/agree_rafth_report_masah_nah_tamp.html', context)
+@department_head_or_system_manager_required
 def serch_talbt_report_by_mnager_nah(request):
-    form=report_masahi.objects.filter( tr_masah=True,
+    form=filter_reports(report_masahi.objects.filter(
+            tr_masah=True,
             return_masah_jm=False,
             rafth_adarah_generl=False,
             masahi_convert=False,
             agree_adarah_generl_by_manager_mahfth=False,
-            rafth_adarah_generl_by_manager_mahfth=False)
+            rafth_adarah_generl_by_manager_mahfth=False), request.user)
     context={'form':form}
     return render(request, 'masha/serch_talbt_report_by_mnager_nah.html',context)
 from django.http import JsonResponse
@@ -4606,8 +4617,9 @@ def show_convert_to_mashi_from_fero(request):
             show_manger_form=report_masahi.objects.filter(tr_masah=True,return_masah_jm=False,rafth_adarah_generl=False,masahi_convert=True,convert_agin=False,convert_agin_agree=False,agree_adarah_generl_by_manager_mahfth=False,rafth_adarah_generl_by_manager_mahfth=False)
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero.html',context)
+@department_head_or_system_manager_required
 def show_convert_to_mashi_from_fero_nah(request):
-            show_manger_form=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True)
+            show_manger_form=filter_reports(report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True), request.user)
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero_nah.html',context)
 @space_roles_only(block_management=True)
@@ -4655,8 +4667,9 @@ def rafth_by_manager_aldarah_generl_nah(request):
            show_manger_form=report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True)
            context={'show_manger_form':show_manger_form}
            return render(request,'masha/reason_rafth_managmnat_generl.html',context)
+@department_head_or_system_manager_required
 def reason_rafth_managmnat_generl_to_convert_maderah(request):
-           show_manger_form=report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True)
+           show_manger_form=filter_reports(report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True), request.user)
            context={'show_manger_form':show_manger_form}
            return render(request,'masha/reason_rafth_managmnat_generl_to_convert_maderah.html',context)
 @space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
@@ -4713,24 +4726,27 @@ def show_manager_masah_nah(request):
 
     return render(request, 'masha/show_manager_masah_nah.html', context)
 @login_required
+@department_head_or_system_manager_required
 def show_report_nah_by_manager(request):
-    print_report_x= report_masahi.objects.filter( 
+    print_report_x= filter_reports(report_masahi.objects.filter(
              return_masah_jm=True,
             rafth_adarah_generl=False,
             masahi_convert=False,
             rafth_adarah_generl_by_manager_mahfth=False
-            ) 
+            ), request.user)
     context={'print_report_x':print_report_x} 
     return render(request,'masha/print_report_mashi_report_nah.html',context)
 def show_report_nah_by_manager_rafth(request):
     print_report_x= report_masahi.objects.filter( rafth_adarah_generl=True) 
     context={'print_report_x':print_report_x} 
     return render(request,'masha/show_report_nah_by_manager_rafth.html',context)
-def  serch_in_screen_prisdent_masah_talbt(request):
+@department_head_or_system_manager_required
+def serch_in_screen_prisdent_masah_talbt(request):
     return render(request,'masha/serch_in_screen_talbt_date.html')
 
 
 @csrf_exempt
+@department_head_or_system_manager_required
 def serch_in_screen_prisdent_masah_talbt_to_data_base(request):
     if request.method == 'GET':
         # استدعاء التواريخ من الفورم
@@ -4756,7 +4772,7 @@ def serch_in_screen_prisdent_masah_talbt_to_data_base(request):
 
         # فلترة البيانات
         # إذا كان الحقل DateTimeField، استخدم __date__range
-        form = Form.objects.filter(sent_att__date__range=(start_date, end_date))
+        form = filter_forms(Form.objects.filter(sent_att__date__range=(start_date, end_date)), request.user)
 
         context = {
             'form': form,
@@ -4773,6 +4789,7 @@ from django.http import JsonResponse
 
 
 @mahfth_screen_required
+@department_head_or_system_manager_required
 def show_manager_masah_nah_json(request):
     user = request.user
 
@@ -5011,6 +5028,7 @@ def red_bol_massage(request):
 
 
 @mahfth_screen_required
+@department_head_or_system_manager_required
 def asder_nah_report_masah(request):
     return render(request,'masha/asder_nah_report_masah.html')
 @mahfth_screen_required
@@ -5845,8 +5863,9 @@ def show_tsrah_exit_eng_by_manger (request):
     form=Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
     context={'form':form}
     return render(request,'masha/show_tsrah_exit_eng_by_manger.html',context)
+@department_head_or_system_manager_required
 def show_tsrah_exit_eng_by_manger_by_manger(request):
-    form=Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False).order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False), request.user).order_by('-id')
     context={'form':form}
     return render(request,'masha/show_tsrah_exit_eng_by_presdent_mashi.html',context)
 
@@ -6689,9 +6708,9 @@ def live_search_ajax_report_masha_print_archif(request):
 
     return JsonResponse({"results": results})
     return JsonResponse(results, safe=False)
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_unit'))
+@department_head_or_system_manager_required
 def print_report(request):
-    print_report_x= report_masahi.objects.filter( return_masah_jm=True, print_nah=False )
+    print_report_x= filter_reports(report_masahi.objects.filter(return_masah_jm=True, print_nah=False), request.user)
     context={'print_report_x':print_report_x}
     return render(request,'masha/print_report.html',context)
 @coordinator_or_manager_required

@@ -182,6 +182,29 @@ class SpaceRoleAccessTests(TestCase):
         response = self.client.get(reverse("masha:agree_tsrah_xx"))
         self.assertEqual(response.status_code, 200)
 
+    def test_head_can_open_all_links_in_its_workspace(self):
+        names = (
+            "masha:agree_tsrah_xx",
+            "masha:serch_talbt_report_by_mnager_nah",
+            "masha:show_tsrah_exit_eng_by_manger_by_manger",
+            "masha:print_report",
+            "masha:show_report_nah_by_manager",
+            "masha:asder_nah_report_masah",
+            "masha:serch_in_screen_prisdent_masah_talbt",
+            "masha:serch_in_screen_prisdent_masah_talbt_to_data_base",
+            "masha:show_convert_to_mashi_from_fero_nah",
+            "masha:reason_rafth_managmnat_generl_to_convert_maderah",
+            "masha:show_manager_masah_nah_json",
+        )
+        for name in names:
+            if name == "masha:serch_in_screen_prisdent_masah_talbt_to_data_base":
+                response = self.client.get(
+                    reverse(name), {"zz": "2026-01-01", "q": "2026-01-31"}
+                )
+            else:
+                response = self.client.get(reverse(name))
+            self.assertEqual(response.status_code, 200, name)
+
     def test_system_manager_can_open_approval_link(self):
         manager = User.objects.create_superuser("system-manager", "admin@example.com", "pass1234")
         self.client.force_login(manager)
