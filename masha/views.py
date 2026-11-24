@@ -3703,13 +3703,9 @@ def image_to_base64(image_path):
         )
 
         return ""
-@login_required
+@mahfth_screen_required
 def agree_tsrah_xx(request):
-    # السماح إذا كان مشرف أو لديه الصلاحية
-    if not (request.user.is_superuser or request.user.has_perm('masha.add_unit')):
-        return render(request, 'masha/no_permission.html')  # صفحة غير مصرح
-
-    # المستخدم مسموح له بالدخول
+    # السماح لمستخدمي المديرية بعرض طلباتهم مع تطبيق نطاق المديرية أدناه
     form = filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=False, return_form=False, digital=False), request.user).order_by('-id')
     context = {'form': form, 'zz': request.user}
     return render(request, 'masha/agree_to_tsrah_kroj.html', context)
