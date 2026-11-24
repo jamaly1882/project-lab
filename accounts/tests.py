@@ -307,6 +307,29 @@ class DirectorateDataIsolationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "masha/print_report_mashi_report_nah.html")
 
+    def test_head_can_open_transfer_queue_with_only_own_reports(self):
+        self.user.profile.role = "رئيس قسم مساحة"
+        self.user.profile.save()
+        own_report = report_masahi.objects.create(
+            form=self.own_form,
+            agree_adarah_generl_by_manager_mahfth=True,
+        )
+        report_masahi.objects.create(
+            form=self.other_form,
+            agree_adarah_generl_by_manager_mahfth=True,
+        )
+
+        response = self.client.get(reverse("masha:show_convert_to_mashi_from_fero_nah"))
+        self.assertEqual(response.status_code, 200)
+        visible_report_ids = {report.id for report in response.context["show_manger_form"]}
+        self.assertEqual(visible_report_ids, {own_report.id})
+
+    def test_legacy_scoped_user_can_open_transfer_queue(self):
+        self.user.profile.role = ""
+        self.user.profile.save()
+        response = self.client.get(reverse("masha:show_convert_to_mashi_from_fero_nah"))
+        self.assertEqual(response.status_code, 200)
+
     def test_engineer_ajax_search_only_returns_own_directorate(self):
         response = self.client.get(reverse("masha:live_search_ajax_hadod_a"), {"q": "طلب"})
         self.assertEqual(response.status_code, 200)

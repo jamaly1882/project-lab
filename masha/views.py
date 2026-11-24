@@ -4637,7 +4637,8 @@ def show_convert_to_mashi_from_fero(request):
             show_manger_form=report_masahi.objects.filter(tr_masah=True,return_masah_jm=False,rafth_adarah_generl=False,masahi_convert=True,convert_agin=False,convert_agin_agree=False,agree_adarah_generl_by_manager_mahfth=False,rafth_adarah_generl_by_manager_mahfth=False)
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero.html',context)
-@department_head_or_system_manager_required
+@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
+@mahfth_screen_required
 def show_convert_to_mashi_from_fero_nah(request):
             show_manger_form=filter_reports(report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True), request.user)
             context={'show_manger_form':show_manger_form}
