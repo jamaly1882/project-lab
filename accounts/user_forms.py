@@ -27,13 +27,13 @@ class _BaseUserForm(RedirectAfterSaveMixin, forms.ModelForm):
         label="المديرية",
         queryset=None,           # يُحدد في __init__
         required=False,          # يُتحقق من إلزاميته بحسب الدور في clean().
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "form-control", "dir": "rtl"}),
         empty_label="--- اختر المديرية ---",
     )
     role = forms.ChoiceField(
         label="الدور",
         choices=(("", "--- اختر الدور ---"),) + Profile.ROLE_CHOICES,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "form-control", "dir": "rtl"}),
     )
     phone_number = forms.CharField(
         label="رقم الهاتف (اختياري)",

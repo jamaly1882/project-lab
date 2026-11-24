@@ -215,6 +215,7 @@ class UserRoleFormTests(TestCase):
         self.assertLess(username_pos, password_pos)
         self.assertLess(password_pos, confirm_pos)
         self.assertIn('dir="ltr"', body[username_pos - 120 : username_pos + 40])
+        self.assertContains(response, 'name="role" class="form-control" dir="rtl"')
         self.assertContains(response, "مدير إدارة المساحة")
 
     def test_admin_can_assign_a_role_instead_of_city(self):
@@ -262,6 +263,15 @@ class UserRoleFormTests(TestCase):
         self.client.force_login(area_manager)
         response = self.client.get(reverse("masha:screen_adrat_ver"))
         self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse("masha:interface"))
+        self.assertNotContains(response, reverse("masha:screen_adrat_ver"))
+
+        self.client.logout()
+        response = self.client.post(
+            "/accounts/login/",
+            {"username": "area-manager", "password": "pass1234"},
+        )
+        self.assertRedirects(response, reverse("masha:screen_adrat_ver"))
 
     def test_other_roles_still_require_directorate(self):
         admin = User.objects.create_superuser("admin", "admin@example.com", "pass1234")
