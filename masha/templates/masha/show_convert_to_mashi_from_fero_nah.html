@@ -219,11 +219,11 @@ $(document).ready(function() {
                         tbody += `<tr>
                             <td><a class="btn outline-success" href="${reportUrlBase}${encodeURIComponent(item.id)}?space=head">تصفح</a></td>
                             <td>${location}</td>
-                            <td>${escapeHtml(item.unit_name || '—')}</td>
-                            <td>${escapeHtml(item.gata_name || '—')}</td>
-                            <td>${escapeHtml(item.mahfth_name || '—')}</td>
-                            <td>${escapeHtml(item.typ_name || '—')}</td>
-                            <td>${escapeHtml(item.name || '—')}</td>
+                            <td>${escapeHtml(item.form.unit_name || '—')}</td>
+                            <td>${escapeHtml(item.form.gata_name || '—')}</td>
+                            <td>${escapeHtml(item.form.mahfth_name || '—')}</td>
+                            <td>${escapeHtml(item.form.typ_name || '—')}</td>
+                            <td>${escapeHtml(item.form.name || '—')}</td>
                             <td>${escapeHtml(item.id)}</td>
                         </tr>`;
                     });

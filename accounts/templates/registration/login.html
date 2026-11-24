@@ -75,6 +75,7 @@
 
               {% if next %}
                 {% if user.is_authenticated %}
+                 
                   <div class="alert alert-warning" role="alert" dir="rtl" align="right">
                     حسابك ليس لديه حق الوصول إلى هذه الصفحة. الرجاء تسجيل الدخول بحساب له حق الوصول.
                   </div>
@@ -84,7 +85,7 @@
                   </div>
                 {% endif %}
               {% endif %}
-
+  <form method="post" action="{% url 'login' %}" dir="rtl">
                 {% csrf_token %}
 
                 <div class="login-field text-right">
