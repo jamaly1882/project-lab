@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import City, Profile
-from masha.models import AStmrah, Form, Mahfth
+from masha.models import AStmrah, Form, Mahfth, report_masahi
 
 
 class LoginPageTests(TestCase):
@@ -282,6 +282,30 @@ class DirectorateDataIsolationTests(TestCase):
             name_wk=name,
             service_bana="",
         )
+
+    def test_head_can_open_ready_reports_and_sees_only_own_directorate(self):
+        self.user.profile.role = "رئيس قسم مساحة"
+        self.user.profile.save()
+        own_report = report_masahi.objects.create(
+            form=self.own_form,
+            return_masah_jm=True,
+        )
+        report_masahi.objects.create(
+            form=self.other_form,
+            return_masah_jm=True,
+        )
+
+        response = self.client.get(reverse("masha:show_report_nah_by_manager"))
+        self.assertEqual(response.status_code, 200)
+        visible_report_ids = {report.id for report in response.context["print_report_x"]}
+        self.assertEqual(visible_report_ids, {own_report.id})
+
+    def test_legacy_scoped_user_can_open_ready_reports(self):
+        self.user.profile.role = ""
+        self.user.profile.save()
+        response = self.client.get(reverse("masha:show_report_nah_by_manager"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "masha/print_report_mashi_report_nah.html")
 
     def test_engineer_ajax_search_only_returns_own_directorate(self):
         response = self.client.get(reverse("masha:live_search_ajax_hadod_a"), {"q": "طلب"})

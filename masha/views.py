@@ -4745,8 +4745,8 @@ def show_manager_masah_nah(request):
     }
 
     return render(request, 'masha/show_manager_masah_nah.html', context)
-@login_required
-@department_head_or_system_manager_required
+@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
+@mahfth_screen_required
 def show_report_nah_by_manager(request):
     print_report_x= filter_reports(report_masahi.objects.filter(
              return_masah_jm=True,
