@@ -184,3 +184,48 @@ class ReportApprovalFlowTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'id="approval_space"')
         self.assertContains(response, 'value="head"')
+
+    def test_head_lists_are_limited_to_his_mahfth(self):
+        """الجاهزة والمقبولة من الإدارة تعرضان مديرية رئيس القسم فقط."""
+        other_mahfth = Mahfth.objects.create(name="مديرية أخرى للعرض")
+        other_form = Form.objects.create(
+            name="قطعة أخرى",
+            mahfth=other_mahfth,
+            kml_file=SimpleUploadedFile("other.kml", b"<kml/>"),
+        )
+        other_report = report_masahi.objects.create(
+            name="مساحي",
+            form=other_form,
+            kml_file=SimpleUploadedFile("other-report.kml", b"<kml/>"),
+            return_masah_jm=True,
+            agree_adarah_generl_by_manager_mahfth=True,
+        )
+
+        head = self._make_head("head_scope", self.mahfth)
+        self.client.force_login(head)
+
+        # التقارير الجاهزة
+        self.report.return_masah_jm = True
+        self.report.save()
+        ready = self.client.get(
+            reverse("masha:show_report_nah_by_manager")
+        ).context["print_report_x"]
+        self.assertIn(self.report, ready)
+        self.assertNotIn(other_report, ready)
+
+        # المقبولة من الإدارة (يجب ألا يكون التقرير جاهزاً حتى يظهر هنا)
+        self.report.return_masah_jm = False
+        self.report.save()
+        accepted = self.client.get(
+            reverse("masha:show_convert_to_mashi_from_fero_nah")
+        ).context["show_manger_form"]
+        self.assertIn(self.report, accepted)
+        self.assertNotIn(other_report, accepted)
+
+        # مدير النظام يرى مديريات كلها في القائمتين
+        self.client.logout()
+        self.client.force_login(self._make_manager("manager_scope"))
+        all_ready = self.client.get(
+            reverse("masha:show_report_nah_by_manager")
+        ).context["print_report_x"]
+        self.assertIn(other_report, all_ready)

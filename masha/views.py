@@ -4542,7 +4542,11 @@ def show_convert_to_mashi_from_fero(request):
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero.html',context)
 def show_convert_to_mashi_from_fero_nah(request):
-            show_manger_form=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True)
+            # رئيس القسم يرى المقبولة من الإدارة لمديريته فقط (المدير يرى الكل).
+            show_manger_form=filter_reports(
+                report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True),
+                request.user,
+            )
             # التقرير الذي يرحّله رئيس القسم للإدارة العامة يخرج من قائمته،
             # ويبقى في قائمة الإدارة العامة (نفس علم الموافقة محفوظاً).
             if is_head_user(request.user):
@@ -4657,12 +4661,16 @@ def show_manager_masah_nah(request):
     return render(request, 'masha/show_manager_masah_nah.html', context)
 @login_required
 def show_report_nah_by_manager(request):
-    print_report_x= report_masahi.objects.filter( 
-             return_masah_jm=True,
+    # التقارير الجاهزة الخاصة بمديرية رئيس القسم فقط (المدير يرى الجميع).
+    print_report_x = filter_reports(
+        report_masahi.objects.filter(
+            return_masah_jm=True,
             rafth_adarah_generl=False,
             masahi_convert=False,
-            rafth_adarah_generl_by_manager_mahfth=False
-            ) 
+            rafth_adarah_generl_by_manager_mahfth=False,
+        ),
+        request.user,
+    )
     context={'print_report_x':print_report_x} 
     return render(request,'masha/print_report_mashi_report_nah.html',context)
 def show_report_nah_by_manager_rafth(request):
