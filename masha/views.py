@@ -3766,12 +3766,7 @@ def image_to_base64(image_path):
 @login_required
 def agree_tsrah_xx(request):
     role = get_space_role(request.user)
-    allowed_roles = {SPACE_ROLE_HEAD, SPACE_ROLE_AREA_MANAGER}
-    if not (
-        is_manager(request.user)
-        or request.user.has_perm('masha.add_unit')
-        or role in allowed_roles
-    ):
+    if not (is_manager(request.user) or role == SPACE_ROLE_HEAD):
         return render(request, 'masha/no_permission.html', status=403)
 
     forms = Form.objects.filter(

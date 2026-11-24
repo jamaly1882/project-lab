@@ -182,6 +182,19 @@ class SpaceRoleAccessTests(TestCase):
         response = self.client.get(reverse("masha:agree_tsrah_xx"))
         self.assertEqual(response.status_code, 200)
 
+    def test_system_manager_can_open_approval_link(self):
+        manager = User.objects.create_superuser("system-manager", "admin@example.com", "pass1234")
+        self.client.force_login(manager)
+        response = self.client.get(reverse("masha:agree_tsrah_xx"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_area_manager_role_is_not_allowed_on_department_approval_link(self):
+        self.user.profile.role = "مدير إدارة المساحة"
+        self.user.profile.save()
+        response = self.client.get(reverse("masha:agree_tsrah_xx"))
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "masha/no_permission.html")
+
     def test_coordinator_can_open_both_report_workflows(self):
         self.user.profile.role = "منسق قسم مساحة"
         self.user.profile.save()
