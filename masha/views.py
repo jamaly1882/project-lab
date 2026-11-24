@@ -6660,7 +6660,6 @@ def live_search_ajax_report_masha_print_archif(request):
     return JsonResponse({"results": results})
     return JsonResponse(results, safe=False)
 @mahfth_screen_required
-@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_unit'))
 def print_report(request):
     print_report_x=filter_reports(report_masahi.objects.filter(return_masah_jm=True, print_nah=False), request.user)
     context={'print_report_x':print_report_x}
