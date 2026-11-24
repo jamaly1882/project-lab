@@ -4458,7 +4458,7 @@ def live_search_ajax_report_masha(request):
                 "name": obj.form.name if obj.form else '',
                 "typ_name": obj.type_map.name if obj.type_map else '',
                "unit_name": obj.form.unit.name if obj.form and hasattr(obj.form, 'unit') else '',
-               "gata_name": obj.form.gata.name if obj.form and hasattr(obj.form, 'gata') else '',
+               "gata_name": "",
                 "mahfth_name": obj.form.mahfth.name if obj.resone else '',
                 "img_document": '',
                 "kml_file": obj.kml_file.url if obj.kml_file else '',  # 
@@ -4492,7 +4492,7 @@ def live_search_ajax_report_masha_to_generle_adarah(request):
                 "name": obj.form.name if obj.form else '',
                 "typ_name": obj.type_map.name if obj.type_map else '',
                "unit_name": obj.form.unit.name if obj.form and hasattr(obj.form, 'unit') else '',
-               "gata_name": obj.form.gata.name if obj.form and hasattr(obj.form, 'gata') else '',
+               "gata_name": "",
                 "mahfth_name": obj.resone.name if obj.resone else '',
                 "img_document": '',
                 "kml_file": obj.kml_file.url if obj.kml_file else '',  # 
@@ -4514,7 +4514,6 @@ def live_search_ajax_report_masha_to_agree_manager_generl_mang(request):
         matches = report_masahi.objects.select_related(
             "form",
             "form__unit",
-            "form__gata",
             "form__mahfth",
             "form__typ",
         ).filter(
@@ -4535,7 +4534,8 @@ def live_search_ajax_report_masha_to_agree_manager_generl_mang(request):
                 "name": form.name if form else '',
                 "typ_name": form.typ.name if form and form.typ else '',
                 "unit_name": form.unit.name if form and form.unit else '',
-                "gata_name": form.gata.name if form and form.gata else '',
+                # Form has no direct Gata relation; keep the legacy sector column empty.
+                "gata_name": "",
                 "mahfth_name": form.mahfth.name if form and form.mahfth else '',
                 "kml_file": kml_file.url if kml_file else '',
             })
@@ -4556,7 +4556,6 @@ def show_convert_to_mashi_from_fero_nah(request):
     ).select_related(
         "form",
         "form__unit",
-        "form__gata",
         "form__mahfth",
         "form__typ",
     )
@@ -6611,7 +6610,7 @@ def live_search_ajax_report_masha_print(request):
                 "name": obj.form.name if obj.form else '',
                 "typ_name": obj.type_map.name if obj.type_map else '',
                "unit_name": obj.form.unit.name if obj.form and hasattr(obj.form, 'unit') else '',
-               "gata_name": obj.form.gata.name if obj.form and hasattr(obj.form, 'gata') else '',
+               "gata_name": "",
                 "mahfth_name": obj.resone.name if obj.resone else '',
                 "img_document": '',
                 "kml_file": obj.kml_file.url if obj.kml_file else '',  # 
