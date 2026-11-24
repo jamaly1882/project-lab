@@ -77,12 +77,13 @@ input[type="checkbox"]:checked + label span::after {
           </div>
         <nav class="templatemo-left-nav">
           <ul>
-            <li><a href="{% url 'masha:screen_adrat_ver' %}"class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
-            <li><a href="#" class="toggle"><i class="fa fa-bar-chart fa-fw"></i>الطلبات </a>
-            
-            </li>
-       
-             <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج </a></li>
+            {% if request.user.is_authenticated %}
+                <li><a href="{% url 'masha:screen_adrat_ver' %}" class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+                <li><a href="#" class="toggle"><i class="fa fa-bar-chart fa-fw"></i>الطلبات</a></li>
+                <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج</a></li>
+            {% else %}
+                <li><a href="{% url 'masha:show_convert_to_mashi_from_fero_nah' %}" class="active"><i class="fa fa-home fa-fw"></i>التقارير المقبولة</a></li>
+            {% endif %}
           </ul>
         </nav>
       </div>
@@ -103,6 +104,7 @@ input[type="checkbox"]:checked + label span::after {
         </div>
       
 
+  {% if request.user.is_authenticated %}
   <div align="right">
             <form id="slam_no_b"  dir="rtl" >
 
@@ -164,6 +166,7 @@ input[type="checkbox"]:checked + label span::after {
  
 </div>
 </div>
+  {% endif %}
  <div class="templatemo-content-container">
  	  <div class="templatemo-flex-row flex-content-row">
             <div class="col-1">              
