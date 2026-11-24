@@ -25,12 +25,6 @@ from .scoping import (
     resolve_mahfth_for_user,
     visible_mahfth_list,
 )
-
-
-def get_scoped_form_or_404(request, form_id):
-    """Fetch a Form only when it is inside the current user's directorate."""
-    return get_object_or_404(filter_forms(Form.objects.all(), request.user), id=form_id)
-
 from django.contrib import messages
 from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth import authenticate,login
@@ -97,89 +91,18 @@ def is_manager(user):
     )
 
 
-SPACE_ROLE_HEAD = "رئيس قسم مساحة"
-SPACE_ROLE_ENGINEER = "مهندس مساحة"
-SPACE_ROLE_COORDINATOR = "منسق قسم مساحة"
-SPACE_ROLE_AREA_MANAGER = "مدير إدارة المساحة"
-SPACE_ROLES = {SPACE_ROLE_HEAD, SPACE_ROLE_ENGINEER, SPACE_ROLE_COORDINATOR}
+def is_head_user(user):
+    """رئيس القسم: كل مستخدم مربوط بمديرية وليس مدير نظام.
 
-
-def get_space_role(user):
-    """الدور المساحي المختار للمستخدم من لوحة إدارة المستخدمين."""
-    try:
-        return user.profile.role
-    except Exception:
-        return ""
-
-
-def role_landing_url(user):
-    """صفحة الدخول المباشرة لكل دور بدلاً من عرض أيقونة اختيار الدور."""
-    if is_manager(user):
-        return None
-    return {
-        SPACE_ROLE_HEAD: "masha:show_manager_masah_nah",
-        SPACE_ROLE_ENGINEER: "masha:show_astmrat",
-        SPACE_ROLE_COORDINATOR: "masha:interface",
-        SPACE_ROLE_AREA_MANAGER: "masha:screen_adrat_ver",
-    }.get(get_space_role(user))
-
-
-def space_roles_only(allowed_roles=None, block_management=False):
-    """حماية روابط الأيقونات؛ المديرون والحسابات القديمة تظل على سلوكها المعتاد."""
-    def decorator(view_func):
-        @wraps(view_func)
-        def _wrapped(request, *args, **kwargs):
-            user = request.user
-            role = get_space_role(user)
-            if role in SPACE_ROLES and not is_manager(user):
-                if block_management or (allowed_roles and role not in allowed_roles):
-                    messages.warning(request, "لا تملك صلاحية الدخول إلى هذه الأيقونة.")
-                    return redirect(role_landing_url(user) or "masha:screen_paesdint_masah")
-            return view_func(request, *args, **kwargs)
-        return _wrapped
-    return decorator
-
-
-def coordinator_or_manager_required(view_func):
-    """السماح بإصدار التقارير للمنسق ومدير النظام فقط."""
-    @wraps(view_func)
-    def _wrapped(request, *args, **kwargs):
-        user = request.user
-        if not getattr(user, "is_authenticated", False):
-            return redirect_to_login(request.get_full_path(), "accounts:login")
-        if is_manager(user) or get_space_role(user) == SPACE_ROLE_COORDINATOR:
-            return view_func(request, *args, **kwargs)
-
-        messages.warning(request, "إصدار التقارير متاح لمنسق القسم ومدير النظام فقط.")
-        role = get_space_role(user)
-        if role == SPACE_ROLE_HEAD:
-            return redirect("masha:show_manager_masah_nah")
-        if role == SPACE_ROLE_ENGINEER:
-            return redirect("masha:show_astmrat")
-        return redirect("masha:index")
-    return _wrapped
-
-
-def department_head_or_system_manager_required(view_func):
-    """حماية كل روابط ملف رئيس القسم بصلاحية موحّدة."""
-    @wraps(view_func)
-    def _wrapped(request, *args, **kwargs):
-        user = request.user
-        if not getattr(user, "is_authenticated", False):
-            return redirect_to_login(request.get_full_path(), "accounts:login")
-        if is_manager(user) or get_space_role(user) == SPACE_ROLE_HEAD:
-            return view_func(request, *args, **kwargs)
-        return render(request, "masha/no_permission.html", status=403)
-    return _wrapped
+    لا يوجد في هذا المشروع نظام أدوار منفصل (SPACE_ROLE_HEAD وغيره)،
+    لذا يُعتبر غير المدير رئيسَ قسم، تماشياً مع منطق الشاشات الحالية.
+    """
+    return bool(getattr(user, "is_authenticated", False) and not is_manager(user))
 
 
 def can_access_mahfth_screen(user):
-    """الوصول إلى شاشات الأقسام وفق المديريات أو الدور الإداري العام."""
-    return (
-        is_manager(user)
-        or get_space_role(user) == SPACE_ROLE_AREA_MANAGER
-        or _user_in_scope(user)
-    )
+    """الوصول إلى شاشات الأقسام: المدير أو مستخدم مرتبط بمدينة/مديرية."""
+    return is_manager(user) or _user_in_scope(user)
 
 
 def mahfth_screen_required(view_func):
@@ -3543,8 +3466,6 @@ def show_intreface(request):
 def is_admin_or_has_permission(user):
     return user.is_superuser or user.has_perm("masha.add_form")
 
-@coordinator_or_manager_required
-@mahfth_screen_required
 def enter_data_report_masahi(request):
     
     ty=typ.objects.all()
@@ -3568,7 +3489,6 @@ def enter_data_report_masahi(request):
 @csrf_exempt
 
 
-@coordinator_or_manager_required
 def form_add_masah(request):
     if request.method == "POST":
 
@@ -3782,16 +3702,14 @@ def image_to_base64(image_path):
         )
 
         return ""
-@department_head_or_system_manager_required
+@login_required
 def agree_tsrah_xx(request):
-    forms = Form.objects.filter(
-        show_tasrah_karoj=False,
-        rafth_maml=False,
-        talb_astkml=False,
-        return_form=False,
-        digital=False,
-    )
-    form = filter_forms(forms, request.user).order_by('-id')
+    # السماح إذا كان مشرف أو لديه الصلاحية
+    if not (request.user.is_superuser or request.user.has_perm('masha.add_unit')):
+        return render(request, 'masha/no_permission.html')  # صفحة غير مصرح
+
+    # المستخدم مسموح له بالدخول
+    form = Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=False, return_form=False, digital=False).order_by('-id')
     context = {'form': form, 'zz': request.user}
     return render(request, 'masha/agree_to_tsrah_kroj.html', context)
 @mahfth_screen_required
@@ -3800,7 +3718,7 @@ def add_motan_service_jamhore_to_fane(request,id):
 
     
     
-    f = get_scoped_form_or_404(request, id)
+    f=Form.objects.get(id=id)
     zz=User.objects.get(username=request.user)
     
 
@@ -3822,7 +3740,7 @@ def search_edit_form_talb_bana(request,id):
     saf = Safah.objects.all()
     mah = visible_mahfth_list(request.user)
     astmrah =AStmrah.objects.all()
-    ass = get_scoped_form_or_404(request, id)
+    ass = get_object_or_404(Form, id=id)
     val = Vald_doc.objects.all()
     val_m = Vald_tharb.objects.all()
     zz = request.user
@@ -3843,9 +3761,8 @@ def search_edit_form_talb_bana(request,id):
 
 
 
-@mahfth_screen_required
 def update_request(request, id):
-    ass = get_scoped_form_or_404(request, id)
+    ass = get_object_or_404(Form, id=id)
 
     if request.method == "POST":
         # العلاقات
@@ -3877,13 +3794,11 @@ def update_request(request, id):
 
 
 
-@mahfth_screen_required
 def show_astmrah(request,id):
-    aa = get_scoped_form_or_404(request, id)
+    aa=Form.objects.get(id=id)
     context={'aa':aa}
     return render(request,'masha/show_astmrah.html',context)
 @csrf_exempt
-@mahfth_screen_required
 def add_unit_nah_eng_masha(request):
     if request.method=="POST":
         
@@ -3894,7 +3809,7 @@ def add_unit_nah_eng_masha(request):
         ex = request.POST.get('ex')
         number=request.POST['number']
         if ex =='منجزة':
-            form = get_scoped_form_or_404(request, number)
+            form,created=Form.objects.get_or_create(id=number)
             form.sender=request.user
             form.is_readt=True
             form.show_tasrah_karoj=True
@@ -3903,7 +3818,7 @@ def add_unit_nah_eng_masha(request):
             form.save()
             return HttpResponse(status=200)
         elif ex=='رفض':
-            form = get_scoped_form_or_404(request, number)
+            form,created=Form.objects.get_or_create(id=number)
             form.sender=request.user
             form.rasone_rafth_maml=rasone_rafth_maml
             form.is_readt=True
@@ -3913,7 +3828,7 @@ def add_unit_nah_eng_masha(request):
             form.save()
             return HttpResponse(status=200)
         elif ex== 'استكمال  '  :
-            form = get_scoped_form_or_404(request, number)
+            form,created=Form.objects.get_or_create(id=number)
             form.sender=request.user
             form.is_readt=True
             form.talb_astkml=True
@@ -3926,7 +3841,6 @@ def add_unit_nah_eng_masha(request):
 
 def screen_show_report(request):
          return render(request,'masha/screen_show_report.html')
-@space_roles_only(allowed_roles={SPACE_ROLE_ENGINEER})
 @mahfth_screen_required
 def show_astmrat(request):
     form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=True), request.user).count()
@@ -3976,7 +3890,6 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Form, Unit, Type_map, Type_kah, Type_seol, Type_natural, Type_block, report_masahi, Location
 
 @csrf_exempt
-@login_required
 def edit_report_ajax(request,id):
    
     if request.method == "POST":
@@ -4006,7 +3919,7 @@ def edit_report_ajax(request,id):
 
         # ───── جلب الكائنات المرتبطة بأمان ─────
         try:
-            form_obj = get_scoped_form_or_404(request, id)
+            form_obj = Form.objects.get(id=id)
             report=report_masahi.objects.filter(form=form_obj,tr_masah=True,rafth_adarah_generl=False)
 
         except Form.DoesNotExist:
@@ -4021,11 +3934,7 @@ def edit_report_ajax(request,id):
             natural = Type_natural.objects.get(id=hid_nat) if hid_nat else None
             block = Type_block.objects.get(id=hid_block) if hid_block else None
 
-            mah, mahfth_error = resolve_mahfth_for_user(request.user, hid_mah) if hid_mah else (form_obj.mahfth, None)
-            if mahfth_error:
-                return JsonResponse({"error": mahfth_error}, status=403)
-            if unit and mah and unit.mahfth_id != mah.id:
-                return JsonResponse({"error": "Unit is outside the selected directorate"}, status=403)
+            mah=Mahfth.objects.get(id=hid_mah)if hid_mah else None
         except Exception as e:
             return JsonResponse({"error": f"Related object error: {str(e)}"}, status=400)
 
@@ -4124,23 +4033,20 @@ from .models import Unit
 def get_units_by_mderah(request):
     if request.method == "POST":
         mderah_id = request.POST.get('mderah_id')
-        units = Unit.objects.filter(
-            mahfth__in=visible_mahfth_list(request.user),
-            mahfth_id=mderah_id,
-        ).values('id', 'name')
+        units = Unit.objects.filter(mahfth_id=mderah_id).values('id', 'name')
         return JsonResponse({'units': list(units)})
     return JsonResponse({'units': []}, status=400)
 @user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_shift_form_hadod'))
 def search_edit_form(request, id):
-    form_obj = get_scoped_form_or_404(request, id)
+    form_obj = get_object_or_404(Form, id=id)
     res=Resone.objects.get(id=2)
     mas = report_masahi.objects.filter(name="مساحي",form=form_obj,tr_masah=True,rafth_adarah_generl=True,resone=res).first()
     if not mas:
             messages.error(request, "لايمكنك تعديل بيانات  التقرير")
             return redirect('masha:search_page')
-    form_a = get_scoped_form_or_404(request, id)
+    form_a = get_object_or_404(Form, id=id)
     mderah=visible_mahfth_list(request.user)
-    ss = form_a
+    ss=Form.objects.get(id=id)
     xx=Type_map.objects.all()
     kah=Type_kah.objects.all()
     seo=Type_seol.objects.all()
@@ -4162,8 +4068,8 @@ def search_edit_form_talb(request, id):
     saf = Safah.objects.all()
     val = Vald_doc.objects.all()
     val_m = Vald_tharb.objects.all()
-    ass = get_scoped_form_or_404(request, id)
-    form_a = ass
+    ass = get_object_or_404(Form,id=id)
+    form_a=Form.objects.get(id=id)
     zz = request.user
 
     mah = visible_mahfth_list(request.user)
@@ -4186,7 +4092,7 @@ def search_edit_form_talb(request, id):
 @mahfth_screen_required
 def edit_form_talb(request, id):
     if request.method == "POST":
-        ass = get_scoped_form_or_404(request, id)
+        ass = get_object_or_404(Form, id=id)
         errors = {}
 
         # التحقق من الحقول المطلوبة
@@ -4249,7 +4155,6 @@ def live_search_ajax_hadod_a(request):
         matches = Form.objects.filter(
             Q(name__icontains=query) | Q(id__icontains=query)
         )[:50]  # الحد الأعلى للنتائج
-        matches = filter_forms(matches, request.user)
 
         for obj in matches:
             results.append({
@@ -4360,8 +4265,8 @@ def edit_form(request, id):
 @mahfth_screen_required
 def astkmal_report_masah_nah(request,id):
    
-      form = get_scoped_form_or_404(request, id)
-      form_a = form
+      form=Form.objects.get(id=id)
+      form_a=Form.objects.get(id=id)
      
       unt = Unit.objects.filter(mahfth=form.mahfth)
 
@@ -4410,9 +4315,7 @@ def add_abade_report_masahi(request, id):
             seol = Type_seol.objects.get(name=hid_seol)
             natural = Type_natural.objects.get(id=hid_nat)
             block = Type_block.objects.get(id=hid_block)
-            form_obj = get_scoped_form_or_404(request, id)
-            if unit.mahfth_id != form_obj.mahfth_id:
-                return HttpResponse("Unit is outside the form's directorate", status=403)
+            form_obj = Form.objects.get(id=id)
         except Exception as e:
             return HttpResponse(f"Error: {str(e)}", status=400)
 
@@ -4438,7 +4341,7 @@ def add_abade_report_masahi(request, id):
         mass.mnsobe=mnsobe
         mass.save()
         aa=mass.form.id
-        form = form_obj
+        form,created=Form.objects.get_or_create(id=aa)
         xx=form.width_street_big_not
         asd=10.0
         if xx<asd:
@@ -4504,15 +4407,13 @@ def agree_rafth_report_masah_nah_tamp(request):
     }
 
     return render(request, 'masha/agree_rafth_report_masah_nah_tamp.html', context)
-@department_head_or_system_manager_required
 def serch_talbt_report_by_mnager_nah(request):
-    form=filter_reports(report_masahi.objects.filter(
-            tr_masah=True,
+    form=report_masahi.objects.filter( tr_masah=True,
             return_masah_jm=False,
             rafth_adarah_generl=False,
             masahi_convert=False,
             agree_adarah_generl_by_manager_mahfth=False,
-            rafth_adarah_generl_by_manager_mahfth=False), request.user)
+            rafth_adarah_generl_by_manager_mahfth=False)
     context={'form':form}
     return render(request, 'masha/serch_talbt_report_by_mnager_nah.html',context)
 from django.http import JsonResponse
@@ -4611,11 +4512,13 @@ def live_search_ajax_report_masha_to_agree_manager_generl_mang(request):
             "type_map"
         ).filter(
             filters,
-            agree_adarah_generl_by_manager_mahfth=True,
-            masahi_convert=False,
-            rafth_adarah_generl_by_manager_mahfth=False,
-        )[:50]
-        matches = filter_reports(matches, request.user)
+            agree_adarah_generl_by_manager_mahfth=True
+        )
+        # ما رحّله رئيس القسم للإدارة العامة يختفي من قائمته،
+        # لكنه يبقى ظاهراً في قائمة الإدارة العامة.
+        if is_head_user(request.user):
+            matches = matches.filter(masahi_convert=False, return_masah_jm=False)
+        matches = filter_reports(matches[:50], request.user)
 
         for obj in matches:
             results.append({
@@ -4634,22 +4537,20 @@ def live_search_ajax_report_masha_to_agree_manager_generl_mang(request):
 def serch_agree_tsrah_karoj(request):
     return render(request,'masha/serch_agree_tsrah_karoj.html',context)
 
-@space_roles_only(block_management=True)
 def show_convert_to_mashi_from_fero(request):
             show_manger_form=report_masahi.objects.filter(tr_masah=True,return_masah_jm=False,rafth_adarah_generl=False,masahi_convert=True,convert_agin=False,convert_agin_agree=False,agree_adarah_generl_by_manager_mahfth=False,rafth_adarah_generl_by_manager_mahfth=False)
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero.html',context)
-@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
-@mahfth_screen_required
 def show_convert_to_mashi_from_fero_nah(request):
-            show_manger_form=filter_reports(report_masahi.objects.filter(
-                agree_adarah_generl_by_manager_mahfth=True,
-                masahi_convert=False,
-                rafth_adarah_generl_by_manager_mahfth=False,
-            ), request.user)
+            show_manger_form=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True)
+            # التقرير الذي يرحّله رئيس القسم للإدارة العامة يخرج من قائمته،
+            # ويبقى في قائمة الإدارة العامة (نفس علم الموافقة محفوظاً).
+            if is_head_user(request.user):
+                show_manger_form=show_manger_form.filter(
+                    masahi_convert=False, return_masah_jm=False
+                )
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero_nah.html',context)
-@space_roles_only(block_management=True)
 def show_convert_to_mashi_from_fero_nah_adrah(request):
         show_manger_form=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True)
         context={'show_manger_form':show_manger_form}
@@ -4689,18 +4590,16 @@ def live_search_ajax_report_masha_to_rafth_aldarah_to_report(request):
             })
 
     return JsonResponse({"results": results})
-@space_roles_only(block_management=True)
 def rafth_by_manager_aldarah_generl_nah(request):
            show_manger_form=report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True)
            context={'show_manger_form':show_manger_form}
            return render(request,'masha/reason_rafth_managmnat_generl.html',context)
-@department_head_or_system_manager_required
 def reason_rafth_managmnat_generl_to_convert_maderah(request):
-           show_manger_form=filter_reports(report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True), request.user)
+           show_manger_form=report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True)
            context={'show_manger_form':show_manger_form}
            return render(request,'masha/reason_rafth_managmnat_generl_to_convert_maderah.html',context)
-@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
 @mahfth_screen_required
+
 def show_manager_masah_nah(request):
     # جلب المستخدم الحالي ورقم الهاتف
     zz = request.user
@@ -4735,7 +4634,11 @@ def show_manager_masah_nah(request):
         report_masahi.objects.filter(rafth_adarah_generl=True), request.user
     ).count()
     num_unread_agree_mahfth = filter_reports(
-        report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True), request.user
+        report_masahi.objects.filter(
+            agree_adarah_generl_by_manager_mahfth=True,
+            masahi_convert=False,
+            return_masah_jm=False,
+        ), request.user
     ).count()
     num_unread_rafth_mahfth = filter_reports(
         report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True), request.user
@@ -4752,28 +4655,25 @@ def show_manager_masah_nah(request):
     }
 
     return render(request, 'masha/show_manager_masah_nah.html', context)
-@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
-@mahfth_screen_required
+@login_required
 def show_report_nah_by_manager(request):
-    print_report_x= filter_reports(report_masahi.objects.filter(
+    print_report_x= report_masahi.objects.filter( 
              return_masah_jm=True,
             rafth_adarah_generl=False,
             masahi_convert=False,
             rafth_adarah_generl_by_manager_mahfth=False
-            ), request.user)
+            ) 
     context={'print_report_x':print_report_x} 
     return render(request,'masha/print_report_mashi_report_nah.html',context)
 def show_report_nah_by_manager_rafth(request):
-    print_report_x=filter_reports(report_masahi.objects.filter(rafth_adarah_generl=True), request.user)
+    print_report_x= report_masahi.objects.filter( rafth_adarah_generl=True) 
     context={'print_report_x':print_report_x} 
     return render(request,'masha/show_report_nah_by_manager_rafth.html',context)
-@department_head_or_system_manager_required
-def serch_in_screen_prisdent_masah_talbt(request):
+def  serch_in_screen_prisdent_masah_talbt(request):
     return render(request,'masha/serch_in_screen_talbt_date.html')
 
 
 @csrf_exempt
-@department_head_or_system_manager_required
 def serch_in_screen_prisdent_masah_talbt_to_data_base(request):
     if request.method == 'GET':
         # استدعاء التواريخ من الفورم
@@ -4799,7 +4699,7 @@ def serch_in_screen_prisdent_masah_talbt_to_data_base(request):
 
         # فلترة البيانات
         # إذا كان الحقل DateTimeField، استخدم __date__range
-        form = filter_forms(Form.objects.filter(sent_att__date__range=(start_date, end_date)), request.user)
+        form = Form.objects.filter(sent_att__date__range=(start_date, end_date))
 
         context = {
             'form': form,
@@ -4816,7 +4716,6 @@ from django.http import JsonResponse
 
 
 @mahfth_screen_required
-@department_head_or_system_manager_required
 def show_manager_masah_nah_json(request):
     user = request.user
 
@@ -4846,7 +4745,11 @@ def show_manager_masah_nah_json(request):
         report_masahi.objects.filter(rafth_adarah_generl=True), user
     ).count()
     num_unread_agree_mahfth = filter_reports(
-        report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True), user
+        report_masahi.objects.filter(
+            agree_adarah_generl_by_manager_mahfth=True,
+            masahi_convert=False,
+            return_masah_jm=False,
+        ), user
     ).count()
     num_unread_rafth_mahfth = filter_reports(
         report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True), user
@@ -4868,19 +4771,21 @@ def show_manager_masah_nah_json(request):
 
 @mahfth_screen_required
 def show_report_masah_by_eng_data(request,id):
-     mas=get_object_or_404(filter_reports(report_masahi.objects.all(), request.user), id=id)
+     mas=report_masahi.objects.get(id=id)
      resone=Resone.objects.all()
      
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
      context={'mas':mas,'f':f,'resone':resone}
      return render(request,'masha/show_report_masah_by_eng_data.html',context)
-@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
 @mahfth_screen_required
 def show_report_adrah(request,id):
-     mas=get_object_or_404(filter_reports(report_masahi.objects.all(), request.user), id=id)
+     # space يحدّد الشاشة التي جاء منها المستخدم: إدارة عامة أم رئيس قسم.
+     mas = get_object_or_404(
+         filter_reports(report_masahi.objects.all(), request.user), id=id
+     )
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
-     send_back_to_management = is_manager(request.user) or get_space_role(request.user) == SPACE_ROLE_AREA_MANAGER
-     context={'mas':mas,'f':f,'send_back_to_management':send_back_to_management}
+     space = 'management' if request.GET.get('space') == 'management' else 'head'
+     context={'mas':mas,'f':f,'space':space}
      return render(request,'masha/show_report_adrah.html',context)
 def masahi_convert(request,id):
         masahi_convert=request.POST.get('masahi_convert')
@@ -4931,18 +4836,24 @@ def send_sms_safe(phone, message):
 
 
 @csrf_exempt
-@mahfth_screen_required
 def agree_report_masahi_by_manager_mangmant(request, id):
-    exit_action = request.POST.get('exit')
+    exit_action = (request.POST.get('exit') or '').strip()
     no_salm_5 = request.POST.get('no_salm_5', '')
     resone_report_stop = request.POST.get('resone_report_stop', '')
     text_36 = request.POST.get('text36', '')
 
 
-    report = get_object_or_404(filter_reports(report_masahi.objects.all(), request.user), id=id)
+    try:
+        report = report_masahi.objects.get(id=id)
+    except report_masahi.DoesNotExist:
+        return HttpResponse("Report not found", status=404)
+
     form_instance = report.form
 
     if exit_action == 'منجزة':
+        # التقرير المعتمد يخرج من قوائم الانتظار ويظهر في "التقارير الجاهزة".
+        report.agree_adarah_generl_by_manager_mahfth = False
+        report.rafth_adarah_generl_by_manager_mahfth = False
         report.return_masah_jm = True
         report.masahi_convert = False
         report.ajaml=text_36
@@ -4974,36 +4885,47 @@ def agree_report_masahi_by_manager_mangmant(request, id):
 
 
 @csrf_exempt
-@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
 @mahfth_screen_required
 def agree_report_masahi_by_manager_mangmant_adarah(request, id):
-    exit_action = request.POST.get('exit')
+    exit_action = (request.POST.get('exit') or '').strip()
     no_salm_5 = request.POST.get('no_salm_5', '')
     text_36 = request.POST.get('text36', '')
+    # الشاشة التي جاء منها الطلب: إدارة عامة أو رئيس قسم. المدير (staff)
+    # يعامل كإدارة عامة حتى لو فتح الرابط مباشرة.
+    is_management_action = (
+        request.POST.get('space') == 'management' or is_manager(request.user)
+    )
 
-    report = get_object_or_404(filter_reports(report_masahi.objects.all(), request.user), id=id)
-    form_instance = report.form
+    # تقييد النطاق: لا يستطيع رئيس قسم تعديل تقرير مديرية أخرى حتى لو عرف رقمه.
+    report = get_object_or_404(
+        filter_reports(report_masahi.objects.all(), request.user), id=id
+    )
 
     if exit_action == 'منجزة':
-        # رئيس القسم يرحّل التقرير المقبول من إدارة المديرية إلى الإدارة العامة.
-        # يبقى علم الموافقة محفوظاً لتظهر المعاملة في قائمة الإدارة العامة،
-        # بينما يزيلها masahi_convert من قائمة الترحيل الخاصة برئيس القسم.
-        is_head_transfer = (
-            get_space_role(request.user) == SPACE_ROLE_HEAD
-            or (not get_space_role(request.user) and not is_manager(request.user))
-        )
-        if is_head_transfer:
-            report.masahi_convert = True
+        report.ajaml = text_36
+
+        if not is_management_action:
+            # موافقة رئيس القسم: يختفي التقرير من قائمته ويظهر في
+            # "التقارير الجاهزة". يبقى علم الموافقة محفوظاً ليستمر ظهور
+            # المعاملة في قوائم مدير الإدارة العامة (مقبول/مرفوض).
+            report.rafth_adarah_generl_by_manager_mahfth = False
+            report.rafth_adarah_generl = False
+            report.masahi_convert = False
+            report.return_masah_jm = True
         else:
+            # موافقة مدير الإدارة العامة: تبقى المعاملة في قوائمه:
+            # الوارد من الفروع ثم المقبولة من الإدارة.
             report.agree_adarah_generl_by_manager_mahfth = True
             report.masahi_convert = False
-        report.ajaml=text_36
 
-
-    elif exit_action.strip() == 'رفض':
+    elif exit_action == 'رفض':
+        # علم الرفض يظهر المعاملة في قائمة "المرفوضة من الإدارة"
+        # لكل من رئيس القسم ومدير الإدارة العامة.
         report.rafth_adarah_generl_by_manager_mahfth = True
+        report.return_masah_jm = False
+        report.agree_adarah_generl_by_manager_mahfth = False
         report.masahi_convert = False
-        report.resone_refth_adrah=no_salm_5
+        report.resone_refth_adrah = no_salm_5
     else:
         return HttpResponse("Invalid action", status=400)
 
@@ -5061,7 +4983,6 @@ def red_bol_massage(request):
 
 
 @mahfth_screen_required
-@department_head_or_system_manager_required
 def asder_nah_report_masah(request):
     return render(request,'masha/asder_nah_report_masah.html')
 @mahfth_screen_required
@@ -5148,32 +5069,48 @@ def image_to_base64(image_path):
 
         
 
-@login_required
 def show_managmant_masah(request)  :
-    role_landing = role_landing_url(request.user)
-    if role_landing:
-        return redirect(role_landing)
     num_unread =Form.objects.filter(tr_masah=False,show_tasrah_karoj=True).count()
     context={'num_unread':num_unread}
     return render(request,'masha/show_managmant_masah.html',context)
     
-@space_roles_only(block_management=True)
+def management_dashboard_context():
+    """عدادات الأقسام الثلاثة في صفحة مدير الإدارة العامة."""
+    return {
+        'num_unread': Conection.objects.filter().count(),
+        # الوارد من الفروع
+        'num_unread_1': report_masahi.objects.filter(
+            masahi_convert=True,
+            convert_agin=False,
+            convert_agin_agree=False,
+            agree_adarah_generl_by_manager_mahfth=False,
+            rafth_adarah_generl_by_manager_mahfth=False,
+        ).count(),
+        # المقبولة من الإدارة
+        'num_unread_agree': report_masahi.objects.filter(
+            agree_adarah_generl_by_manager_mahfth=True,
+            rafth_adarah_generl_by_manager_mahfth=False,
+        ).count(),
+        # المرفوضة من الإدارة
+        'num_unread_rafth': report_masahi.objects.filter(
+            rafth_adarah_generl_by_manager_mahfth=True
+        ).count(),
+    }
+
+
 @mahfth_screen_required
 def show_managment_nah(request):
-    return render(request,'masha/show_managment_nah.html')
+    return render(request, 'masha/show_managment_nah.html', management_dashboard_context())
+
+
 @mahfth_screen_required
 def werd_sader_manager(request):
     return render(request,'masha/werd_sader_manager.html')
-@space_roles_only(block_management=True)
+
+
 @mahfth_screen_required
 def screen_adrat_ver(request):
-    num_unread =Conection.objects.filter().count()
-    num_unread_1 =report_masahi.objects.filter(masahi_convert=True,convert_agin=False,convert_agin_agree=False,agree_adarah_generl_by_manager_mahfth=False,rafth_adarah_generl_by_manager_mahfth=False).count()
-    num_unread_agree=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True,rafth_adarah_generl_by_manager_mahfth=False).count()
-    num_unread_rafth =report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True).count()
-    context={'num_unread':num_unread,'num_unread_1':num_unread_1,'num_unread_agree':num_unread_agree,'num_unread_rafth':num_unread_rafth}
-    return render(request,'masha/show_managment_nah.html',context)
-@space_roles_only(block_management=True)
+    return render(request, 'masha/show_managment_nah.html', management_dashboard_context())
 @mahfth_screen_required
 def get_realtime_counts(request):
     num_unread = Conection.objects.filter().count()
@@ -5195,11 +5132,10 @@ def get_realtime_counts(request):
         "num_unread_rafth":num_unread_rafth
 
     })
-@login_required
 def screen_paesdint_masah(request):
-    role_landing = role_landing_url(request.user)
-    if role_landing:
-        return redirect(role_landing)
+
+    
+
     return render(request,'masha/show_managmant_masah.html')
 @mahfth_screen_required
 def screen_interface_line_tslime_nah(request):
@@ -5431,8 +5367,6 @@ def add_form_new_talb(request):
     return response
 
 
-@space_roles_only(block_management=True)
-@mahfth_screen_required
 def screen_enter_number_mahther_and_number_strate_and_unit(request):
     mah=visible_mahfth_list(request.user)
     
@@ -5609,7 +5543,7 @@ def serch_data_report_mashi_to_update(request):
 from django.forms import modelformset_factory
 @mahfth_screen_required
 def edit_form_shifts(request, id):
-    form_obj = get_scoped_form_or_404(request, id)
+    form_obj = get_object_or_404(Form, id=id)
 
     # السماح فقط إذا tr_masah=False
     mas = report_masahi.objects.filter(
@@ -5675,14 +5609,14 @@ def edit_form_shifts(request, id):
 from django.forms import modelformset_factory
 @mahfth_screen_required
 def edit_form_shifts_nah(request,id):
-        form_obj = get_scoped_form_or_404(request, id)
+        form_obj = get_object_or_404(Form, id=id)
         
         res=Resone.objects.get(id=1)
         mas = report_masahi.objects.filter(name="مساحي",form=form_obj,tr_masah=True,rafth_adarah_generl=True,resone=res).first()
+        flas=mas.id
         if not mas:
             messages.error(request, "لا يمكن التعديل على هذا السجل لأن التقرير تم اعتماده أو ترحيله سابقاً.")
             return redirect('masha:serch_data_report_mashi_to_update')
-        flas = mas.id
         ShiftFormSet = modelformset_factory(Shift_form_hadod,form=Shift_form_hadodForm,extra=0 )
         queryset = Shift_form_hadod.objects.filter(form=form_obj, report_masahi=mas)
         if request.method == 'POST':
@@ -5708,9 +5642,8 @@ def edit_form_shifts_nah(request,id):
         else:
                 formset = ShiftFormSet(queryset=queryset,form_kwargs={'form_instance': form_obj,'report_instance': mas})
                 return render(request, 'masha/adit_form_shift_update_nah.html', {'form_obj': form_obj,'formset': formset})
-@mahfth_screen_required
 def map_project(request,id):
-    ss = get_scoped_form_or_404(request, id)
+    ss= Form.objects.get(id=id)
     locations = Location.objects.filter(form=ss)
     m = folium.Map(location=[15.369445, 44.191006], zoom_start=9)
     latitudes = []
@@ -5868,27 +5801,24 @@ def red_bol(request,id) :
     context={'f':f}
     return render(request,'masha/red_bol.html',context)
 
-@space_roles_only(block_management=True)
 def show_conecctions(request):
     conection=Conection.objects.filter(red_bol=False)
     context={'conection':conection}
     return render(request, 'masha/massage.html', context)
-@mahfth_screen_required
 def add_location(request,id):
-    scoped_form = get_scoped_form_or_404(request, id)
     if request.method == "POST":
         form = Location_UtmForm(request.POST)
         if form.is_valid():
+                   f=Form.objects.get(id=id)
                    location_instance = form.save(commit=False)  # حفظ النموذج بدون حفظه في قاعدة البيانات
-                   location_instance.form = scoped_form
-                   location_instance.save()
+                   location_instance.form = f 
+                   form.save()
                    return redirect('masha:agree_tsrah_xx')  # قم بتعديل الرابط حسب الحاجة
     else:
         form = Location_UtmForm()
     return render(request, 'masha/add_location_Utm.html', {'form': form})
-@mahfth_screen_required
 def location_list(request,id):
-  r = get_scoped_form_or_404(request, id)
+  r=Form.objects.get(id=id)
   locations=Location_Utm.objects.filter(form=r)
   context={'locations':locations}
   return render(request, 'masha/location_list.html',context)
@@ -5896,12 +5826,11 @@ def location_list(request,id):
 def show_tsrah_exit_eng_by_manger (request):
     
 
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
     context={'form':form}
     return render(request,'masha/show_tsrah_exit_eng_by_manger.html',context)
-@department_head_or_system_manager_required
 def show_tsrah_exit_eng_by_manger_by_manger(request):
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False).order_by('-id')
     context={'form':form}
     return render(request,'masha/show_tsrah_exit_eng_by_presdent_mashi.html',context)
 
@@ -5938,7 +5867,7 @@ def live_search_ajax_tsrah_exit_tsrah_karoj(request):
 def show_tsrah_exit_eng_by_manger_report (request):
     
 
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=True,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
     context={'form':form}
     return render(request,'masha/reprt_tsrah_exit_nah_by_bana.html',context)
 def live_search_tsrah_bana_report(request):
@@ -5980,10 +5909,10 @@ from .models import Form
 
 # الصفحة الرئيسية لعرض التصاريح
 def show_tsrah_exit_eng_by_manger_report_astshrah(request):
-    forms = filter_forms(Form.objects.filter(
+    forms = Form.objects.filter(
         show_tasrah_karoj=True,
         hidden_ansh_hdm="استشارة"
-    ), request.user).order_by('-id')
+    ).order_by('-id')
     context = {'forms': forms}
     return render(request, 'masha/report_tsrah_nah.html', context)
 
@@ -6025,7 +5954,6 @@ from django.http import HttpResponseForbidden
 def is_admin_or_has_permission(user):
     return user.is_superuser or user.has_perm("masha.add_form")
 
-@coordinator_or_manager_required
 @login_required
 def astshr(request):
     # الوصول مسموح للمدير أو لمستخدم مرتبط بمدينة/مديرية،
@@ -6335,7 +6263,6 @@ def unit_create(request):
 from django.http import JsonResponse
 from .models import Form, Mahfth, typ, Type_talb_astshr
 
-@coordinator_or_manager_required
 def form_add_masah_nah(request):
     if request.method != "POST":
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
@@ -6344,10 +6271,8 @@ def form_add_masah_nah(request):
     data = request.POST
     files = request.FILES
 
-    # لا يُسمح للمستخدم العادي بإنشاء طلب خارج مديريته أو دون ربطه بها.
-    mahfth, mahfth_error = resolve_mahfth_for_user(request.user, data.get('hid_mah'))
-    if mahfth is None:
-        return JsonResponse({'error': mahfth_error or 'مديرية غير صحيحة'}, status=403)
+    # الحصول على العناصر المطلوبة من قاعدة البيانات إذا موجودة
+    mahfth = Mahfth.objects.get(id=data.get('hid_mah')) if data.get('hid_mah') else None
     typ_a = typ.objects.get(name=data.get('hid_type_document')) if data.get('hid_type_document') else None
     type_talb_astshr = Type_talb_astshr.objects.get(id=data.get('service_list_form_x')) if data.get('service_list_form_x') else None
 
@@ -6373,9 +6298,6 @@ def form_add_masah_nah(request):
         name_wk=data.get('f2'),
         phone_wk=data.get('f4'),
         card_id_wk=data.get('f6'),
-        content=data.get('content', ''),
-        resone_refth=data.get('resone_refth', ''),
-        service_bana=data.get('service_bana', ''),
         hidden_ansh_hdm=data.get('hid_ansh_hdm'),
         type_talb_astshr=type_talb_astshr,
         mahfth=mahfth
@@ -6749,12 +6671,11 @@ def live_search_ajax_report_masha_print_archif(request):
 
     return JsonResponse({"results": results})
     return JsonResponse(results, safe=False)
-@department_head_or_system_manager_required
+@user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_unit'))
 def print_report(request):
-    print_report_x= filter_reports(report_masahi.objects.filter(return_masah_jm=True, print_nah=False), request.user)
+    print_report_x= report_masahi.objects.filter( return_masah_jm=True, print_nah=False )
     context={'print_report_x':print_report_x}
     return render(request,'masha/print_report.html',context)
-@coordinator_or_manager_required
 @mahfth_screen_required
 def interface_nah_astshr(request):
     num_unread=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,hidden_ansh_hdm="استشارة"), request.user).count()
@@ -6763,31 +6684,31 @@ def interface_nah_astshr(request):
     context={'num_unread':num_unread,'num_unread_3':num_unread_3,'num_unread_2':num_unread_2}
     return render(request,'masha/interface_nah.html',context)
 def show_tsrah_exit_eng_by_manger_astsherh(request):
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False,hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False,hidden_ansh_hdm="استشارة").order_by('-id')
     context={"form":form}
     return render(request,'masha/show_tsrah_exit_eng_by_manger_ashchr.html',context)
 def print_talbt_nah(request):
-        form=filter_forms(Form.objects.filter(hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
+        form=Form.objects.filter(hidden_ansh_hdm="استشارة").order_by('-id')
         context={"form":form}
         return render(request,'masha/print_talbt_nah.html',context)
 def print_talbt_nah_bana(request):
 
-        form=filter_forms(Form.objects.filter(hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
+        form=Form.objects.filter(hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
         context={"form":form}
         return render(request,'masha/print_talbt_nah.html',context)
     
 
 def rafth_mamlah_form_by_manger(request):
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
     context={'form':form}
     return render(request,'masha/reasone_rafth.html',context)
 def rafth_mamlah_form_by_manger_astsherh(request):
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="استشارة").order_by('-id')
     context={'form':form}
     return render(request,'masha/reason_rafth_astshr.html',context)
 
 def rafth_mamlah_form_by_manger_report(request):
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
     context={'form':form}
     return render(request,'masha/reasone_rafth_report.html',context)
 
@@ -6822,12 +6743,12 @@ def live_search_rafth_mamlah_bana(request):
     return JsonResponse({"results": results})
 
 def rafth_mamlah_form_by_manger_report_astsherh(request):
-    form = filter_forms(Form.objects.filter(
+    form = Form.objects.filter(
         show_tasrah_karoj=False,
         rafth_maml=True,
         talb_astkml=False,
         hidden_ansh_hdm="استشارة"
-    ), request.user).order_by('-id')
+    ).order_by('-id')
 
     context = {'form': form}
     return render(request, 'masha/reson_refth_astsharah_report.html', context)
@@ -6866,20 +6787,20 @@ def live_search_rafth_mamlah(request):
 
     return JsonResponse({"results": results})
 def talb_astkmal_mamlah(request):
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_astkmal=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_astkmal=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
     context={'form':form}
     return render(request,'masha/talb_astkmal_doc.html',context)
 def talb_astkmal_mamlah_astsherh(request):
-      form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_astkmal=False,hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
+      form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_astkmal=False,hidden_ansh_hdm="استشارة").order_by('-id')
       context={'form':form}
       return render(request,'masha/talb_astkmal_doc_asthshrah.html',context)
 
 def talb_astkmal_mamlah_report(request):
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
     context={'form':form}
     return render(request,'masha/talb_astkmal_report_bana_nah.html',context)
 def talb_astkmal_mamlah_report_astsherh(request):
-    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
+    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,hidden_ansh_hdm="استشارة").order_by('-id')
     context={'form':form}
     return render(request,'masha/talb_astkmal_doc_report.html',context)
 from django.http import JsonResponse
@@ -7048,7 +6969,6 @@ def report_state_talbat_nah_json_astsherh(request):
     })
 
 
-@coordinator_or_manager_required
 @mahfth_screen_required
 def enter_data_report_masahi_screen(request):
     num_unread=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).count()
@@ -7056,3 +6976,4 @@ def enter_data_report_masahi_screen(request):
     num_unread_2=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).count()
     context={'num_unread':num_unread,'num_unread_3':num_unread_3,"num_unread_2":num_unread_2}
     return render(request,'masha/enter_data_report_masahi_screen.html',context)
+    

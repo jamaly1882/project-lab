@@ -68,7 +68,6 @@
                 <th>طباعة التقرير</th>
                  
                   <th>الوحدة</th>
-                <th>القطاع</th>
 
                 <th>المديرية</th>
                  <th>نوع الوثيقة</th>
@@ -87,7 +86,6 @@
 
  
                         <td>{{item.form.unit.name}}</td>
-                             <td>{{item.gata_name}}</td>
                             <td>{{item.form.mahfth.name}}</td>
                                 <td>{{item.type_map.name}}</td>
                           <td>{{item.form.name}}</td>
@@ -136,7 +134,6 @@ $(document).ready(function(){
 
  
                         <td>${item.unit_name}</td>
-                             <td>${item.gata_name}</td>
                             <td>${item.mahfth_name}</td>
                                 <td>${item.typ_name}</td>
                           <td>${item.name}</td>
@@ -145,7 +142,7 @@ $(document).ready(function(){
                         </tr>`;
                     });
                 } else {
-                    tbody = "<tr><td colspan='7' style='text-align:center'>لا توجد نتائج</td></tr>";
+                    tbody = "<tr><td colspan='6' style='text-align:center'>لا توجد نتائج</td></tr>";
                 }
                 $('#results_body').html(tbody);
             },
