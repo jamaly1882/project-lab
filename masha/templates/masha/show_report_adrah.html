@@ -120,6 +120,7 @@ input[type="checkbox"]:checked + label span::after {
                 <div class="col-lg-12 form-group">                   
        <input type="hidden" value="{{mas.id}}" 
         id="number">
+       <input type="hidden" value="{{ space }}" id="approval_space">
 
                
                     <div class="margin-right-15 templatemo-inline-block">
@@ -632,6 +633,7 @@ var  form_data = new FormData();
 form_data.append('form_id', document.querySelector('#form_id').value);
 form_data.append('no_salm_5', document.querySelector('#no_salm_5').value);
 form_data.append('text36', document.querySelector('#text36').value);
+form_data.append('space', document.querySelector('#approval_space').value);
 
 var xhr = new XMLHttpRequest();
 xhr.open('POST', '/masha/agree_report_masahi_by_manager_mangmant_adarah/' + number);
@@ -651,7 +653,9 @@ Swal.fire({
        
         
         // توجيه المستخدم إلى الصفحة الجديدة
-         window.location.href="{% url 'masha:screen_adrat_ver' %}"
+         window.location.href = document.querySelector('#approval_space').value === 'management'
+            ? "{% url 'masha:screen_adrat_ver' %}"
+            : "{% url 'masha:show_manager_masah_nah' %}"
       
     }
 });

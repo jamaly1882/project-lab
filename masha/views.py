@@ -91,6 +91,15 @@ def is_manager(user):
     )
 
 
+def is_head_user(user):
+    """رئيس القسم: كل مستخدم مربوط بمديرية وليس مدير نظام.
+
+    لا يوجد في هذا المشروع نظام أدوار منفصل (SPACE_ROLE_HEAD وغيره)،
+    لذا يُعتبر غير المدير رئيسَ قسم، تماشياً مع منطق الشاشات الحالية.
+    """
+    return bool(getattr(user, "is_authenticated", False) and not is_manager(user))
+
+
 def can_access_mahfth_screen(user):
     """الوصول إلى شاشات الأقسام: المدير أو مستخدم مرتبط بمدينة/مديرية."""
     return is_manager(user) or _user_in_scope(user)
@@ -4504,8 +4513,12 @@ def live_search_ajax_report_masha_to_agree_manager_generl_mang(request):
         ).filter(
             filters,
             agree_adarah_generl_by_manager_mahfth=True
-        )[:50]
-        matches = filter_reports(matches, request.user)
+        )
+        # ما رحّله رئيس القسم للإدارة العامة يختفي من قائمته،
+        # لكنه يبقى ظاهراً في قائمة الإدارة العامة.
+        if is_head_user(request.user):
+            matches = matches.filter(masahi_convert=False, return_masah_jm=False)
+        matches = filter_reports(matches[:50], request.user)
 
         for obj in matches:
             results.append({
@@ -4530,6 +4543,12 @@ def show_convert_to_mashi_from_fero(request):
             return render(request,'masha/show_convert_to_mashi_from_fero.html',context)
 def show_convert_to_mashi_from_fero_nah(request):
             show_manger_form=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True)
+            # التقرير الذي يرحّله رئيس القسم للإدارة العامة يخرج من قائمته،
+            # ويبقى في قائمة الإدارة العامة (نفس علم الموافقة محفوظاً).
+            if is_head_user(request.user):
+                show_manger_form=show_manger_form.filter(
+                    masahi_convert=False, return_masah_jm=False
+                )
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero_nah.html',context)
 def show_convert_to_mashi_from_fero_nah_adrah(request):
@@ -4615,7 +4634,11 @@ def show_manager_masah_nah(request):
         report_masahi.objects.filter(rafth_adarah_generl=True), request.user
     ).count()
     num_unread_agree_mahfth = filter_reports(
-        report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True), request.user
+        report_masahi.objects.filter(
+            agree_adarah_generl_by_manager_mahfth=True,
+            masahi_convert=False,
+            return_masah_jm=False,
+        ), request.user
     ).count()
     num_unread_rafth_mahfth = filter_reports(
         report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True), request.user
@@ -4722,7 +4745,11 @@ def show_manager_masah_nah_json(request):
         report_masahi.objects.filter(rafth_adarah_generl=True), user
     ).count()
     num_unread_agree_mahfth = filter_reports(
-        report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True), user
+        report_masahi.objects.filter(
+            agree_adarah_generl_by_manager_mahfth=True,
+            masahi_convert=False,
+            return_masah_jm=False,
+        ), user
     ).count()
     num_unread_rafth_mahfth = filter_reports(
         report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True), user
@@ -4752,9 +4779,13 @@ def show_report_masah_by_eng_data(request,id):
      return render(request,'masha/show_report_masah_by_eng_data.html',context)
 @mahfth_screen_required
 def show_report_adrah(request,id):
-     mas=report_masahi.objects.get(id=id)
+     # space يحدّد الشاشة التي جاء منها المستخدم: إدارة عامة أم رئيس قسم.
+     mas = get_object_or_404(
+         filter_reports(report_masahi.objects.all(), request.user), id=id
+     )
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
-     context={'mas':mas,'f':f}
+     space = 'management' if request.GET.get('space') == 'management' else 'head'
+     context={'mas':mas,'f':f,'space':space}
      return render(request,'masha/show_report_adrah.html',context)
 def masahi_convert(request,id):
         masahi_convert=request.POST.get('masahi_convert')
@@ -4806,7 +4837,7 @@ def send_sms_safe(phone, message):
 
 @csrf_exempt
 def agree_report_masahi_by_manager_mangmant(request, id):
-    exit_action = request.POST.get('exit')
+    exit_action = (request.POST.get('exit') or '').strip()
     no_salm_5 = request.POST.get('no_salm_5', '')
     resone_report_stop = request.POST.get('resone_report_stop', '')
     text_36 = request.POST.get('text36', '')
@@ -4820,6 +4851,9 @@ def agree_report_masahi_by_manager_mangmant(request, id):
     form_instance = report.form
 
     if exit_action == 'منجزة':
+        # التقرير المعتمد يخرج من قوائم الانتظار ويظهر في "التقارير الجاهزة".
+        report.agree_adarah_generl_by_manager_mahfth = False
+        report.rafth_adarah_generl_by_manager_mahfth = False
         report.return_masah_jm = True
         report.masahi_convert = False
         report.ajaml=text_36
@@ -4853,27 +4887,45 @@ def agree_report_masahi_by_manager_mangmant(request, id):
 @csrf_exempt
 @mahfth_screen_required
 def agree_report_masahi_by_manager_mangmant_adarah(request, id):
-    exit_action = request.POST.get('exit')
+    exit_action = (request.POST.get('exit') or '').strip()
     no_salm_5 = request.POST.get('no_salm_5', '')
     text_36 = request.POST.get('text36', '')
+    # الشاشة التي جاء منها الطلب: إدارة عامة أو رئيس قسم. المدير (staff)
+    # يعامل كإدارة عامة حتى لو فتح الرابط مباشرة.
+    is_management_action = (
+        request.POST.get('space') == 'management' or is_manager(request.user)
+    )
 
-    try:
-        report = report_masahi.objects.get(id=id)
-    except report_masahi.DoesNotExist:
-        return HttpResponse("Report not found", status=404)
-
-    form_instance = report.form
+    # تقييد النطاق: لا يستطيع رئيس قسم تعديل تقرير مديرية أخرى حتى لو عرف رقمه.
+    report = get_object_or_404(
+        filter_reports(report_masahi.objects.all(), request.user), id=id
+    )
 
     if exit_action == 'منجزة':
-        report.agree_adarah_generl_by_manager_mahfth = True
-        report.masahi_convert = False
-        report.ajaml=text_36
+        report.ajaml = text_36
 
+        if not is_management_action:
+            # موافقة رئيس القسم: يختفي التقرير من قائمته ويظهر في
+            # "التقارير الجاهزة". يبقى علم الموافقة محفوظاً ليستمر ظهور
+            # المعاملة في قوائم مدير الإدارة العامة (مقبول/مرفوض).
+            report.rafth_adarah_generl_by_manager_mahfth = False
+            report.rafth_adarah_generl = False
+            report.masahi_convert = False
+            report.return_masah_jm = True
+        else:
+            # موافقة مدير الإدارة العامة: تبقى المعاملة في قوائمه:
+            # الوارد من الفروع ثم المقبولة من الإدارة.
+            report.agree_adarah_generl_by_manager_mahfth = True
+            report.masahi_convert = False
 
-    elif exit_action.strip() == 'رفض':
+    elif exit_action == 'رفض':
+        # علم الرفض يظهر المعاملة في قائمة "المرفوضة من الإدارة"
+        # لكل من رئيس القسم ومدير الإدارة العامة.
         report.rafth_adarah_generl_by_manager_mahfth = True
+        report.return_masah_jm = False
+        report.agree_adarah_generl_by_manager_mahfth = False
         report.masahi_convert = False
-        report.resone_refth_adrah=no_salm_5
+        report.resone_refth_adrah = no_salm_5
     else:
         return HttpResponse("Invalid action", status=400)
 
@@ -5022,20 +5074,43 @@ def show_managmant_masah(request)  :
     context={'num_unread':num_unread}
     return render(request,'masha/show_managmant_masah.html',context)
     
+def management_dashboard_context():
+    """عدادات الأقسام الثلاثة في صفحة مدير الإدارة العامة."""
+    return {
+        'num_unread': Conection.objects.filter().count(),
+        # الوارد من الفروع
+        'num_unread_1': report_masahi.objects.filter(
+            masahi_convert=True,
+            convert_agin=False,
+            convert_agin_agree=False,
+            agree_adarah_generl_by_manager_mahfth=False,
+            rafth_adarah_generl_by_manager_mahfth=False,
+        ).count(),
+        # المقبولة من الإدارة
+        'num_unread_agree': report_masahi.objects.filter(
+            agree_adarah_generl_by_manager_mahfth=True,
+            rafth_adarah_generl_by_manager_mahfth=False,
+        ).count(),
+        # المرفوضة من الإدارة
+        'num_unread_rafth': report_masahi.objects.filter(
+            rafth_adarah_generl_by_manager_mahfth=True
+        ).count(),
+    }
+
+
 @mahfth_screen_required
 def show_managment_nah(request):
-    return render(request,'masha/show_managment_nah.html')
+    return render(request, 'masha/show_managment_nah.html', management_dashboard_context())
+
+
 @mahfth_screen_required
 def werd_sader_manager(request):
     return render(request,'masha/werd_sader_manager.html')
+
+
 @mahfth_screen_required
 def screen_adrat_ver(request):
-    num_unread =Conection.objects.filter().count()
-    num_unread_1 =report_masahi.objects.filter(masahi_convert=True,convert_agin=False,convert_agin_agree=False,agree_adarah_generl_by_manager_mahfth=False,rafth_adarah_generl_by_manager_mahfth=False).count()
-    num_unread_agree=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True,rafth_adarah_generl_by_manager_mahfth=False).count()
-    num_unread_rafth =report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True).count()
-    context={'num_unread':num_unread,'num_unread_1':num_unread_1,'num_unread_agree':num_unread_agree,'num_unread_rafth':num_unread_rafth}
-    return render(request,'masha/show_managment_nah.html',context)
+    return render(request, 'masha/show_managment_nah.html', management_dashboard_context())
 @mahfth_screen_required
 def get_realtime_counts(request):
     num_unread = Conection.objects.filter().count()

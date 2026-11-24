@@ -126,7 +126,6 @@ window.addEventListener('popstate', function(event) {
                 <th>طباعة</th>
                   <th>عرض الموقع  الجغارفي</th>
                   <th>الوحدة</th>
-                <th>القطاع</th>
 
                 <th>المديرية</th>
                  <th>نوع الوثيقة</th>
@@ -136,13 +135,12 @@ window.addEventListener('popstate', function(event) {
         </thead>
 <tbody id="results_body">
             {% for item in show_manger_form %}
-                                     <td><a href="{% url  'masha:show_report_adrah' item.id %}"   class="btn outline-success">تصفح</a>
+                                     <td><a href="{% url  'masha:show_report_adrah' item.id %}?space=head"   class="btn outline-success">تصفح</a>
 </td>
                 
 
                        <td>{{item.form.unit.name}}</td>
                          
-                            <td>{{item.form.gata_name}}</td>
                           
                             <td>{{item.form.mahfth.name}}</td>
                             <td>{{item.form.typ.name}}</td>
@@ -194,7 +192,6 @@ $(document).ready(function(){
 
  
                         <td>${item.unit_name}</td>
-                             <td>${item.gata_name}</td>
                             <td>${item.mahfth_name}</td>
                                 <td>${item.typ_name}</td>
                           <td>${item.name}</td>
@@ -203,7 +200,7 @@ $(document).ready(function(){
                         </tr>`;
                     });
                 } else {
-                    tbody = "<tr><td colspan='7' style='text-align:center'>لا توجد نتائج</td></tr>";
+                    tbody = "<tr><td colspan='6' style='text-align:center'>لا توجد نتائج</td></tr>";
                 }
                 $('#results_body').html(tbody);
             },
