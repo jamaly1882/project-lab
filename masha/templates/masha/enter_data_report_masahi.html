@@ -296,7 +296,7 @@ class="form-control">
            <br>
 
 
- <input type="hidden" id="hid_mah"style="display:none;">
+ <input type="hidden" id="hid_mah" value="{% if not is_system_manager and mah %}{{ mah.0.id }}{% endif %}" style="display:none;">
    <input type="hidden" id="hid_er"style="display:none;">
      <input type="hidden" id="hid_g"style="display:none;">
     

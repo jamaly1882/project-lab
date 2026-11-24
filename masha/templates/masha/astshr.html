@@ -291,7 +291,7 @@
 
   <input type="hidden" id="text36"   name="text_36" onkeypress="return runScript_14(event)"
 class="form-control">
-  <input type="hidden" id="hid_mah"style="display:none;">
+  <input type="hidden" id="hid_mah" value="{% if not is_system_manager and mah %}{{ mah.0.id }}{% endif %}" style="display:none;">
    <input type="hidden" id="hid_er"style="display:none;">
 
      <input type="hidden" id="hid_g"style="display:none;">

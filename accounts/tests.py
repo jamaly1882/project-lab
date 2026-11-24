@@ -191,6 +191,12 @@ class SpaceRoleAccessTests(TestCase):
         ):
             response = self.client.get(reverse(name))
             self.assertEqual(response.status_code, 200, name)
+            if name in {"masha:enter_data_report_masahi", "masha:astshr"}:
+                self.assertContains(
+                    response,
+                    'id="hid_mah" value="{}"'.format(self.mahfth.pk),
+                    html=False,
+                )
 
     def test_head_is_denied_both_report_workflows(self):
         for name in (
