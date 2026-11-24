@@ -24,7 +24,7 @@ def get_user_mahfth(user):
     if user is None or not user.is_authenticated:
         return None
 
-    if user.is_superuser or user.is_staff:
+    if user.is_superuser:
         return None
 
     profile = getattr(user, "profile", None)
@@ -41,18 +41,29 @@ def get_user_mahfth(user):
     return None
 
 
+def is_global_mahfth_manager(user):
+    """True only for global admins, not staff accounts assigned to a district."""
+    if user is None or not user.is_authenticated:
+        return False
+    return user.is_superuser or (user.is_staff and get_user_mahfth(user) is None)
+
+
 def filter_queryset_by_mahfth(queryset, user, field="mahfth"):
-    """تقييد الـ queryset بمديرية المستخدم (إن كان مستخدماً عادياً).
+    """تقييد الـ queryset بمديرية المستخدم المرتبط بها، بما في ذلك الموظف المعيّن.
 
     يقبل field مساراً واحداً أو عدة مسارات بديلة، ويدعم الـ queryset
     المقطّع بإعادة تطبيق الحد بعد فلترة المديرية.
     """
     if user is None or not user.is_authenticated:
         return queryset.none()
-    if user.is_superuser or user.is_staff:
+    if user.is_superuser:
         return queryset
 
     mahfth = get_user_mahfth(user)
+    # A staff account explicitly tied to a district (for example, a department
+    # head) is district-scoped too. Unassigned staff remain global administrators.
+    if user.is_staff and mahfth is None:
+        return queryset
     if mahfth is None:
         return queryset.none()
 
@@ -101,10 +112,12 @@ def visible_mahfth_list(user):
 
     if user is None or not user.is_authenticated:
         return Mahfth.objects.none()
-    if user.is_superuser or user.is_staff:
+    if user.is_superuser:
         return Mahfth.objects.all()
 
     mahfth = get_user_mahfth(user)
+    if user.is_staff and mahfth is None:
+        return Mahfth.objects.all()
     if mahfth is None:
         return Mahfth.objects.none()
     return Mahfth.objects.filter(id=mahfth.id)
@@ -113,8 +126,8 @@ def visible_mahfth_list(user):
 def resolve_mahfth_for_user(user, mahfth_id):
     """تحديد المديرية المسموح بها عند إنشاء/تعديل البيانات.
 
-    * المدير (staff/superuser): يستطيع اختيار أي مديرية.
-    * المستخدم العادي: يُجبَر على مديريته دائماً مهما أرسل من بيانات.
+    * المشرف العام أو الموظف غير المرتبط بمديرية: يستطيع اختيار أي مديرية.
+    * المستخدم المرتبط بمديرية، بما فيه رئيس القسم: يُجبَر على مديريته.
 
     يرجع (mahfth, error_message).
     """
@@ -123,7 +136,12 @@ def resolve_mahfth_for_user(user, mahfth_id):
     if user is None or not user.is_authenticated:
         return None, "يجب تسجيل الدخول أولاً."
 
-    if user.is_superuser or user.is_staff:
+    my_mahfth = get_user_mahfth(user)
+
+    # Superusers, and staff accounts without a district assignment, are global
+    # administrators. Staff accounts assigned to a district follow the same
+    # district boundary as other users.
+    if user.is_superuser or (user.is_staff and my_mahfth is None):
         if not mahfth_id:
             return None, "يجب تحديد المديرية."
         try:
@@ -131,7 +149,6 @@ def resolve_mahfth_for_user(user, mahfth_id):
         except (Mahfth.DoesNotExist, ValueError, TypeError):
             return None, "المديرية المحددة غير موجودة."
 
-    my_mahfth = get_user_mahfth(user)
     if my_mahfth is None:
         return None, "لم يتم ربط حسابك بأي مديرية، راجع مدير النظام."
 

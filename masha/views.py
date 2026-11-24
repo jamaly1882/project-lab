@@ -22,6 +22,7 @@ from .scoping import (
     filter_forms,
     filter_reports,
     get_user_mahfth,
+    is_global_mahfth_manager,
     resolve_mahfth_for_user,
     visible_mahfth_list,
 )
@@ -3926,7 +3927,8 @@ def edit_report_ajax(request,id):
 
         # ─── تحقق من أن القيمة موجودة قبل جلب الـ FK ───
         try:
-            unit_scope = get_user_mahfth(request.user) if not (request.user.is_staff or request.user.is_superuser) else (form_obj.mahfth or get_user_mahfth(request.user))
+            user_mahfth = get_user_mahfth(request.user)
+            unit_scope = None if is_global_mahfth_manager(request.user) else user_mahfth
             unit = Unit.objects.get(id=hid_gata, mahfth=unit_scope) if hid_gata and unit_scope else (Unit.objects.get(id=hid_gata) if hid_gata else None)
             type_map_xx = Type_map.objects.get(name=hid_map_location) if hid_map_location else None
             kah = Type_kah.objects.get(name=hid_kah) if hid_kah else None
@@ -3936,7 +3938,7 @@ def edit_report_ajax(request,id):
 
             mah=Mahfth.objects.get(id=hid_mah) if hid_mah else None
             user_mahfth = get_user_mahfth(request.user)
-            if mah and not (request.user.is_staff or request.user.is_superuser) and (user_mahfth is None or mah.id != user_mahfth.id):
+            if mah and not is_global_mahfth_manager(request.user) and (user_mahfth is None or mah.id != user_mahfth.id):
                 return JsonResponse({"error": "مديرية غير مسموح بها"}, status=403)
         except Exception as e:
             return JsonResponse({"error": f"Related object error: {str(e)}"}, status=400)
@@ -4038,7 +4040,7 @@ def get_units_by_mderah(request):
     if request.method == "POST":
         my_mahfth = get_user_mahfth(request.user)
         mderah_id = request.POST.get('mderah_id')
-        if not (request.user.is_staff or request.user.is_superuser) and (not my_mahfth or str(my_mahfth.id) != str(mderah_id)):
+        if not is_global_mahfth_manager(request.user) and (not my_mahfth or str(my_mahfth.id) != str(mderah_id)):
             return JsonResponse({'units': []}, status=403)
         units = Unit.objects.filter(mahfth_id=mderah_id).values('id', 'name')
         return JsonResponse({'units': list(units)})
@@ -4330,7 +4332,8 @@ def add_abade_report_masahi(request, id):
 
         # ───── جلب الكائنات المرتبطة ─────
         try:
-            unit_scope = get_user_mahfth(request.user) if not (request.user.is_staff or request.user.is_superuser) else (form_obj.mahfth or get_user_mahfth(request.user))
+            user_mahfth = get_user_mahfth(request.user)
+            unit_scope = None if is_global_mahfth_manager(request.user) else user_mahfth
             unit = Unit.objects.get(id=hid_gata, mahfth=unit_scope) if unit_scope else Unit.objects.get(id=hid_gata)
             type_map_xx = Type_map.objects.get(name=hid_map_location)
             kah = Type_kah.objects.get(name=hid_kah)
@@ -6038,7 +6041,7 @@ def index(request):
 
     user = request.user
     my_mahfth = get_user_mahfth(user)
-    is_manager = user.is_superuser or user.is_staff
+    is_manager = is_global_mahfth_manager(user)
 
     forms_qs = Form.objects.all()
     reports_qs = report_masahi.objects.all()
