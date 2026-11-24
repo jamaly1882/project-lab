@@ -4611,7 +4611,9 @@ def live_search_ajax_report_masha_to_agree_manager_generl_mang(request):
             "type_map"
         ).filter(
             filters,
-            agree_adarah_generl_by_manager_mahfth=True
+            agree_adarah_generl_by_manager_mahfth=True,
+            masahi_convert=False,
+            rafth_adarah_generl_by_manager_mahfth=False,
         )[:50]
         matches = filter_reports(matches, request.user)
 
@@ -4640,7 +4642,11 @@ def show_convert_to_mashi_from_fero(request):
 @space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
 @mahfth_screen_required
 def show_convert_to_mashi_from_fero_nah(request):
-            show_manger_form=filter_reports(report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True), request.user)
+            show_manger_form=filter_reports(report_masahi.objects.filter(
+                agree_adarah_generl_by_manager_mahfth=True,
+                masahi_convert=False,
+                rafth_adarah_generl_by_manager_mahfth=False,
+            ), request.user)
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero_nah.html',context)
 @space_roles_only(block_management=True)
@@ -4868,11 +4874,13 @@ def show_report_masah_by_eng_data(request,id):
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
      context={'mas':mas,'f':f,'resone':resone}
      return render(request,'masha/show_report_masah_by_eng_data.html',context)
+@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
 @mahfth_screen_required
 def show_report_adrah(request,id):
      mas=get_object_or_404(filter_reports(report_masahi.objects.all(), request.user), id=id)
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
-     context={'mas':mas,'f':f}
+     send_back_to_management = is_manager(request.user) or get_space_role(request.user) == SPACE_ROLE_AREA_MANAGER
+     context={'mas':mas,'f':f,'send_back_to_management':send_back_to_management}
      return render(request,'masha/show_report_adrah.html',context)
 def masahi_convert(request,id):
         masahi_convert=request.POST.get('masahi_convert')
@@ -4966,6 +4974,7 @@ def agree_report_masahi_by_manager_mangmant(request, id):
 
 
 @csrf_exempt
+@space_roles_only(allowed_roles={SPACE_ROLE_HEAD})
 @mahfth_screen_required
 def agree_report_masahi_by_manager_mangmant_adarah(request, id):
     exit_action = request.POST.get('exit')
@@ -4976,8 +4985,18 @@ def agree_report_masahi_by_manager_mangmant_adarah(request, id):
     form_instance = report.form
 
     if exit_action == 'منجزة':
-        report.agree_adarah_generl_by_manager_mahfth = True
-        report.masahi_convert = False
+        # رئيس القسم يرحّل التقرير المقبول من إدارة المديرية إلى الإدارة العامة.
+        # يبقى علم الموافقة محفوظاً لتظهر المعاملة في قائمة الإدارة العامة،
+        # بينما يزيلها masahi_convert من قائمة الترحيل الخاصة برئيس القسم.
+        is_head_transfer = (
+            get_space_role(request.user) == SPACE_ROLE_HEAD
+            or (not get_space_role(request.user) and not is_manager(request.user))
+        )
+        if is_head_transfer:
+            report.masahi_convert = True
+        else:
+            report.agree_adarah_generl_by_manager_mahfth = True
+            report.masahi_convert = False
         report.ajaml=text_36
 
 

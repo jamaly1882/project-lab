@@ -324,6 +324,27 @@ class DirectorateDataIsolationTests(TestCase):
         visible_report_ids = {report.id for report in response.context["show_manger_form"]}
         self.assertEqual(visible_report_ids, {own_report.id})
 
+    def test_head_transfer_marks_report_moved_and_removes_it_from_queue(self):
+        self.user.profile.role = "رئيس قسم مساحة"
+        self.user.profile.save()
+        report = report_masahi.objects.create(
+            form=self.own_form,
+            agree_adarah_generl_by_manager_mahfth=True,
+        )
+
+        response = self.client.post(
+            reverse("masha:agree_report_masahi_by_manager_mangmant_adarah", args=[report.id]),
+            {"exit": "منجزة", "text36": "تم الترحيل"},
+        )
+        self.assertEqual(response.status_code, 200)
+        report.refresh_from_db()
+        self.assertTrue(report.masahi_convert)
+        self.assertTrue(report.agree_adarah_generl_by_manager_mahfth)
+
+        queue_response = self.client.get(reverse("masha:show_convert_to_mashi_from_fero_nah"))
+        self.assertEqual(queue_response.status_code, 200)
+        self.assertNotIn(report.id, {item.id for item in queue_response.context["show_manger_form"]})
+
     def test_legacy_scoped_user_can_open_transfer_queue(self):
         self.user.profile.role = ""
         self.user.profile.save()
