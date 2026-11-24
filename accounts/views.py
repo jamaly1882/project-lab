@@ -95,8 +95,12 @@ def login_view(request):
                 role = user.profile.role
             except Exception:
                 role = ""
-            if role in {"رئيس قسم مساحة", "مهندس مساحة", "منسق قسم مساحة"}:
-                return redirect("masha:screen_paesdint_masah")
+            if role == "رئيس قسم مساحة":
+                return redirect("masha:show_manager_masah_nah")
+            if role == "مهندس مساحة":
+                return redirect("masha:show_astmrat")
+            if role == "منسق قسم مساحة":
+                return redirect("masha:interface")
             return redirect('masha:index')
 
         return render(

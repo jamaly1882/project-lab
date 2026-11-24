@@ -119,7 +119,7 @@
                         </div>
                      </div>
                     {% endif %}
-                    {% if is_system_manager or has_mahfth_access or user_role %}
+                    {% if is_system_manager or has_mahfth_access and not user_role %}
                        <div class="col-lg-6 col-md-4 col-6">
                         <div class="partner-box text-center">
                            <figure class="mb-0">
@@ -140,6 +140,7 @@
          </section>
       <!---slider-section-->
       <!---information-section-->
+      {% if is_system_manager or user_role == "منسق قسم مساحة" %}
        <section>
     <div class="blog-post-con dots-right-img">
         <div class="container overlay-content">
@@ -186,6 +187,7 @@
         </div>
     </div>
 </section>
+      {% endif %}
 
      
     

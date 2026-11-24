@@ -290,9 +290,11 @@
           <div class="col-md-4">
             <div class="panel">
               <h4><i class="fa fa-bolt"></i> إجراءات سريعة</h4>
-              <a href="{% url 'masha:enter_data_report_masahi_screen' %}" class="quick-link">
-                <i class="fa fa-file-text-o"></i> إصدار تقرير مساحي
-              </a>
+              {% if is_manager or user_role == "منسق قسم مساحة" %}
+                <a href="{% url 'masha:enter_data_report_masahi_screen' %}" class="quick-link">
+                  <i class="fa fa-file-text-o"></i> إصدار تقرير مساحي
+                </a>
+              {% endif %}
               <a href="{% url 'masha:manage_eng' %}" class="quick-link">
                 <i class="fa fa-user-secret"></i> المهندسون
               </a>

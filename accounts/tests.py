@@ -39,14 +39,25 @@ class LoginPageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "غير صحيحة")
 
-    def test_space_role_login_opens_section_screen(self):
+    def test_space_role_login_opens_own_profile(self):
         user = User.objects.create_user("surveyor", "s@s.s", "pass1234")
         user.profile.role = "مهندس مساحة"
+        user.profile.mahfth = Mahfth.objects.create(name="مديرية صنعاء")
         user.profile.save()
         response = self.client.post(
             "/accounts/login/", {"username": "surveyor", "password": "pass1234"}
         )
-        self.assertRedirects(response, reverse("masha:screen_paesdint_masah"))
+        self.assertRedirects(response, reverse("masha:show_astmrat"))
+
+    def test_coordinator_login_opens_report_services(self):
+        user = User.objects.create_user("coordinator", "c@s.s", "pass1234")
+        user.profile.role = "منسق قسم مساحة"
+        user.profile.mahfth = Mahfth.objects.create(name="مديرية صنعاء")
+        user.profile.save()
+        response = self.client.post(
+            "/accounts/login/", {"username": "coordinator", "password": "pass1234"}
+        )
+        self.assertRedirects(response, reverse("masha:interface"))
 
 
 class CityScopeTests(TestCase):
@@ -79,14 +90,10 @@ class CityScopeTests(TestCase):
         self.assertIn("مديرية صنعاء", body)
         self.assertIn("مديرية عدن", body)
 
-    def test_user_sees_only_own_directorate(self):
+    def test_user_without_coordinator_role_cannot_open_report_issue_form(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("masha:enter_data_report_masahi"))
-        body = response.content.decode()
-        start = body.find('id="mderah"')
-        segment = body[start : start + 900]
-        self.assertIn("مديرية عدن", segment)
-        self.assertNotIn("مديرية صنعاء", segment)
+        self.assertRedirects(response, reverse("masha:index"))
 
     def test_city_user_sees_own_city_badge(self):
         self.client.force_login(self.city_user)
@@ -100,10 +107,15 @@ class CityScopeTests(TestCase):
         self.assertNotIn("ادارة المساحة", body)
         self.assertNotIn("قسم المساحة", body)
 
-    def test_user_with_scope_can_open_section_screens(self):
+    def test_unassigned_user_cannot_open_report_entry_screens(self):
+        self.client.force_login(self.user)
+        for name in ("masha:astshr", "masha:interface_nah_astshr", "masha:enter_data_report_masahi_screen"):
+            response = self.client.get(reverse(name))
+            self.assertEqual(response.status_code, 302, name)
+
+    def test_unassigned_user_can_open_legacy_space_sections(self):
         self.client.force_login(self.user)
         for name in (
-            "masha:astshr",
             "masha:screen_adrat_ver",
             "masha:show_astmrat",
             "masha:show_managment_nah",
@@ -127,11 +139,14 @@ class SpaceRoleAccessTests(TestCase):
         self.user.profile.save()
         self.client.force_login(self.user)
 
-    def test_role_user_sees_only_the_section_icon(self):
+    def test_head_user_is_taken_to_profile_without_showing_role_icons(self):
         response = self.client.get(reverse("masha:interface"))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, reverse("masha:screen_adrat_ver"))
-        self.assertContains(response, reverse("masha:screen_paesdint_masah"))
+        self.assertNotContains(response, reverse("masha:screen_paesdint_masah"))
+        self.assertNotContains(response, reverse("masha:enter_data_report_masahi_screen"))
+        response = self.client.get(reverse("masha:screen_paesdint_masah"))
+        self.assertRedirects(response, reverse("masha:show_manager_masah_nah"))
 
     def test_role_user_is_blocked_from_space_management_and_its_links(self):
         for name in (
@@ -145,20 +160,47 @@ class SpaceRoleAccessTests(TestCase):
             "masha:screen_enter_number_mahther_and_number_strate_and_unit",
         ):
             response = self.client.get(reverse(name))
-            self.assertRedirects(response, reverse("masha:screen_paesdint_masah"), msg_prefix=name)
+            self.assertRedirects(response, reverse("masha:show_manager_masah_nah"), msg_prefix=name)
 
-    def test_role_user_sees_only_its_icon_inside_department(self):
+    def test_head_is_redirected_directly_to_its_own_profile(self):
         response = self.client.get(reverse("masha:screen_paesdint_masah"))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "رئيس قسم المساحة")
-        self.assertNotContains(response, "مهندس المساحة")
-        self.assertNotContains(response, "منسق قسم المساحة")
+        self.assertRedirects(response, reverse("masha:show_manager_masah_nah"))
 
-    def test_each_role_can_open_only_its_assigned_role_screen(self):
+    def test_head_cannot_open_engineer_profile(self):
         response = self.client.get(reverse("masha:show_astmrat"))
-        self.assertRedirects(response, reverse("masha:screen_paesdint_masah"))
+        self.assertRedirects(response, reverse("masha:show_manager_masah_nah"))
         response = self.client.get(reverse("masha:show_manager_masah_nah"))
         self.assertEqual(response.status_code, 200)
+
+    def test_coordinator_can_open_both_report_workflows(self):
+        self.user.profile.role = "منسق قسم مساحة"
+        self.user.profile.save()
+        AStmrah.objects.get_or_create(id=1, defaults={"name": "تقرير البناء"})
+        AStmrah.objects.get_or_create(id=2, defaults={"name": "تقرير الاستشارة"})
+
+        response = self.client.get(reverse("masha:interface"))
+        self.assertContains(response, reverse("masha:enter_data_report_masahi_screen"))
+        self.assertContains(response, reverse("masha:interface_nah_astshr"))
+        self.assertNotContains(response, reverse("masha:screen_adrat_ver"))
+
+        for name in (
+            "masha:enter_data_report_masahi_screen",
+            "masha:enter_data_report_masahi",
+            "masha:interface_nah_astshr",
+            "masha:astshr",
+        ):
+            response = self.client.get(reverse(name))
+            self.assertEqual(response.status_code, 200, name)
+
+    def test_head_is_denied_both_report_workflows(self):
+        for name in (
+            "masha:enter_data_report_masahi_screen",
+            "masha:enter_data_report_masahi",
+            "masha:interface_nah_astshr",
+            "masha:astshr",
+        ):
+            response = self.client.get(reverse(name))
+            self.assertRedirects(response, reverse("masha:show_manager_masah_nah"), msg_prefix=name)
 
 
 class UserRoleFormTests(TestCase):

@@ -105,6 +105,17 @@ def get_space_role(user):
         return ""
 
 
+def role_landing_url(user):
+    """صفحة الدخول المباشرة لكل دور بدلاً من عرض أيقونة اختيار الدور."""
+    if is_manager(user):
+        return None
+    return {
+        SPACE_ROLE_HEAD: "masha:show_manager_masah_nah",
+        SPACE_ROLE_ENGINEER: "masha:show_astmrat",
+        SPACE_ROLE_COORDINATOR: "masha:interface",
+    }.get(get_space_role(user))
+
+
 def space_roles_only(allowed_roles=None, block_management=False):
     """حماية روابط الأيقونات؛ المديرون والحسابات القديمة تظل على سلوكها المعتاد."""
     def decorator(view_func):
@@ -115,10 +126,30 @@ def space_roles_only(allowed_roles=None, block_management=False):
             if role in SPACE_ROLES and not is_manager(user):
                 if block_management or (allowed_roles and role not in allowed_roles):
                     messages.warning(request, "لا تملك صلاحية الدخول إلى هذه الأيقونة.")
-                    return redirect("masha:screen_paesdint_masah")
+                    return redirect(role_landing_url(user) or "masha:screen_paesdint_masah")
             return view_func(request, *args, **kwargs)
         return _wrapped
     return decorator
+
+
+def coordinator_or_manager_required(view_func):
+    """السماح بإصدار التقارير للمنسق ومدير النظام فقط."""
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        user = request.user
+        if not getattr(user, "is_authenticated", False):
+            return redirect_to_login(request.get_full_path(), "accounts:login")
+        if is_manager(user) or get_space_role(user) == SPACE_ROLE_COORDINATOR:
+            return view_func(request, *args, **kwargs)
+
+        messages.warning(request, "إصدار التقارير متاح لمنسق القسم ومدير النظام فقط.")
+        role = get_space_role(user)
+        if role == SPACE_ROLE_HEAD:
+            return redirect("masha:show_manager_masah_nah")
+        if role == SPACE_ROLE_ENGINEER:
+            return redirect("masha:show_astmrat")
+        return redirect("masha:index")
+    return _wrapped
 
 
 def can_access_mahfth_screen(user):
@@ -3487,6 +3518,8 @@ def show_intreface(request):
 def is_admin_or_has_permission(user):
     return user.is_superuser or user.has_perm("masha.add_form")
 
+@coordinator_or_manager_required
+@mahfth_screen_required
 def enter_data_report_masahi(request):
     
     ty=typ.objects.all()
@@ -3510,6 +3543,7 @@ def enter_data_report_masahi(request):
 @csrf_exempt
 
 
+@coordinator_or_manager_required
 def form_add_masah(request):
     if request.method == "POST":
 
@@ -5053,6 +5087,9 @@ def image_to_base64(image_path):
 
 @login_required
 def show_managmant_masah(request)  :
+    role_landing = role_landing_url(request.user)
+    if role_landing:
+        return redirect(role_landing)
     num_unread =Form.objects.filter(tr_masah=False,show_tasrah_karoj=True).count()
     context={'num_unread':num_unread}
     return render(request,'masha/show_managmant_masah.html',context)
@@ -5097,9 +5134,9 @@ def get_realtime_counts(request):
     })
 @login_required
 def screen_paesdint_masah(request):
-
-    
-
+    role_landing = role_landing_url(request.user)
+    if role_landing:
+        return redirect(role_landing)
     return render(request,'masha/show_managmant_masah.html')
 @mahfth_screen_required
 def screen_interface_line_tslime_nah(request):
@@ -5921,6 +5958,7 @@ from django.http import HttpResponseForbidden
 def is_admin_or_has_permission(user):
     return user.is_superuser or user.has_perm("masha.add_form")
 
+@coordinator_or_manager_required
 @login_required
 def astshr(request):
     # الوصول مسموح للمدير أو لمستخدم مرتبط بمدينة/مديرية،
@@ -6230,6 +6268,7 @@ def unit_create(request):
 from django.http import JsonResponse
 from .models import Form, Mahfth, typ, Type_talb_astshr
 
+@coordinator_or_manager_required
 def form_add_masah_nah(request):
     if request.method != "POST":
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
@@ -6643,6 +6682,7 @@ def print_report(request):
     print_report_x= report_masahi.objects.filter( return_masah_jm=True, print_nah=False )
     context={'print_report_x':print_report_x}
     return render(request,'masha/print_report.html',context)
+@coordinator_or_manager_required
 @mahfth_screen_required
 def interface_nah_astshr(request):
     num_unread=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,hidden_ansh_hdm="استشارة"), request.user).count()
@@ -6936,7 +6976,7 @@ def report_state_talbat_nah_json_astsherh(request):
     })
 
 
-@space_roles_only(allowed_roles={SPACE_ROLE_COORDINATOR})
+@coordinator_or_manager_required
 @mahfth_screen_required
 def enter_data_report_masahi_screen(request):
     num_unread=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).count()
