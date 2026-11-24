@@ -60,14 +60,14 @@ window.addEventListener('popstate', function(event) {
           </div>
         <nav class="templatemo-left-nav">
           <ul>
-             <li><a  href="{% url 'masha:show_manager_masah_nah'   %}"  class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
-            <li><a href="#" class="toggle"><i class="fa fa-bar-chart fa-fw"></i>الطلبات </a>
-            
-            </li>
-       
-            <li><a href="#"><i class="fa fa-database fa-fw"></i>التقارير</a></li>
-          
-            <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج </a></li>
+            {% if request.user.is_authenticated %}
+                <li><a href="{% url 'masha:show_manager_masah_nah' %}" class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+                <li><a href="#" class="toggle"><i class="fa fa-bar-chart fa-fw"></i>الطلبات</a></li>
+                <li><a href="#"><i class="fa fa-database fa-fw"></i>التقارير</a></li>
+                <li><a href="{% url 'accounts:user_logout' %}"><i class="fa fa-eject fa-fw"></i>تسجيل الخروج</a></li>
+            {% else %}
+                <li><a href="{% url 'masha:show_convert_to_mashi_from_fero_nah' %}" class="active"><i class="fa fa-home fa-fw"></i>التقارير المقبولة</a></li>
+            {% endif %}
 
           </ul>
         </nav>
@@ -80,7 +80,11 @@ window.addEventListener('popstate', function(event) {
               <ul class="text-uppercase">
             
             
-              <li><a href="{% url 'masha:show_manager_masah_nah'   %}"   class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+              {% if request.user.is_authenticated %}
+                <li><a href="{% url 'masha:show_manager_masah_nah' %}" class="active"><i class="fa fa-home fa-fw"></i>الرئيسية</a></li>
+              {% else %}
+                <li><a href="{% url 'masha:show_convert_to_mashi_from_fero_nah' %}" class="active"><i class="fa fa-home fa-fw"></i>التقارير المقبولة</a></li>
+              {% endif %}
                     <li><a href="">بيانات الطلب </a></li>
                         <li><a href="" >تعديل الطلب </a></li>
                 <li><a href="">استعراض الطلب </a></li>
@@ -134,21 +138,32 @@ window.addEventListener('popstate', function(event) {
             </tr>
         </thead>
 <tbody id="results_body">
-            {% for item in show_manger_form %}
-                                     <td><a href="{% url  'masha:show_report_adrah' item.id %}?space=head"   class="btn outline-success">تصفح</a>
-</td>
-                
-
-                       <td>{{item.form.unit.name}}</td>
-                         
-                          
-                            <td>{{item.form.mahfth.name}}</td>
-                            <td>{{item.form.typ.name}}</td>
-                            <td>{{item.form.name}}</td>
-                            <td>{{item.id}}</td>
-                        </tr>
-                        {% endfor  %}
-        </tbody>
+    {% for item in show_manger_form %}
+        <tr>
+            <td>
+                <a href="{% url 'masha:show_report_adrah' item.id %}?space=head"
+                   class="btn outline-success">تصفح</a>
+            </td>
+            <td>
+                {% if item.kml_file %}
+                    <a href="{{ item.kml_file.url }}" target="_blank" rel="noopener">عرض الموقع الجغرافي</a>
+                {% elif item.form.kml_file %}
+                    <a href="{{ item.form.kml_file.url }}" target="_blank" rel="noopener">عرض الموقع الجغرافي</a>
+                {% else %}
+                    لا يوجد موقع
+                {% endif %}
+            </td>
+            <td>{{ item.form.unit.name|default:"—" }}</td>
+            <td>{{ item.form.gata.name|default:"—" }}</td>
+            <td>{{ item.form.mahfth.name|default:"—" }}</td>
+            <td>{{ item.form.typ.name|default:"—" }}</td>
+            <td>{{ item.form.name|default:item.name }}</td>
+            <td>{{ item.id }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="8" class="text-center">لا توجد تقارير مقبولة لهذه المديرية.</td></tr>
+    {% endfor %}
+</tbody>
     </table>
      {% if messages %}
     {% for message in messages %}
@@ -163,57 +178,70 @@ window.addEventListener('popstate', function(event) {
   <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"> </script>
 
 <script>
-$(document).ready(function(){
-    $('#live_search').on('input', function(){
-        let query = $(this).val().trim();
-        if(query === ""){
-            $('#results_body').html('');
+const reportUrlBase = "{% url 'masha:show_report_adrah' 0 %}".slice(0, -1);
+const acceptedSearchUrl = "{% url 'masha:live_search_ajax_report_masha_to_agree_manager_generl_mang' %}";
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, function(character) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[character];
+    });
+}
+
+$(document).ready(function() {
+    const initialRows = $('#results_body').html();
+
+    $('#live_search').on('input', function() {
+        const query = $(this).val().trim();
+
+        if (!query) {
+            $('#results_body').html(initialRows);
             return;
         }
+
         $.ajax({
-            url: "{% url 'masha:live_search_ajax_report_masha_to_agree_manager_generl_mang' %}",
+            url: acceptedSearchUrl,
             data: { q: query },
-            success: function(res){
+            success: function(res) {
                 let tbody = '';
-                if(res.results.length > 0){
-                    res.results.forEach(function(item){
+
+                if (res.results.length > 0) {
+                    res.results.forEach(function(item) {
+                        const location = item.kml_file
+                            ? `<a href="${escapeHtml(item.kml_file)}" target="_blank" rel="noopener">عرض الموقع الجغرافي</a>`
+                            : 'لا يوجد موقع';
+
                         tbody += `<tr>
-                          
-<td>
-  ${item.img_document  ? `` : ''}
-  <a href="${editUrlBase}/${item.id}" >عرض بيانات  الارض</a>
-</td>
-<td>
-  ${item.kml_file 
-      ? `<a href="${item.kml_file}" target="_blank">🌍 عرض الموقع الجغرافي</a>` 
-      : 'لا يوجد موقع'}
-</td>
-
-
- 
-                        <td>${item.unit_name}</td>
-                            <td>${item.mahfth_name}</td>
-                                <td>${item.typ_name}</td>
-                          <td>${item.name}</td>
-
-                               <td>${item.id}</td>
+                            <td><a class="btn outline-success" href="${reportUrlBase}${encodeURIComponent(item.id)}?space=head">تصفح</a></td>
+                            <td>${location}</td>
+                            <td>${escapeHtml(item.unit_name || '—')}</td>
+                            <td>${escapeHtml(item.gata_name || '—')}</td>
+                            <td>${escapeHtml(item.mahfth_name || '—')}</td>
+                            <td>${escapeHtml(item.typ_name || '—')}</td>
+                            <td>${escapeHtml(item.name || '—')}</td>
+                            <td>${escapeHtml(item.id)}</td>
                         </tr>`;
                     });
                 } else {
-                    tbody = "<tr><td colspan='6' style='text-align:center'>لا توجد نتائج</td></tr>";
+                    tbody = "<tr><td colspan='8' class='text-center'>لا توجد نتائج</td></tr>";
                 }
+
                 $('#results_body').html(tbody);
             },
-            error: function(err){
-                console.log(err);
+            error: function(xhr) {
+                console.error('تعذر البحث في التقارير المقبولة', xhr);
             }
         });
     });
 });
 </script>
-<script>
-  const editUrlBase = "{% url 'masha:outpu_report_masah_nah_to_moatn' 0  %}".slice(0, -2); 
-  // slice(-2) لإزالة الرقم 0 و الـ /
-</script>
+           
+
+      
 </body>
 </html>

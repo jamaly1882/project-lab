@@ -4502,34 +4502,43 @@ def live_search_ajax_report_masha_to_agree_manager_generl_mang(request):
 
     if query:
         filters = Q(form__name__icontains=query)
-
         if query.isdigit():
             filters |= Q(id=query)
 
         matches = report_masahi.objects.select_related(
             "form",
-           
-            "type_map"
+            "form__unit",
+            "form__gata",
+            "form__mahfth",
+            "form__typ",
         ).filter(
             filters,
-            agree_adarah_generl_by_manager_mahfth=True
+            agree_adarah_generl_by_manager_mahfth=True,
         )
-        # ما رحّله رئيس القسم للإدارة العامة يختفي من قائمته،
-        # لكنه يبقى ظاهراً في قائمة الإدارة العامة.
+
+        # أبقِ سلوك clean-main: ما رحّله رئيس القسم يختفي من قائمته.
         if is_head_user(request.user):
-            matches = matches.filter(masahi_convert=False, return_masah_jm=False)
-        matches = filter_reports(matches[:50], request.user)
+            matches = matches.filter(
+                masahi_convert=False,
+                return_masah_jm=False,
+            )
+
+        # المستخدم المسجل يرى مديريتَه فقط؛ الزائر يرى المقبول فقط.
+        if request.user.is_authenticated:
+            matches = filter_reports(matches, request.user)
+        matches = matches[:50]
 
         for obj in matches:
+            form = obj.form
+            kml_file = obj.kml_file or (form.kml_file if form else None)
             results.append({
                 "id": obj.id,
-                "name": obj.form.name if obj.form else '',
-                "typ_name": obj.type_map.name if obj.type_map else '',
-               "unit_name": obj.form.unit.name if obj.form and hasattr(obj.form, 'unit') else '',
-               "mahfth_name": obj.form.mahfth.name if obj.form and hasattr(obj.form, 'gata') else '',
-              
-                "img_document": '',
-                "kml_file": obj.kml_file.url if obj.kml_file else '',  # 
+                "name": form.name if form else '',
+                "typ_name": form.typ.name if form and form.typ else '',
+                "unit_name": form.unit.name if form and form.unit else '',
+                "gata_name": form.gata.name if form and form.gata else '',
+                "mahfth_name": form.mahfth.name if form and form.mahfth else '',
+                "kml_file": kml_file.url if kml_file else '',
             })
 
     return JsonResponse({"results": results})
@@ -4542,19 +4551,38 @@ def show_convert_to_mashi_from_fero(request):
             context={'show_manger_form':show_manger_form}
             return render(request,'masha/show_convert_to_mashi_from_fero.html',context)
 def show_convert_to_mashi_from_fero_nah(request):
-            show_manger_form=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True)
-            # التقرير الذي يرحّله رئيس القسم للإدارة العامة يخرج من قائمته،
-            # ويبقى في قائمة الإدارة العامة (نفس علم الموافقة محفوظاً).
-            if is_head_user(request.user):
-                show_manger_form=show_manger_form.filter(
-                    masahi_convert=False, return_masah_jm=False
-                )
-            context={'show_manger_form':show_manger_form}
-            return render(request,'masha/show_convert_to_mashi_from_fero_nah.html',context)
+    show_manger_form = report_masahi.objects.filter(
+        agree_adarah_generl_by_manager_mahfth=True
+    ).select_related(
+        "form",
+        "form__unit",
+        "form__gata",
+        "form__mahfth",
+        "form__typ",
+    )
+
+    if is_head_user(request.user):
+        show_manger_form = show_manger_form.filter(
+            masahi_convert=False,
+            return_masah_jm=False,
+        )
+
+    if request.user.is_authenticated:
+        show_manger_form = filter_reports(show_manger_form, request.user)
+
+    return render(
+        request,
+        'masha/show_convert_to_mashi_from_fero_nah.html',
+        {"show_manger_form": show_manger_form},
+    )
 def show_convert_to_mashi_from_fero_nah_adrah(request):
-        show_manger_form=report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True)
-        context={'show_manger_form':show_manger_form}
-        return render(request,'masha/show_convert_to_mashi_from_fero_nah_aldarha.html',context)
+    show_manger_form = report_masahi.objects.filter(
+        agree_adarah_generl_by_manager_mahfth=True
+    )
+    if request.user.is_authenticated:
+        show_manger_form = filter_reports(show_manger_form, request.user)
+    context = {'show_manger_form': show_manger_form}
+    return render(request, 'masha/show_convert_to_mashi_from_fero_nah_aldarha.html', context)
 
 
 def live_search_ajax_report_masha_to_rafth_aldarah_to_report(request):
@@ -4777,6 +4805,7 @@ def show_report_masah_by_eng_data(request,id):
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
      context={'mas':mas,'f':f,'resone':resone}
      return render(request,'masha/show_report_masah_by_eng_data.html',context)
+<<<<<<< HEAD
 @mahfth_screen_required
 def show_report_adrah(request,id):
      # space يحدّد الشاشة التي جاء منها المستخدم: إدارة عامة أم رئيس قسم.
@@ -4787,6 +4816,24 @@ def show_report_adrah(request,id):
      space = 'management' if request.GET.get('space') == 'management' else 'head'
      context={'mas':mas,'f':f,'space':space}
      return render(request,'masha/show_report_adrah.html',context)
+=======
+def show_report_adrah(request, id):
+    reports = report_masahi.objects.select_related(
+        "form",
+        "form__mahfth",
+    )
+    if request.user.is_authenticated:
+        # المستخدم المسجل لا يستطيع فتح تقارير مديرية أخرى.
+        reports = filter_reports(reports, request.user)
+    else:
+        # للزائر: السماح بالعرض فقط للتقارير المقبولة، دون أي إجراءات تعديل.
+        reports = reports.filter(agree_adarah_generl_by_manager_mahfth=True)
+
+    mas = get_object_or_404(reports, id=id)
+    f = Shift_form_hadod.objects.filter(report_masahi=mas)
+    context = {'mas': mas, 'f': f}
+    return render(request, 'masha/show_report_adrah.html', context)
+>>>>>>> origin/arena/ee3b7159-project-lab
 def masahi_convert(request,id):
         masahi_convert=request.POST.get('masahi_convert')
         if   masahi_convert=='منجزة':
