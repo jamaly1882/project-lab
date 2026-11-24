@@ -3765,12 +3765,23 @@ def image_to_base64(image_path):
         return ""
 @login_required
 def agree_tsrah_xx(request):
-    # السماح إذا كان مشرف أو لديه الصلاحية
-    if not (request.user.is_superuser or request.user.has_perm('masha.add_unit')):
-        return render(request, 'masha/no_permission.html')  # صفحة غير مصرح
+    role = get_space_role(request.user)
+    allowed_roles = {SPACE_ROLE_HEAD, SPACE_ROLE_AREA_MANAGER}
+    if not (
+        is_manager(request.user)
+        or request.user.has_perm('masha.add_unit')
+        or role in allowed_roles
+    ):
+        return render(request, 'masha/no_permission.html', status=403)
 
-    # المستخدم مسموح له بالدخول
-    form = Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=False, return_form=False, digital=False).order_by('-id')
+    forms = Form.objects.filter(
+        show_tasrah_karoj=False,
+        rafth_maml=False,
+        talb_astkml=False,
+        return_form=False,
+        digital=False,
+    )
+    form = filter_forms(forms, request.user).order_by('-id')
     context = {'form': form, 'zz': request.user}
     return render(request, 'masha/agree_to_tsrah_kroj.html', context)
 @mahfth_screen_required

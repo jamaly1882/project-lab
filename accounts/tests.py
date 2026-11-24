@@ -129,6 +129,12 @@ class CityScopeTests(TestCase):
         self.assertRedirects(response, "/index/")
         self.assertContains(response, "لم يتم ربط حسابك")
 
+    def test_unauthorized_user_gets_permission_page_not_template_error(self):
+        self.client.force_login(self.no_scope_user)
+        response = self.client.get(reverse("masha:agree_tsrah_xx"))
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, "masha/no_permission.html")
+
 
 class SpaceRoleAccessTests(TestCase):
     def setUp(self):
@@ -170,6 +176,10 @@ class SpaceRoleAccessTests(TestCase):
         response = self.client.get(reverse("masha:show_astmrat"))
         self.assertRedirects(response, reverse("masha:show_manager_masah_nah"))
         response = self.client.get(reverse("masha:show_manager_masah_nah"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_head_can_open_its_approval_link(self):
+        response = self.client.get(reverse("masha:agree_tsrah_xx"))
         self.assertEqual(response.status_code, 200)
 
     def test_coordinator_can_open_both_report_workflows(self):
