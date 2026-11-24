@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from accounts.models import City, Profile
-from masha.models import AStmrah, Mahfth
+from masha.models import AStmrah, Form, Mahfth
 
 
 class LoginPageTests(TestCase):
@@ -253,6 +253,102 @@ class SpaceRoleAccessTests(TestCase):
         ):
             response = self.client.get(reverse(name))
             self.assertRedirects(response, reverse("masha:show_manager_masah_nah"), msg_prefix=name)
+
+
+class DirectorateDataIsolationTests(TestCase):
+    """List, search, edit, and create endpoints enforce the user's directorate."""
+
+    def setUp(self):
+        self.own_mahfth = Mahfth.objects.create(name="مديرية صنعاء")
+        self.other_mahfth = Mahfth.objects.create(name="مديرية عدن")
+        self.user = User.objects.create_user("scoped-user", "scope@example.com", "pass1234")
+        self.user.profile.role = "مهندس مساحة"
+        self.user.profile.mahfth = self.own_mahfth
+        self.user.profile.save()
+        self.own_form = self._form("طلب صنعاء", self.own_mahfth)
+        self.other_form = self._form("طلب عدن", self.other_mahfth)
+        self.client.force_login(self.user)
+
+    @staticmethod
+    def _form(name, mahfth):
+        return Form.objects.create(
+            name=name,
+            mahfth=mahfth,
+            typ_aqur="",
+            saft_sahb_talab="صاحب الطلب",
+            streat_name="",
+            content="",
+            resone_refth="",
+            name_wk=name,
+            service_bana="",
+        )
+
+    def test_engineer_ajax_search_only_returns_own_directorate(self):
+        response = self.client.get(reverse("masha:live_search_ajax_hadod_a"), {"q": "طلب"})
+        self.assertEqual(response.status_code, 200)
+        result_ids = {item["id"] for item in response.json()["results"]}
+        self.assertIn(self.own_form.id, result_ids)
+        self.assertNotIn(self.other_form.id, result_ids)
+
+    def test_engineer_cannot_open_another_directorates_edit_form(self):
+        response = self.client.get(
+            reverse("masha:search_edit_form_talb", args=[self.other_form.id])
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_engineer_cannot_post_another_directorates_edit(self):
+        response = self.client.post(
+            reverse("masha:edit_form_talb", args=[self.other_form.id]),
+            {"card_id": "1", "name": "modified", "phone": "1", "typ": ""},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.other_form.refresh_from_db()
+        self.assertEqual(self.other_form.name, "طلب عدن")
+
+    def test_engineer_cannot_edit_another_directorates_ajax_report(self):
+        response = self.client.post(
+            reverse("masha:edit_report_ajax", args=[self.other_form.id]),
+            {"name": "modified"},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.other_form.refresh_from_db()
+        self.assertEqual(self.other_form.name, "طلب عدن")
+
+    def test_coordinator_report_list_only_shows_own_directorate(self):
+        self.user.profile.role = "منسق قسم مساحة"
+        self.user.profile.save()
+        for obj in (self.own_form, self.other_form):
+            obj.show_tasrah_karoj = True
+            obj.hidden_ansh_hdm = "استشارة"
+            obj.save()
+        response = self.client.get(reverse("masha:show_tsrah_exit_eng_by_manger_astsherh"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "طلب صنعاء")
+        self.assertNotContains(response, "طلب عدن")
+
+    def test_coordinator_cannot_create_request_in_another_directorate(self):
+        self.user.profile.role = "منسق قسم مساحة"
+        self.user.profile.save()
+        response = self.client.post(
+            reverse("masha:form_add_masah_nah"),
+            {
+                "hid_mah": self.other_mahfth.id,
+                "name_aml": "طلب جديد",
+                "hid_type_form_rakash": "صاحب الطلب",
+                "hid_type_aqure": "",
+                "streat_name": "",
+                "content": "",
+                "resone_refth": "",
+                "f2": "مقدم الطلب",
+                "f4": "000",
+                "f6": "000",
+                "hid_ansh_hdm": "",
+                "service_bana": "",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        created_form = Form.objects.exclude(id__in=[self.own_form.id, self.other_form.id]).get()
+        self.assertEqual(created_form.mahfth_id, self.own_mahfth.id)
 
 
 class UserRoleFormTests(TestCase):

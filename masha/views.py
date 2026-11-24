@@ -25,6 +25,12 @@ from .scoping import (
     resolve_mahfth_for_user,
     visible_mahfth_list,
 )
+
+
+def get_scoped_form_or_404(request, form_id):
+    """Fetch a Form only when it is inside the current user's directorate."""
+    return get_object_or_404(filter_forms(Form.objects.all(), request.user), id=form_id)
+
 from django.contrib import messages
 from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth import authenticate,login
@@ -3794,7 +3800,7 @@ def add_motan_service_jamhore_to_fane(request,id):
 
     
     
-    f=Form.objects.get(id=id)
+    f = get_scoped_form_or_404(request, id)
     zz=User.objects.get(username=request.user)
     
 
@@ -3816,7 +3822,7 @@ def search_edit_form_talb_bana(request,id):
     saf = Safah.objects.all()
     mah = visible_mahfth_list(request.user)
     astmrah =AStmrah.objects.all()
-    ass = get_object_or_404(Form, id=id)
+    ass = get_scoped_form_or_404(request, id)
     val = Vald_doc.objects.all()
     val_m = Vald_tharb.objects.all()
     zz = request.user
@@ -3837,8 +3843,9 @@ def search_edit_form_talb_bana(request,id):
 
 
 
+@mahfth_screen_required
 def update_request(request, id):
-    ass = get_object_or_404(Form, id=id)
+    ass = get_scoped_form_or_404(request, id)
 
     if request.method == "POST":
         # العلاقات
@@ -3870,11 +3877,13 @@ def update_request(request, id):
 
 
 
+@mahfth_screen_required
 def show_astmrah(request,id):
-    aa=Form.objects.get(id=id)
+    aa = get_scoped_form_or_404(request, id)
     context={'aa':aa}
     return render(request,'masha/show_astmrah.html',context)
 @csrf_exempt
+@mahfth_screen_required
 def add_unit_nah_eng_masha(request):
     if request.method=="POST":
         
@@ -3885,7 +3894,7 @@ def add_unit_nah_eng_masha(request):
         ex = request.POST.get('ex')
         number=request.POST['number']
         if ex =='منجزة':
-            form,created=Form.objects.get_or_create(id=number)
+            form = get_scoped_form_or_404(request, number)
             form.sender=request.user
             form.is_readt=True
             form.show_tasrah_karoj=True
@@ -3894,7 +3903,7 @@ def add_unit_nah_eng_masha(request):
             form.save()
             return HttpResponse(status=200)
         elif ex=='رفض':
-            form,created=Form.objects.get_or_create(id=number)
+            form = get_scoped_form_or_404(request, number)
             form.sender=request.user
             form.rasone_rafth_maml=rasone_rafth_maml
             form.is_readt=True
@@ -3904,7 +3913,7 @@ def add_unit_nah_eng_masha(request):
             form.save()
             return HttpResponse(status=200)
         elif ex== 'استكمال  '  :
-            form,created=Form.objects.get_or_create(id=number)
+            form = get_scoped_form_or_404(request, number)
             form.sender=request.user
             form.is_readt=True
             form.talb_astkml=True
@@ -3967,6 +3976,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Form, Unit, Type_map, Type_kah, Type_seol, Type_natural, Type_block, report_masahi, Location
 
 @csrf_exempt
+@login_required
 def edit_report_ajax(request,id):
    
     if request.method == "POST":
@@ -3996,7 +4006,7 @@ def edit_report_ajax(request,id):
 
         # ───── جلب الكائنات المرتبطة بأمان ─────
         try:
-            form_obj = Form.objects.get(id=id)
+            form_obj = get_scoped_form_or_404(request, id)
             report=report_masahi.objects.filter(form=form_obj,tr_masah=True,rafth_adarah_generl=False)
 
         except Form.DoesNotExist:
@@ -4011,7 +4021,11 @@ def edit_report_ajax(request,id):
             natural = Type_natural.objects.get(id=hid_nat) if hid_nat else None
             block = Type_block.objects.get(id=hid_block) if hid_block else None
 
-            mah=Mahfth.objects.get(id=hid_mah)if hid_mah else None
+            mah, mahfth_error = resolve_mahfth_for_user(request.user, hid_mah) if hid_mah else (form_obj.mahfth, None)
+            if mahfth_error:
+                return JsonResponse({"error": mahfth_error}, status=403)
+            if unit and mah and unit.mahfth_id != mah.id:
+                return JsonResponse({"error": "Unit is outside the selected directorate"}, status=403)
         except Exception as e:
             return JsonResponse({"error": f"Related object error: {str(e)}"}, status=400)
 
@@ -4110,20 +4124,23 @@ from .models import Unit
 def get_units_by_mderah(request):
     if request.method == "POST":
         mderah_id = request.POST.get('mderah_id')
-        units = Unit.objects.filter(mahfth_id=mderah_id).values('id', 'name')
+        units = Unit.objects.filter(
+            mahfth__in=visible_mahfth_list(request.user),
+            mahfth_id=mderah_id,
+        ).values('id', 'name')
         return JsonResponse({'units': list(units)})
     return JsonResponse({'units': []}, status=400)
 @user_passes_test(lambda u: u.is_superuser or u.has_perm('masha.add_shift_form_hadod'))
 def search_edit_form(request, id):
-    form_obj = get_object_or_404(Form, id=id)
+    form_obj = get_scoped_form_or_404(request, id)
     res=Resone.objects.get(id=2)
     mas = report_masahi.objects.filter(name="مساحي",form=form_obj,tr_masah=True,rafth_adarah_generl=True,resone=res).first()
     if not mas:
             messages.error(request, "لايمكنك تعديل بيانات  التقرير")
             return redirect('masha:search_page')
-    form_a = get_object_or_404(Form, id=id)
+    form_a = get_scoped_form_or_404(request, id)
     mderah=visible_mahfth_list(request.user)
-    ss=Form.objects.get(id=id)
+    ss = form_a
     xx=Type_map.objects.all()
     kah=Type_kah.objects.all()
     seo=Type_seol.objects.all()
@@ -4145,8 +4162,8 @@ def search_edit_form_talb(request, id):
     saf = Safah.objects.all()
     val = Vald_doc.objects.all()
     val_m = Vald_tharb.objects.all()
-    ass = get_object_or_404(Form,id=id)
-    form_a=Form.objects.get(id=id)
+    ass = get_scoped_form_or_404(request, id)
+    form_a = ass
     zz = request.user
 
     mah = visible_mahfth_list(request.user)
@@ -4169,7 +4186,7 @@ def search_edit_form_talb(request, id):
 @mahfth_screen_required
 def edit_form_talb(request, id):
     if request.method == "POST":
-        ass = get_object_or_404(Form, id=id)
+        ass = get_scoped_form_or_404(request, id)
         errors = {}
 
         # التحقق من الحقول المطلوبة
@@ -4232,6 +4249,7 @@ def live_search_ajax_hadod_a(request):
         matches = Form.objects.filter(
             Q(name__icontains=query) | Q(id__icontains=query)
         )[:50]  # الحد الأعلى للنتائج
+        matches = filter_forms(matches, request.user)
 
         for obj in matches:
             results.append({
@@ -4342,8 +4360,8 @@ def edit_form(request, id):
 @mahfth_screen_required
 def astkmal_report_masah_nah(request,id):
    
-      form=Form.objects.get(id=id)
-      form_a=Form.objects.get(id=id)
+      form = get_scoped_form_or_404(request, id)
+      form_a = form
      
       unt = Unit.objects.filter(mahfth=form.mahfth)
 
@@ -4392,7 +4410,9 @@ def add_abade_report_masahi(request, id):
             seol = Type_seol.objects.get(name=hid_seol)
             natural = Type_natural.objects.get(id=hid_nat)
             block = Type_block.objects.get(id=hid_block)
-            form_obj = Form.objects.get(id=id)
+            form_obj = get_scoped_form_or_404(request, id)
+            if unit.mahfth_id != form_obj.mahfth_id:
+                return HttpResponse("Unit is outside the form's directorate", status=403)
         except Exception as e:
             return HttpResponse(f"Error: {str(e)}", status=400)
 
@@ -4418,7 +4438,7 @@ def add_abade_report_masahi(request, id):
         mass.mnsobe=mnsobe
         mass.save()
         aa=mass.form.id
-        form,created=Form.objects.get_or_create(id=aa)
+        form = form_obj
         xx=form.width_street_big_not
         asd=10.0
         if xx<asd:
@@ -4737,7 +4757,7 @@ def show_report_nah_by_manager(request):
     context={'print_report_x':print_report_x} 
     return render(request,'masha/print_report_mashi_report_nah.html',context)
 def show_report_nah_by_manager_rafth(request):
-    print_report_x= report_masahi.objects.filter( rafth_adarah_generl=True) 
+    print_report_x=filter_reports(report_masahi.objects.filter(rafth_adarah_generl=True), request.user)
     context={'print_report_x':print_report_x} 
     return render(request,'masha/show_report_nah_by_manager_rafth.html',context)
 @department_head_or_system_manager_required
@@ -4841,7 +4861,7 @@ def show_manager_masah_nah_json(request):
 
 @mahfth_screen_required
 def show_report_masah_by_eng_data(request,id):
-     mas=report_masahi.objects.get(id=id)
+     mas=get_object_or_404(filter_reports(report_masahi.objects.all(), request.user), id=id)
      resone=Resone.objects.all()
      
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
@@ -4849,7 +4869,7 @@ def show_report_masah_by_eng_data(request,id):
      return render(request,'masha/show_report_masah_by_eng_data.html',context)
 @mahfth_screen_required
 def show_report_adrah(request,id):
-     mas=report_masahi.objects.get(id=id)
+     mas=get_object_or_404(filter_reports(report_masahi.objects.all(), request.user), id=id)
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
      context={'mas':mas,'f':f}
      return render(request,'masha/show_report_adrah.html',context)
@@ -4902,6 +4922,7 @@ def send_sms_safe(phone, message):
 
 
 @csrf_exempt
+@mahfth_screen_required
 def agree_report_masahi_by_manager_mangmant(request, id):
     exit_action = request.POST.get('exit')
     no_salm_5 = request.POST.get('no_salm_5', '')
@@ -4909,11 +4930,7 @@ def agree_report_masahi_by_manager_mangmant(request, id):
     text_36 = request.POST.get('text36', '')
 
 
-    try:
-        report = report_masahi.objects.get(id=id)
-    except report_masahi.DoesNotExist:
-        return HttpResponse("Report not found", status=404)
-
+    report = get_object_or_404(filter_reports(report_masahi.objects.all(), request.user), id=id)
     form_instance = report.form
 
     if exit_action == 'منجزة':
@@ -4954,11 +4971,7 @@ def agree_report_masahi_by_manager_mangmant_adarah(request, id):
     no_salm_5 = request.POST.get('no_salm_5', '')
     text_36 = request.POST.get('text36', '')
 
-    try:
-        report = report_masahi.objects.get(id=id)
-    except report_masahi.DoesNotExist:
-        return HttpResponse("Report not found", status=404)
-
+    report = get_object_or_404(filter_reports(report_masahi.objects.all(), request.user), id=id)
     form_instance = report.form
 
     if exit_action == 'منجزة':
@@ -5576,7 +5589,7 @@ def serch_data_report_mashi_to_update(request):
 from django.forms import modelformset_factory
 @mahfth_screen_required
 def edit_form_shifts(request, id):
-    form_obj = get_object_or_404(Form, id=id)
+    form_obj = get_scoped_form_or_404(request, id)
 
     # السماح فقط إذا tr_masah=False
     mas = report_masahi.objects.filter(
@@ -5642,14 +5655,14 @@ def edit_form_shifts(request, id):
 from django.forms import modelformset_factory
 @mahfth_screen_required
 def edit_form_shifts_nah(request,id):
-        form_obj = get_object_or_404(Form, id=id)
+        form_obj = get_scoped_form_or_404(request, id)
         
         res=Resone.objects.get(id=1)
         mas = report_masahi.objects.filter(name="مساحي",form=form_obj,tr_masah=True,rafth_adarah_generl=True,resone=res).first()
-        flas=mas.id
         if not mas:
             messages.error(request, "لا يمكن التعديل على هذا السجل لأن التقرير تم اعتماده أو ترحيله سابقاً.")
             return redirect('masha:serch_data_report_mashi_to_update')
+        flas = mas.id
         ShiftFormSet = modelformset_factory(Shift_form_hadod,form=Shift_form_hadodForm,extra=0 )
         queryset = Shift_form_hadod.objects.filter(form=form_obj, report_masahi=mas)
         if request.method == 'POST':
@@ -5675,8 +5688,9 @@ def edit_form_shifts_nah(request,id):
         else:
                 formset = ShiftFormSet(queryset=queryset,form_kwargs={'form_instance': form_obj,'report_instance': mas})
                 return render(request, 'masha/adit_form_shift_update_nah.html', {'form_obj': form_obj,'formset': formset})
+@mahfth_screen_required
 def map_project(request,id):
-    ss= Form.objects.get(id=id)
+    ss = get_scoped_form_or_404(request, id)
     locations = Location.objects.filter(form=ss)
     m = folium.Map(location=[15.369445, 44.191006], zoom_start=9)
     latitudes = []
@@ -5839,20 +5853,22 @@ def show_conecctions(request):
     conection=Conection.objects.filter(red_bol=False)
     context={'conection':conection}
     return render(request, 'masha/massage.html', context)
+@mahfth_screen_required
 def add_location(request,id):
+    scoped_form = get_scoped_form_or_404(request, id)
     if request.method == "POST":
         form = Location_UtmForm(request.POST)
         if form.is_valid():
-                   f=Form.objects.get(id=id)
                    location_instance = form.save(commit=False)  # حفظ النموذج بدون حفظه في قاعدة البيانات
-                   location_instance.form = f 
-                   form.save()
+                   location_instance.form = scoped_form
+                   location_instance.save()
                    return redirect('masha:agree_tsrah_xx')  # قم بتعديل الرابط حسب الحاجة
     else:
         form = Location_UtmForm()
     return render(request, 'masha/add_location_Utm.html', {'form': form})
+@mahfth_screen_required
 def location_list(request,id):
-  r=Form.objects.get(id=id)
+  r = get_scoped_form_or_404(request, id)
   locations=Location_Utm.objects.filter(form=r)
   context={'locations':locations}
   return render(request, 'masha/location_list.html',context)
@@ -5860,7 +5876,7 @@ def location_list(request,id):
 def show_tsrah_exit_eng_by_manger (request):
     
 
-    form=Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
     context={'form':form}
     return render(request,'masha/show_tsrah_exit_eng_by_manger.html',context)
 @department_head_or_system_manager_required
@@ -5902,7 +5918,7 @@ def live_search_ajax_tsrah_exit_tsrah_karoj(request):
 def show_tsrah_exit_eng_by_manger_report (request):
     
 
-    form=Form.objects.filter(show_tasrah_karoj=True,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
     context={'form':form}
     return render(request,'masha/reprt_tsrah_exit_nah_by_bana.html',context)
 def live_search_tsrah_bana_report(request):
@@ -5944,10 +5960,10 @@ from .models import Form
 
 # الصفحة الرئيسية لعرض التصاريح
 def show_tsrah_exit_eng_by_manger_report_astshrah(request):
-    forms = Form.objects.filter(
+    forms = filter_forms(Form.objects.filter(
         show_tasrah_karoj=True,
         hidden_ansh_hdm="استشارة"
-    ).order_by('-id')
+    ), request.user).order_by('-id')
     context = {'forms': forms}
     return render(request, 'masha/report_tsrah_nah.html', context)
 
@@ -6308,8 +6324,10 @@ def form_add_masah_nah(request):
     data = request.POST
     files = request.FILES
 
-    # الحصول على العناصر المطلوبة من قاعدة البيانات إذا موجودة
-    mahfth = Mahfth.objects.get(id=data.get('hid_mah')) if data.get('hid_mah') else None
+    # لا يُسمح للمستخدم العادي بإنشاء طلب خارج مديريته أو دون ربطه بها.
+    mahfth, mahfth_error = resolve_mahfth_for_user(request.user, data.get('hid_mah'))
+    if mahfth is None:
+        return JsonResponse({'error': mahfth_error or 'مديرية غير صحيحة'}, status=403)
     typ_a = typ.objects.get(name=data.get('hid_type_document')) if data.get('hid_type_document') else None
     type_talb_astshr = Type_talb_astshr.objects.get(id=data.get('service_list_form_x')) if data.get('service_list_form_x') else None
 
@@ -6335,6 +6353,9 @@ def form_add_masah_nah(request):
         name_wk=data.get('f2'),
         phone_wk=data.get('f4'),
         card_id_wk=data.get('f6'),
+        content=data.get('content', ''),
+        resone_refth=data.get('resone_refth', ''),
+        service_bana=data.get('service_bana', ''),
         hidden_ansh_hdm=data.get('hid_ansh_hdm'),
         type_talb_astshr=type_talb_astshr,
         mahfth=mahfth
@@ -6722,31 +6743,31 @@ def interface_nah_astshr(request):
     context={'num_unread':num_unread,'num_unread_3':num_unread_3,'num_unread_2':num_unread_2}
     return render(request,'masha/interface_nah.html',context)
 def show_tsrah_exit_eng_by_manger_astsherh(request):
-    form=Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False,hidden_ansh_hdm="استشارة").order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=True,return_form=False,digital=False,tr_masah=False,exit_eng=False,hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
     context={"form":form}
     return render(request,'masha/show_tsrah_exit_eng_by_manger_ashchr.html',context)
 def print_talbt_nah(request):
-        form=Form.objects.filter(hidden_ansh_hdm="استشارة").order_by('-id')
+        form=filter_forms(Form.objects.filter(hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
         context={"form":form}
         return render(request,'masha/print_talbt_nah.html',context)
 def print_talbt_nah_bana(request):
 
-        form=Form.objects.filter(hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
+        form=filter_forms(Form.objects.filter(hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
         context={"form":form}
         return render(request,'masha/print_talbt_nah.html',context)
     
 
 def rafth_mamlah_form_by_manger(request):
-    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
     context={'form':form}
     return render(request,'masha/reasone_rafth.html',context)
 def rafth_mamlah_form_by_manger_astsherh(request):
-    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="استشارة").order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,tslem_rafth=False,hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
     context={'form':form}
     return render(request,'masha/reason_rafth_astshr.html',context)
 
 def rafth_mamlah_form_by_manger_report(request):
-    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=True,talb_astkml=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
     context={'form':form}
     return render(request,'masha/reasone_rafth_report.html',context)
 
@@ -6781,12 +6802,12 @@ def live_search_rafth_mamlah_bana(request):
     return JsonResponse({"results": results})
 
 def rafth_mamlah_form_by_manger_report_astsherh(request):
-    form = Form.objects.filter(
+    form = filter_forms(Form.objects.filter(
         show_tasrah_karoj=False,
         rafth_maml=True,
         talb_astkml=False,
         hidden_ansh_hdm="استشارة"
-    ).order_by('-id')
+    ), request.user).order_by('-id')
 
     context = {'form': form}
     return render(request, 'masha/reson_refth_astsharah_report.html', context)
@@ -6825,20 +6846,20 @@ def live_search_rafth_mamlah(request):
 
     return JsonResponse({"results": results})
 def talb_astkmal_mamlah(request):
-    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_astkmal=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_astkmal=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
     context={'form':form}
     return render(request,'masha/talb_astkmal_doc.html',context)
 def talb_astkmal_mamlah_astsherh(request):
-      form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_astkmal=False,hidden_ansh_hdm="استشارة").order_by('-id')
+      form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_astkmal=False,hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
       context={'form':form}
       return render(request,'masha/talb_astkmal_doc_asthshrah.html',context)
 
 def talb_astkmal_mamlah_report(request):
-    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص").order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).order_by('-id')
     context={'form':form}
     return render(request,'masha/talb_astkmal_report_bana_nah.html',context)
 def talb_astkmal_mamlah_report_astsherh(request):
-    form=Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,hidden_ansh_hdm="استشارة").order_by('-id')
+    form=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,hidden_ansh_hdm="استشارة"), request.user).order_by('-id')
     context={'form':form}
     return render(request,'masha/talb_astkmal_doc_report.html',context)
 from django.http import JsonResponse
@@ -7015,4 +7036,3 @@ def enter_data_report_masahi_screen(request):
     num_unread_2=filter_forms(Form.objects.filter(show_tasrah_karoj=False,rafth_maml=False,talb_astkml=True,tslem_rafth=False,hidden_ansh_hdm="اصدار تقرير مساحي بغرض الترخيص"), request.user).count()
     context={'num_unread':num_unread,'num_unread_3':num_unread_3,"num_unread_2":num_unread_2}
     return render(request,'masha/enter_data_report_masahi_screen.html',context)
-    
