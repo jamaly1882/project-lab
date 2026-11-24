@@ -2,7 +2,7 @@
 أدوات مساعدة لربط المستخدم بالمديرية (جدول Mahfth) وتقييد البيانات المعروضة.
 
 القاعدة:
-    * مدير النظام أو مدير إدارة المساحة يرى جميع المديريات.
+    * مدير النظام (superuser / staff) يرى جميع المديريات.
     * المستخدم العادي يرى مديريته فقط (المحددة في ملفه الشخصي Profile.mahfth).
 """
 
@@ -12,18 +12,6 @@ from .models import Form, report_masahi
 
 # أسماء الحقول في نموذج report_masahi التي تشير إلى المديرية
 REPORT_MAHFTH_FIELDS = ("mahfth", "form__mahfth")
-
-
-def is_scope_manager(user):
-    """هل للحساب صلاحية عامة على نطاق المديريات؟"""
-    if user is None or not user.is_authenticated:
-        return False
-    if user.is_superuser or user.is_staff:
-        return True
-    try:
-        return user.profile.role == "مدير إدارة المساحة"
-    except Exception:
-        return False
 
 
 def get_user_mahfth(user):
@@ -36,7 +24,7 @@ def get_user_mahfth(user):
     if user is None or not user.is_authenticated:
         return None
 
-    if is_scope_manager(user):
+    if user.is_superuser:
         return None
 
     profile = getattr(user, "profile", None)
@@ -53,41 +41,69 @@ def get_user_mahfth(user):
     return None
 
 
-def filter_queryset_by_mahfth(queryset, user, field="mahfth"):
-    """تقييد الـ queryset بمديرية المستخدم (إن كان مستخدماً عادياً).
+def is_global_mahfth_manager(user):
+    """True only for global admins, not staff accounts assigned to a district."""
+    if user is None or not user.is_authenticated:
+        return False
+    return user.is_superuser or (user.is_staff and get_user_mahfth(user) is None)
 
-    يدعم أيضاً الـ queryset الذي تم تقطيعه ([:50]) بإزالة الحدود ثم
-    إعادة تطبيقها بعد الفلترة.
+
+def filter_queryset_by_mahfth(queryset, user, field="mahfth"):
+    """تقييد الـ queryset بمديرية المستخدم المرتبط بها، بما في ذلك الموظف المعيّن.
+
+    يقبل field مساراً واحداً أو عدة مسارات بديلة، ويدعم الـ queryset
+    المقطّع بإعادة تطبيق الحد بعد فلترة المديرية.
     """
     if user is None or not user.is_authenticated:
         return queryset.none()
-    if is_scope_manager(user):
+    if user.is_superuser:
         return queryset
 
     mahfth = get_user_mahfth(user)
+    # A staff account explicitly tied to a district (for example, a department
+    # head) is district-scoped too. Unassigned staff remain global administrators.
+    if user.is_staff and mahfth is None:
+        return queryset
     if mahfth is None:
-        # مستخدم عادي بدون مديرية = لا يرى أي بيانات
         return queryset.none()
+
+    fields = (field,) if isinstance(field, str) else tuple(field)
+    scope_filter = Q(**{fields[0]: mahfth})
+    # Treat later paths as legacy fallbacks only when the primary relation is empty.
+    # This prevents an inconsistent secondary relation from overriding a direct
+    # assignment to a different district.
+    for path in fields[1:]:
+        scope_filter |= Q(**{f"{fields[0]}__isnull": True, path: mahfth})
 
     if queryset.query.is_sliced:
         low = queryset.query.low_mark
         high = queryset.query.high_mark
         base = queryset.all()
         base.query.clear_limits()
-        filtered = base.filter(**{field: mahfth})
-        return filtered[low:high]
+        return base.filter(scope_filter)[low:high]
 
-    return queryset.filter(**{field: mahfth})
+    return queryset.filter(scope_filter)
 
 
 def filter_forms(queryset, user):
-    """تقييد نماذج Form بمديرية المستخدم."""
-    return filter_queryset_by_mahfth(queryset, user, field="mahfth")
+    """تقييد النماذج بمديرية المستخدم، حتى للبيانات القديمة ذات الربط غير المباشر."""
+    return filter_queryset_by_mahfth(
+        queryset,
+        user,
+        field=("mahfth", "unit__mahfth"),
+    )
 
 
 def filter_reports(queryset, user):
-    """تقييد تقارير report_masahi بمديرية المستخدم."""
-    return filter_queryset_by_mahfth(queryset, user, field="form__mahfth")
+    """تقييد التقارير بمديرية النموذج أو الوحدة/القطاع المرتبط به."""
+    return filter_queryset_by_mahfth(
+        queryset,
+        user,
+        field=(
+            "form__mahfth",
+            "form__unit__mahfth",
+        ),
+    )
 
 
 def visible_mahfth_list(user):
@@ -96,10 +112,12 @@ def visible_mahfth_list(user):
 
     if user is None or not user.is_authenticated:
         return Mahfth.objects.none()
-    if is_scope_manager(user):
+    if user.is_superuser:
         return Mahfth.objects.all()
 
     mahfth = get_user_mahfth(user)
+    if user.is_staff and mahfth is None:
+        return Mahfth.objects.all()
     if mahfth is None:
         return Mahfth.objects.none()
     return Mahfth.objects.filter(id=mahfth.id)
@@ -108,8 +126,8 @@ def visible_mahfth_list(user):
 def resolve_mahfth_for_user(user, mahfth_id):
     """تحديد المديرية المسموح بها عند إنشاء/تعديل البيانات.
 
-    * مدير النظام أو مدير إدارة المساحة: يستطيع اختيار أي مديرية.
-    * المستخدم العادي: يُجبَر على مديريته دائماً مهما أرسل من بيانات.
+    * المشرف العام أو الموظف غير المرتبط بمديرية: يستطيع اختيار أي مديرية.
+    * المستخدم المرتبط بمديرية، بما فيه رئيس القسم: يُجبَر على مديريته.
 
     يرجع (mahfth, error_message).
     """
@@ -118,7 +136,12 @@ def resolve_mahfth_for_user(user, mahfth_id):
     if user is None or not user.is_authenticated:
         return None, "يجب تسجيل الدخول أولاً."
 
-    if is_scope_manager(user):
+    my_mahfth = get_user_mahfth(user)
+
+    # Superusers, and staff accounts without a district assignment, are global
+    # administrators. Staff accounts assigned to a district follow the same
+    # district boundary as other users.
+    if user.is_superuser or (user.is_staff and my_mahfth is None):
         if not mahfth_id:
             return None, "يجب تحديد المديرية."
         try:
@@ -126,7 +149,6 @@ def resolve_mahfth_for_user(user, mahfth_id):
         except (Mahfth.DoesNotExist, ValueError, TypeError):
             return None, "المديرية المحددة غير موجودة."
 
-    my_mahfth = get_user_mahfth(user)
     if my_mahfth is None:
         return None, "لم يتم ربط حسابك بأي مديرية، راجع مدير النظام."
 
