@@ -4805,7 +4805,7 @@ def show_report_masah_by_eng_data(request,id):
      f=Shift_form_hadod.objects.filter(report_masahi=mas)
      context={'mas':mas,'f':f,'resone':resone}
      return render(request,'masha/show_report_masah_by_eng_data.html',context)
-<<<<<<< HEAD
+
 @mahfth_screen_required
 def show_report_adrah(request,id):
      # space يحدّد الشاشة التي جاء منها المستخدم: إدارة عامة أم رئيس قسم.
@@ -4816,7 +4816,7 @@ def show_report_adrah(request,id):
      space = 'management' if request.GET.get('space') == 'management' else 'head'
      context={'mas':mas,'f':f,'space':space}
      return render(request,'masha/show_report_adrah.html',context)
-=======
+
 def show_report_adrah(request, id):
     reports = report_masahi.objects.select_related(
         "form",
@@ -4833,7 +4833,7 @@ def show_report_adrah(request, id):
     f = Shift_form_hadod.objects.filter(report_masahi=mas)
     context = {'mas': mas, 'f': f}
     return render(request, 'masha/show_report_adrah.html', context)
->>>>>>> origin/arena/ee3b7159-project-lab
+
 def masahi_convert(request,id):
         masahi_convert=request.POST.get('masahi_convert')
         if   masahi_convert=='منجزة':
