@@ -44,8 +44,8 @@ def get_user_mahfth(user):
 def filter_queryset_by_mahfth(queryset, user, field="mahfth"):
     """تقييد الـ queryset بمديرية المستخدم (إن كان مستخدماً عادياً).
 
-    يدعم أيضاً الـ queryset الذي تم تقطيعه ([:50]) بإزالة الحدود ثم
-    إعادة تطبيقها بعد الفلترة.
+    يقبل field مساراً واحداً أو عدة مسارات بديلة، ويدعم الـ queryset
+    المقطّع بإعادة تطبيق الحد بعد فلترة المديرية.
     """
     if user is None or not user.is_authenticated:
         return queryset.none()
@@ -54,28 +54,45 @@ def filter_queryset_by_mahfth(queryset, user, field="mahfth"):
 
     mahfth = get_user_mahfth(user)
     if mahfth is None:
-        # مستخدم عادي بدون مديرية = لا يرى أي بيانات
         return queryset.none()
+
+    fields = (field,) if isinstance(field, str) else tuple(field)
+    scope_filter = Q(**{fields[0]: mahfth})
+    # Treat later paths as legacy fallbacks only when the primary relation is empty.
+    # This prevents an inconsistent secondary relation from overriding a direct
+    # assignment to a different district.
+    for path in fields[1:]:
+        scope_filter |= Q(**{f"{fields[0]}__isnull": True, path: mahfth})
 
     if queryset.query.is_sliced:
         low = queryset.query.low_mark
         high = queryset.query.high_mark
         base = queryset.all()
         base.query.clear_limits()
-        filtered = base.filter(**{field: mahfth})
-        return filtered[low:high]
+        return base.filter(scope_filter)[low:high]
 
-    return queryset.filter(**{field: mahfth})
+    return queryset.filter(scope_filter)
 
 
 def filter_forms(queryset, user):
-    """تقييد نماذج Form بمديرية المستخدم."""
-    return filter_queryset_by_mahfth(queryset, user, field="mahfth")
+    """تقييد النماذج بمديرية المستخدم، حتى للبيانات القديمة ذات الربط غير المباشر."""
+    return filter_queryset_by_mahfth(
+        queryset,
+        user,
+        field=("mahfth", "unit__mahfth"),
+    )
 
 
 def filter_reports(queryset, user):
-    """تقييد تقارير report_masahi بمديرية المستخدم."""
-    return filter_queryset_by_mahfth(queryset, user, field="form__mahfth")
+    """تقييد التقارير بمديرية النموذج أو الوحدة/القطاع المرتبط به."""
+    return filter_queryset_by_mahfth(
+        queryset,
+        user,
+        field=(
+            "form__mahfth",
+            "form__unit__mahfth",
+        ),
+    )
 
 
 def visible_mahfth_list(user):
