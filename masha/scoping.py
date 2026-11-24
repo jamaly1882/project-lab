@@ -2,7 +2,7 @@
 أدوات مساعدة لربط المستخدم بالمديرية (جدول Mahfth) وتقييد البيانات المعروضة.
 
 القاعدة:
-    * مدير النظام (superuser / staff) يرى جميع المديريات.
+    * مدير النظام أو مدير إدارة المساحة يرى جميع المديريات.
     * المستخدم العادي يرى مديريته فقط (المحددة في ملفه الشخصي Profile.mahfth).
 """
 
@@ -12,6 +12,18 @@ from .models import Form, report_masahi
 
 # أسماء الحقول في نموذج report_masahi التي تشير إلى المديرية
 REPORT_MAHFTH_FIELDS = ("mahfth", "form__mahfth")
+
+
+def is_scope_manager(user):
+    """هل للحساب صلاحية عامة على نطاق المديريات؟"""
+    if user is None or not user.is_authenticated:
+        return False
+    if user.is_superuser or user.is_staff:
+        return True
+    try:
+        return user.profile.role == "مدير إدارة المساحة"
+    except Exception:
+        return False
 
 
 def get_user_mahfth(user):
@@ -24,7 +36,7 @@ def get_user_mahfth(user):
     if user is None or not user.is_authenticated:
         return None
 
-    if user.is_superuser or user.is_staff:
+    if is_scope_manager(user):
         return None
 
     profile = getattr(user, "profile", None)
@@ -49,7 +61,7 @@ def filter_queryset_by_mahfth(queryset, user, field="mahfth"):
     """
     if user is None or not user.is_authenticated:
         return queryset.none()
-    if user.is_superuser or user.is_staff:
+    if is_scope_manager(user):
         return queryset
 
     mahfth = get_user_mahfth(user)
@@ -84,7 +96,7 @@ def visible_mahfth_list(user):
 
     if user is None or not user.is_authenticated:
         return Mahfth.objects.none()
-    if user.is_superuser or user.is_staff:
+    if is_scope_manager(user):
         return Mahfth.objects.all()
 
     mahfth = get_user_mahfth(user)
@@ -96,7 +108,7 @@ def visible_mahfth_list(user):
 def resolve_mahfth_for_user(user, mahfth_id):
     """تحديد المديرية المسموح بها عند إنشاء/تعديل البيانات.
 
-    * المدير (staff/superuser): يستطيع اختيار أي مديرية.
+    * مدير النظام أو مدير إدارة المساحة: يستطيع اختيار أي مديرية.
     * المستخدم العادي: يُجبَر على مديريته دائماً مهما أرسل من بيانات.
 
     يرجع (mahfth, error_message).
@@ -106,7 +118,7 @@ def resolve_mahfth_for_user(user, mahfth_id):
     if user is None or not user.is_authenticated:
         return None, "يجب تسجيل الدخول أولاً."
 
-    if user.is_superuser or user.is_staff:
+    if is_scope_manager(user):
         if not mahfth_id:
             return None, "يجب تحديد المديرية."
         try:

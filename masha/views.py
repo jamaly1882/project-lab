@@ -94,6 +94,7 @@ def is_manager(user):
 SPACE_ROLE_HEAD = "رئيس قسم مساحة"
 SPACE_ROLE_ENGINEER = "مهندس مساحة"
 SPACE_ROLE_COORDINATOR = "منسق قسم مساحة"
+SPACE_ROLE_AREA_MANAGER = "مدير إدارة المساحة"
 SPACE_ROLES = {SPACE_ROLE_HEAD, SPACE_ROLE_ENGINEER, SPACE_ROLE_COORDINATOR}
 
 
@@ -113,6 +114,7 @@ def role_landing_url(user):
         SPACE_ROLE_HEAD: "masha:show_manager_masah_nah",
         SPACE_ROLE_ENGINEER: "masha:show_astmrat",
         SPACE_ROLE_COORDINATOR: "masha:interface",
+        SPACE_ROLE_AREA_MANAGER: "masha:screen_adrat_ver",
     }.get(get_space_role(user))
 
 
@@ -153,8 +155,12 @@ def coordinator_or_manager_required(view_func):
 
 
 def can_access_mahfth_screen(user):
-    """الوصول إلى شاشات الأقسام: المدير أو مستخدم مرتبط بمدينة/مديرية."""
-    return is_manager(user) or _user_in_scope(user)
+    """الوصول إلى شاشات الأقسام وفق المديريات أو الدور الإداري العام."""
+    return (
+        is_manager(user)
+        or get_space_role(user) == SPACE_ROLE_AREA_MANAGER
+        or _user_in_scope(user)
+    )
 
 
 def mahfth_screen_required(view_func):

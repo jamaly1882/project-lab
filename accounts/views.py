@@ -101,6 +101,8 @@ def login_view(request):
                 return redirect("masha:show_astmrat")
             if role == "منسق قسم مساحة":
                 return redirect("masha:interface")
+            if role == "مدير إدارة المساحة":
+                return redirect("masha:screen_adrat_ver")
             return redirect('masha:index')
 
         return render(

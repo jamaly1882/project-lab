@@ -94,6 +94,8 @@
 
     label { font-weight: bold; color: #33475b; margin-bottom: 6px; display: block; }
     .form-control { font-size: 16px; padding: 9px 12px; height: auto; }
+    .credential-fields { display: flex; flex-direction: row; }
+    .credential-fields input[dir="ltr"] { direction: ltr; text-align: right; }
     .help-text { color: #8494a8; font-size: 13px; }
     .errorlist {
       color: #c0392b;
@@ -171,6 +173,7 @@
       .templatemo-flex-row { flex-direction: column; }
       .templatemo-sidebar { width: 100%; min-height: auto; }
       .templatemo-content { padding: 15px; }
+      .credential-fields { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -241,7 +244,7 @@
             <div class="alert alert-danger">{{ form.non_field_errors }}</div>
           {% endif %}
 
-          <div class="row">
+          <div class="row credential-fields">
             <div class="col-md-4">
               <label for="{{ form.username.id_for_label }}">{{ form.username.label }} <span style="color:#c0392b">*</span></label>
               {{ form.username }}
@@ -261,10 +264,10 @@
 
           <div class="row" style="margin-top:15px;">
             <div class="col-md-4">
-              <label for="{{ form.mahfth.id_for_label }}">{{ form.mahfth.label }} <span style="color:#c0392b">*</span></label>
+              <label for="{{ form.mahfth.id_for_label }}">{{ form.mahfth.label }}</label>
               {{ form.mahfth }}
               {{ form.mahfth.errors }}
-              <div class="help-text">عند دخول المستخدم ستظهر له مديريته المحددة هنا فقط.</div>
+              <div class="help-text">مطلوبة للأدوار المساحية، واختيارية لمدير إدارة المساحة.</div>
             </div>
             <div class="col-md-4">
               <label for="{{ form.role.id_for_label }}">{{ form.role.label }} <span style="color:#c0392b">*</span></label>

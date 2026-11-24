@@ -50,10 +50,14 @@ def user_manage(request):
         if form.is_valid():
             user = form.save()
             profile = getattr(user, "profile", None)
-            mahfth_name = profile.mahfth.name if profile and profile.mahfth else "—"
+            assignment = (
+                f"وربطه بـ {profile.mahfth.name}"
+                if profile and profile.mahfth
+                else "دون ربطه بمديرية"
+            )
             messages.success(
                 request,
-                f"تم إنشاء المستخدم «{user.username}» بنجاح، وربطه بـ {mahfth_name}.",
+                f"تم إنشاء المستخدم «{user.username}» بنجاح، {assignment}.",
             )
             return redirect("accounts:user_manage")
         messages.error(request, "تعذّر إنشاء المستخدم، يرجى تصحيح الأخطاء أدناه.")

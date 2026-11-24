@@ -204,6 +204,19 @@ class SpaceRoleAccessTests(TestCase):
 
 
 class UserRoleFormTests(TestCase):
+    def test_add_user_form_orders_english_username_and_passwords_from_right(self):
+        admin = User.objects.create_superuser("admin", "admin@example.com", "pass1234")
+        self.client.force_login(admin)
+        response = self.client.get(reverse("accounts:user_manage"))
+        body = response.content.decode()
+        username_pos = body.index('id="id_username"')
+        password_pos = body.index('id="id_password1"')
+        confirm_pos = body.index('id="id_password2"')
+        self.assertLess(username_pos, password_pos)
+        self.assertLess(password_pos, confirm_pos)
+        self.assertIn('dir="ltr"', body[username_pos - 120 : username_pos + 40])
+        self.assertContains(response, "مدير إدارة المساحة")
+
     def test_admin_can_assign_a_role_instead_of_city(self):
         admin = User.objects.create_superuser("admin", "admin@example.com", "pass1234")
         mahfth = Mahfth.objects.create(name="مديرية صنعاء")
@@ -226,3 +239,43 @@ class UserRoleFormTests(TestCase):
         created = User.objects.get(username="new-surveyor")
         self.assertEqual(created.profile.role, "مهندس مساحة")
         self.assertIsNone(created.profile.city)
+
+    def test_area_manager_role_does_not_require_directorate_and_can_open_its_page(self):
+        admin = User.objects.create_superuser("admin", "admin@example.com", "pass1234")
+        self.client.force_login(admin)
+        response = self.client.post(
+            reverse("accounts:user_manage"),
+            {
+                "username": "area-manager",
+                "password1": "pass1234",
+                "password2": "pass1234",
+                "mahfth": "",
+                "role": "مدير إدارة المساحة",
+                "phone_number": "",
+            },
+        )
+        self.assertRedirects(response, reverse("accounts:user_manage"))
+        area_manager = User.objects.get(username="area-manager")
+        self.assertEqual(area_manager.profile.role, "مدير إدارة المساحة")
+        self.assertIsNone(area_manager.profile.mahfth)
+
+        self.client.force_login(area_manager)
+        response = self.client.get(reverse("masha:screen_adrat_ver"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_other_roles_still_require_directorate(self):
+        admin = User.objects.create_superuser("admin", "admin@example.com", "pass1234")
+        self.client.force_login(admin)
+        response = self.client.post(
+            reverse("accounts:user_manage"),
+            {
+                "username": "surveyor-no-scope",
+                "password1": "pass1234",
+                "password2": "pass1234",
+                "mahfth": "",
+                "role": "مهندس مساحة",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "اختيار المديرية مطلوب لهذا الدور")
+        self.assertFalse(User.objects.filter(username="surveyor-no-scope").exists())

@@ -10,6 +10,7 @@ class Profile(models.Model):
           ("رئيس قسم مساحة", "رئيس قسم مساحة"),
           ("مهندس مساحة", "مهندس مساحة"),
           ("منسق قسم مساحة", "منسق قسم مساحة"),
+          ("مدير إدارة المساحة", "مدير إدارة المساحة"),
      )
 
      user=models.OneToOneField(User,null=True, blank=True,on_delete=models.CASCADE)

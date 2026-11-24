@@ -26,6 +26,7 @@ class _BaseUserForm(RedirectAfterSaveMixin, forms.ModelForm):
     mahfth = forms.ModelChoiceField(
         label="المديرية",
         queryset=None,           # يُحدد في __init__
+        required=False,          # يُتحقق من إلزاميته بحسب الدور في clean().
         widget=forms.Select(attrs={"class": "form-control"}),
         empty_label="--- اختر المديرية ---",
     )
@@ -46,7 +47,7 @@ class _BaseUserForm(RedirectAfterSaveMixin, forms.ModelForm):
         model = User
         fields = ["username", "first_name", "last_name", "email"]
         labels = {
-            "username": "اسم المستخدم",
+            "username": "اسم المستخدم (بالإنجليزية)",
             "first_name": "الاسم الأول",
             "last_name": "الاسم الأخير",
             "email": "البريد الإلكتروني",
@@ -90,6 +91,13 @@ class _BaseUserForm(RedirectAfterSaveMixin, forms.ModelForm):
                 self.fields["role"].initial = profile.role
                 self.fields["phone_number"].initial = profile.phone_number
 
+    def clean(self):
+        cleaned = super().clean()
+        role = cleaned.get("role")
+        if role != "مدير إدارة المساحة" and not cleaned.get("mahfth"):
+            self.add_error("mahfth", "اختيار المديرية مطلوب لهذا الدور.")
+        return cleaned
+
     def clean_username(self):
         username = (self.cleaned_data.get("username") or "").strip()
         if not username:
@@ -109,9 +117,13 @@ class _BaseUserForm(RedirectAfterSaveMixin, forms.ModelForm):
         profile, _ = Profile.objects.get_or_create(
             user=user, defaults={"phone_number": ""}
         )
-        profile.mahfth = self.cleaned_data.get("mahfth")
-        profile.city = None  # المدينة لم تعد تُختار من نموذج إدارة المستخدمين.
         profile.role = self.cleaned_data.get("role") or ""
+        profile.mahfth = (
+            None
+            if profile.role == "مدير إدارة المساحة"
+            else self.cleaned_data.get("mahfth")
+        )
+        profile.city = None  # المدينة لم تعد تُختار من نموذج إدارة المستخدمين.
         phone = (self.cleaned_data.get("phone_number") or "").strip()
         if phone or not profile.phone_number:
             profile.phone_number = phone
