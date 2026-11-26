@@ -1,0 +1,113 @@
+{% comment %}
+  بطاقة البروفايل الجانبية — تعرض بيانات المستخدم المسجّل الحالي
+  (الاسم، الدور، المديرية، اسم المستخدم، رقم الهاتف).
+  المتغيرات تأتي من accounts.context_processors.user_mahfth.
+  الاستخدام:
+    {% include "accounts/includes/sidebar_profile.html" with default_role="مهندس مساحة" %}
+{% endcomment %}
+<div class="sidebar-profile" dir="rtl" aria-label="البروفايل الشخصي">
+  <div class="sidebar-profile-avatar" aria-hidden="true">{{ my_initials|default:"م" }}</div>
+
+  <div class="sidebar-profile-name" title="{{ my_full_name }}">{{ my_full_name|default:request.user.username }}</div>
+
+  <div class="sidebar-profile-role">
+    <i class="fa fa-briefcase" aria-hidden="true"></i>
+    <span>{{ user_role|default:default_role|default:"مستخدم" }}</span>
+  </div>
+
+  {% if my_mahfth_name %}
+  <div class="sidebar-profile-meta">
+    <i class="fa fa-building" aria-hidden="true"></i>
+    <span>المديرية: {{ my_mahfth_name }}</span>
+  </div>
+  {% endif %}
+
+  <div class="sidebar-profile-meta">
+    <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+    <span class="sidebar-profile-ltr">{{ request.user.username }}</span>
+  </div>
+
+  {% if my_phone_number %}
+  <div class="sidebar-profile-meta">
+    <i class="fa fa-phone" aria-hidden="true"></i>
+    <a class="sidebar-profile-ltr sidebar-profile-phone" href="tel:{{ my_phone_number }}">{{ my_phone_number }}</a>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .sidebar-profile {
+    background: linear-gradient(180deg, #0d1c47 0%, #122062 100%);
+    border: 1px solid rgba(255, 207, 9, .4);
+    border-radius: 12px;
+    margin: 12px;
+    padding: 18px 10px 14px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
+  }
+  .sidebar-profile-avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffcf09;
+    color: #122062;
+    font-size: 30px;
+    font-weight: bold;
+    line-height: 1;
+    border: 3px solid rgba(255, 255, 255, .35);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
+    font-family: "Noto Kufi Arabic Medium", Tahoma, sans-serif;
+    user-select: none;
+  }
+  .sidebar-profile-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .sidebar-profile-role {
+    margin-top: 4px;
+    font-size: 12.5px;
+    color: #ffcf09;
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+  }
+  .sidebar-profile-meta {
+    margin-top: 7px;
+    font-size: 12px;
+    color: #dfe6f5;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+  }
+  .sidebar-profile-meta i {
+    color: #ffcf09;
+    width: 16px;
+    text-align: center;
+  }
+  .sidebar-profile-ltr {
+    direction: ltr;
+    unicode-bidi: embed;
+  }
+  a.sidebar-profile-phone {
+    color: #dfe6f5;
+    text-decoration: none;
+  }
+  a.sidebar-profile-phone:hover {
+    color: #ffcf09;
+    text-decoration: underline;
+  }
+  @media (max-width: 767px) {
+    .sidebar-profile { margin: 10px 8px; padding: 14px 8px 10px; }
+    .sidebar-profile-avatar { width: 64px; height: 64px; font-size: 24px; }
+  }
+</style>
