@@ -13,6 +13,40 @@ from .models import Form, report_masahi
 # أسماء الحقول في نموذج report_masahi التي تشير إلى المديرية
 REPORT_MAHFTH_FIELDS = ("mahfth", "form__mahfth")
 
+# أدوار قسم/إدارة المساحة (نفس القيم الموجودة في accounts.Profile.ROLE_CHOICES)
+ROLE_DEPARTMENT_HEAD = "رئيس قسم مساحة"
+ROLE_SURVEY_ENGINEER = "مهندس مساحة"
+ROLE_DEPARTMENT_COORDINATOR = "منسق قسم مساحة"
+ROLE_AREA_MANAGER = "مدير إدارة المساحة"
+
+# الصفحة الرئيسية (البروفايل) الخاصة بكل دور بعد تسجيل الدخول
+ROLE_HOME_URL_NAMES = {
+    ROLE_DEPARTMENT_HEAD: "masha:show_manager_masah_nah",
+    ROLE_SURVEY_ENGINEER: "masha:show_astmrat",
+    ROLE_DEPARTMENT_COORDINATOR: "masha:interface",
+    ROLE_AREA_MANAGER: "masha:screen_adrat_ver",
+}
+
+
+def get_user_role(user):
+    """دور المستخدم من ملفه الشخصي (نص فارغ عند عدم وجود دور)."""
+    if user is None or not getattr(user, "is_authenticated", False):
+        return ""
+    profile = getattr(user, "profile", None)
+    if profile is None:
+        return ""
+    return (getattr(profile, "role", "") or "").strip()
+
+
+def role_home_url_name(user):
+    """اسم رابط الصفحة الرئيسية الخاصة بدور المستخدم أو None."""
+    return ROLE_HOME_URL_NAMES.get(get_user_role(user))
+
+
+def is_area_manager(user):
+    """مدير إدارة المساحة: مسؤول عن الإدارة كلها ولا يرتبط بمديرية واحدة."""
+    return get_user_role(user) == ROLE_AREA_MANAGER
+
 
 def get_user_mahfth(user):
     """إرجاع كائن المديرية الخاص بالمستخدم أو None.
@@ -45,6 +79,8 @@ def is_global_mahfth_manager(user):
     """True only for global admins, not staff accounts assigned to a district."""
     if user is None or not user.is_authenticated:
         return False
+    if is_area_manager(user):
+        return True
     return user.is_superuser or (user.is_staff and get_user_mahfth(user) is None)
 
 
@@ -56,7 +92,8 @@ def filter_queryset_by_mahfth(queryset, user, field="mahfth"):
     """
     if user is None or not user.is_authenticated:
         return queryset.none()
-    if user.is_superuser:
+    if user.is_superuser or is_area_manager(user):
+        # مدير إدارة المساحة يرى معاملات جميع المديريات.
         return queryset
 
     mahfth = get_user_mahfth(user)
@@ -112,7 +149,7 @@ def visible_mahfth_list(user):
 
     if user is None or not user.is_authenticated:
         return Mahfth.objects.none()
-    if user.is_superuser:
+    if user.is_superuser or is_area_manager(user):
         return Mahfth.objects.all()
 
     mahfth = get_user_mahfth(user)
@@ -141,7 +178,7 @@ def resolve_mahfth_for_user(user, mahfth_id):
     # Superusers, and staff accounts without a district assignment, are global
     # administrators. Staff accounts assigned to a district follow the same
     # district boundary as other users.
-    if user.is_superuser or (user.is_staff and my_mahfth is None):
+    if is_area_manager(user) or user.is_superuser or (user.is_staff and my_mahfth is None):
         if not mahfth_id:
             return None, "يجب تحديد المديرية."
         try:
