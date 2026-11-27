@@ -59,6 +59,39 @@ class LoginPageTests(TestCase):
         )
         self.assertRedirects(response, reverse("masha:interface"))
 
+    def test_space_role_login_ignores_generic_next(self):
+        """فتح الموقع من / يضيف ?next=/ للدخول؛ الدور يتقدّم على next."""
+        mahfth = Mahfth.objects.create(name="مديرية صنعاء")
+        cases = (
+            ("eng-next", "مهندس مساحة", "masha:show_astmrat"),
+            ("head-next", "رئيس قسم مساحة", "masha:show_manager_masah_nah"),
+            ("mgr-next", "مدير إدارة المساحة", "masha:screen_adrat_ver"),
+            ("coord-next", "منسق قسم مساحة", "masha:interface"),
+        )
+        for username, role, home in cases:
+            user = User.objects.create_user(username, "n@n.n", "pass1234")
+            user.profile.role = role
+            user.profile.mahfth = mahfth
+            user.profile.save()
+            for next_url in ("/", "/index/"):
+                self.client.logout()
+                response = self.client.post(
+                    "/accounts/login/?next=" + next_url,
+                    {"username": username, "password": "pass1234", "next": next_url},
+                )
+                self.assertRedirects(
+                    response, reverse(home), msg_prefix=f"{role} next={next_url}"
+                )
+
+    def test_authenticated_space_user_opening_login_goes_to_own_profile(self):
+        user = User.objects.create_user("eng-auth", "e@e.e", "pass1234")
+        user.profile.role = "مهندس مساحة"
+        user.profile.mahfth = Mahfth.objects.create(name="مديرية صنعاء")
+        user.profile.save()
+        self.client.force_login(user)
+        response = self.client.get("/accounts/login/")
+        self.assertRedirects(response, reverse("masha:show_astmrat"))
+
 
 class CityScopeTests(TestCase):
     """روابط وبيانات المستخدم تتبع مدينته/مديريته."""

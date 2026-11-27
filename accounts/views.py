@@ -53,12 +53,42 @@ def profile_edite(request):
 		return render(request,'accounts/edite_profile.html',{'userform':userform,'profileform':profileform})
 
 
+def role_home_redirect(user):
+    """إعادة توجيه صاحب الدور المساحي إلى بروفايله، أو None لغيرهم.
+
+    * مدير إدارة المساحة  → masha:screen_adrat_ver
+    * رئيس قسم مساحة      → masha:show_manager_masah_nah
+    * مهندس مساحة         → masha:show_astmrat
+    * منسق قسم مساحة      → masha:interface (أيقونتا طلبات التقارير)
+    """
+    try:
+        role = (user.profile.role or "").strip()
+    except Exception:
+        role = ""
+    homes = {
+        "مدير إدارة المساحة": "masha:screen_adrat_ver",
+        "رئيس قسم مساحة": "masha:show_manager_masah_nah",
+        "مهندس مساحة": "masha:show_astmrat",
+        "منسق قسم مساحة": "masha:interface",
+    }
+    if role in homes:
+        return redirect(homes[role])
+    return None
+
+
 def login_view(request):
     """صفحة تسجيل الدخول الرئيسية للنظام.
 
     ملاحظة مهمة: هذه الصفحة يجب أن تعرض حقلي «اسم المستخدم» و«كلمة المرور»
     دائماً، حتى لا تظهر بطاقة الدخول فارغة (بدون حقول إدخال).
     """
+    # مستخدم مسجّل دخوله أصلاً وفتح صفحة الدخول: صاحب الدور يذهب مباشرة
+    # إلى بروفايله بدل رؤية نموذج الدخول مرة أخرى.
+    if request.method == "GET" and request.user.is_authenticated:
+        home = role_home_redirect(request.user)
+        if home is not None:
+            return home
+
     next_url = request.GET.get('next') or request.POST.get('next') or ''
     if next_url and not url_has_allowed_host_and_scheme(
         next_url,
@@ -86,23 +116,17 @@ def login_view(request):
 
             login(request, user)
 
+            # أصحاب الأدوار المساحية يذهبون إلى بروفايلهم دائماً، حتى لو
+            # جاءت صفحة الدخول بمعامل ?next=/ (وهو ما يحدث عند فتح
+            # الرابط الرئيسي للموقع قبل تسجيل الدخول). بقية المستخدمين
+            # فقط يستمرون إلى وجهة next ثم إلى لوحة التحكم.
+            home = role_home_redirect(user)
+            if home is not None:
+                return home
+
             if next_url:
                 return redirect(next_url)
 
-            # أصحاب الأدوار المساحية يدخلون مباشرة إلى شاشة قسمهم؛ بقية
-            # المستخدمين يستمرون بالذهاب إلى لوحة التحكم.
-            try:
-                role = user.profile.role
-            except Exception:
-                role = ""
-            if role == "رئيس قسم مساحة":
-                return redirect("masha:show_manager_masah_nah")
-            if role == "مهندس مساحة":
-                return redirect("masha:show_astmrat")
-            if role == "منسق قسم مساحة":
-                return redirect("masha:interface")
-            if role == "مدير إدارة المساحة":
-                return redirect("masha:screen_adrat_ver")
             return redirect('masha:index')
 
         return render(
