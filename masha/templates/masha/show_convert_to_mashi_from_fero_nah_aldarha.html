@@ -122,7 +122,7 @@ window.addEventListener('popstate', function(event) {
               
                
                               
-                <th>طباعة</th>
+              
                   <th>عرض الموقع  الجغارفي</th>
                   <th>الوحدة</th>
 
@@ -134,8 +134,7 @@ window.addEventListener('popstate', function(event) {
         </thead>
     <tbody id="results_body">
             {% for item in show_manger_form %}
-                                     <td><a href="{% url  'masha:show_report_adrah' item.id %}?space=management"   class="btn outline-success">تصفح</a>
-</td>
+                                   
                 
 
                        <td>{{item.form.unit.name}}</td>

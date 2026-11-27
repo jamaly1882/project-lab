@@ -4909,7 +4909,7 @@ def show_manager_masah_nah_json(request):
         report_masahi.objects.filter(rafth_adarah_generl=True), user
     ).count()
     num_unread_agree_mahfth = filter_reports(
-        report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True), user
+        report_masahi.objects.filter(agree_adarah_generl_by_manager_mahfth=True,masahi_convert = False), user
     ).count()
     num_unread_rafth_mahfth = filter_reports(
         report_masahi.objects.filter(rafth_adarah_generl_by_manager_mahfth=True), user
@@ -5050,40 +5050,29 @@ def agree_report_masahi_by_manager_mangmant(request, id):
 @csrf_exempt
 @mahfth_screen_required
 def agree_report_masahi_by_manager_mangmant_adarah(request, id):
-    exit_action = (request.POST.get('exit') or '').strip()
+    exit_action = request.POST.get('exit')
     no_salm_5 = request.POST.get('no_salm_5', '')
     text_36 = request.POST.get('text36', '')
-    space = (request.POST.get('space') or '').strip()
 
-    if exit_action not in ('منجزة', 'رفض'):
-        return HttpResponse("Invalid action", status=400)
+    try:
+        report = report_masahi.objects.get(id=id)
+    except report_masahi.DoesNotExist:
+        return HttpResponse("Report not found", status=404)
 
-    report = scoped_report_or_404(request, id)
+    form_instance = report.form
 
     if exit_action == 'منجزة':
-        # علم الموافقة محفوظ في كل الحالات حتى تبقى المعاملة ظاهرة
-        # في قائمة «المقبولة» لدى مدير إدارة المساحة.
         report.agree_adarah_generl_by_manager_mahfth = True
-        report.rafth_adarah_generl_by_manager_mahfth = False
-        report.ajaml = text_36
-        if space == 'management' or is_global_mahfth_manager(request.user):
-            # اعتماد شاشة الإدارة العامة: تبقى المعاملة في قوائم المدير.
-            report.masahi_convert = False
-            report.return_masah_jm = False
-        elif get_user_role(request.user) == ROLE_DEPARTMENT_HEAD:
-            # اعتماد رئيس قسم المساحة: ترحيل المعاملة من قائمة انتظاره.
-            report.masahi_convert = True
-        else:
-            # اعتماد رئيس القسم (حساب مديرية بدون دور): تصبح جاهزة للطباعة.
-            report.return_masah_jm = True
-            report.masahi_convert = False
-
-    else:  # رفض
-        report.rafth_adarah_generl_by_manager_mahfth = True
-        report.agree_adarah_generl_by_manager_mahfth = False
-        report.return_masah_jm = False
         report.masahi_convert = False
-        report.resone_refth_adrah = no_salm_5
+        report.ajaml=text_36
+
+
+    elif exit_action.strip() == 'رفض':
+        report.rafth_adarah_generl_by_manager_mahfth = True
+        report.masahi_convert = False
+        report.resone_refth_adrah=no_salm_5
+    else:
+        return HttpResponse("Invalid action", status=400)
 
     report.save()
     return HttpResponse(status=200)
